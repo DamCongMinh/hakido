@@ -53,7 +53,7 @@
             
                 <div class="social-icons">
                     <a href="#"><i class="fa-brands fa-facebook"></i> Đăng nhập với Facebook</a>
-                    <a href="#"><i class="fa-brands fa-google"></i> Đăng nhập với Google</a>
+                    <a href="/login/google"><i class="fa-brands fa-google"></i> Đăng nhập với Google</a>
 
                 </div>
             </form>

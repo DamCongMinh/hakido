@@ -70,14 +70,15 @@
                             <!-- Dành cho người chưa đăng nhập -->
                             <li class="guest"><a href="{{ route('register') }}">Đăng ký</a></li>
                             <li class="guest"><a href="{{ route('login') }}">Đăng nhập</a></li>
-                          
+                        
                             <!-- Dành cho người đã đăng nhập -->
-                            <li class="auth">
-                                <button id="logout-btn" style="background:none;border:none;color:blue;cursor:pointer">
-                                Đăng xuất
-                                </button>
+                            <li class="auth" style="display: none;">
+                                <img class="avatar" src="{{ asset('img/shiper_avt.jpg') }}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%;">
+                                <h3>Tên người dùng</h3>
+                                <a href="#">Tài khoản của tôi</a>
+                                <button id="logout-btn">Đăng xuất</button>
                             </li>
-                        </ul>                  
+                        </ul>                                      
                         
                     </div>
                     

@@ -80,6 +80,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (res.ok) {
                     alert("Đăng nhập thành công!");
                     localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
                     window.location.href = "home";
                 } else {
                     const errorMsg = document.getElementById('login-message');

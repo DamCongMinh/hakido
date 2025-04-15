@@ -253,8 +253,9 @@ html {
 }
 
 .account-nav {
-    width: 200px;
-    height: 250px;
+    width: 250px;
+    height: auto;
+    min-height: 300px;
     visibility: hidden;
     top: 61px;
     border-radius: 15px;
@@ -287,17 +288,75 @@ html {
     padding: 0;
     line-height: 46px;
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
 }
 
 .account-nav ul li {
-    width: calc(100% - 48px);
+    width: calc(100% - 24px);
     font-size: 1.4rem;
     border-bottom: 2px solid #000;
     cursor: pointer;
 }
+
+.auth {
+    width: 100%;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 25px 20px;
+    width: 240px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: center;
+}
+
+.auth img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.auth h3 {
+    margin: 0 0 15px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+}
+
+.auth a {
+    text-decoration: none;
+    color: #007bff;
+    font-size: 16px;
+    margin-bottom: 10px;
+    transition: all 0.3s;
+}
+
+.auth a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+#logout-btn {
+    background: none;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s;
+}
+
+#logout-btn:hover {
+    color: #dc3545;
+}
+
 
 

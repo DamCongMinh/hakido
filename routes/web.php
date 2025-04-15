@@ -1,5 +1,7 @@
 <?php
-
+use App\Http\Controllers\Auth\GoogleController;
+use Laravel\Socialite\Facades\Socialite;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 
@@ -22,4 +24,11 @@ Route::get('detail', function () {
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::post('/login', [AuthController::class, 'login'])->name('postlogin');
-// Route::get('/login', [AuthController::class, 'login'])->name('login');
+
+
+// Bắt đầu đăng nhập Google
+
+Route::get('/login/google', [GoogleController::class, 'redirect']);
+Route::get('/login/google/callback', [GoogleController::class, 'callback']);
+
+
