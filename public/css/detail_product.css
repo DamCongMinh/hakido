@@ -1,0 +1,718 @@
+#body {
+    margin-top: 90px;
+    height: auto;
+    background: #f8f8f8;
+    display: flex;
+    align-items: center;  
+    justify-content: center;
+    flex-direction: column;
+    gap: 30px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ================== Container chính ================== */
+.container {
+    width: 80%;
+    height: auto;
+    display: flex;
+    flex-direction: row;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* ================== Cấu trúc sản phẩm ================== */
+.infor-product {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Hình ảnh lớn */
+.product-show img {
+    width: 480px;
+    height: 450px;
+    border-radius: 10px;
+    border: 2px solid #ddd;
+    transition: 0.3s;
+}
+
+/* Danh sách ảnh nhỏ */
+.image-slider {
+    display: flex;
+    align-items: center;
+    position: relative;
+    max-width: 500px; /* Điều chỉnh theo ý */
+    overflow: hidden;
+}
+
+/* Thêm padding để tránh nút bị che */
+.list-img {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    white-space: nowrap;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 10px 30px; /* Thêm padding trái/phải để tránh che nút */
+}
+
+.list-img::-webkit-scrollbar {
+    display: none;
+}
+
+.list-img img {
+    width: 100px;
+    height: auto;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.list-img img:hover {
+    transform: scale(1.1);
+}
+
+/* Nút điều hướng */
+.prev-btn, .next-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    border-radius: 5px;
+    transition: 0.3s;
+    z-index: 10; /* Đảm bảo nút nằm trên tất cả phần tử */
+}
+
+/* Khi hover vào list-img, nút không bị ẩn */
+.image-slider:hover .prev-btn,
+.image-slider:hover .next-btn {
+    opacity: 1;
+}
+
+/* Nút mờ khi không hover */
+.prev-btn, .next-btn {
+    opacity: 0.7;
+}
+
+.prev-btn:hover, .next-btn:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+    opacity: 1;
+}
+
+.prev-btn {
+    left: 5px; /* Điều chỉnh để không bị che */
+}
+
+.next-btn {
+    right: 5px;
+}
+
+/* ================== Chi tiết sản phẩm ================== */
+.detail-product {
+    width: calc(40% - 24px);
+    flex: 1;
+    padding: 20px;
+    gap: 32px;
+}
+
+.detail-product h2 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.restaurant,
+.descripttion,
+.cost,
+.size p ,
+.amount {
+    font-size: 1.4rem;
+}
+
+.name-restaurant, 
+.description {
+    color: #666;
+    font-size: 1.3rem;
+    line-height: 1.5;
+    margin-left: 15px;
+}
+
+.name-restaurant p, 
+.description p {
+    font-size: 1.2rem;
+}
+
+.title {
+    width: 100%;
+    display: flex;
+    margin-top: 26px;
+}
+
+.title-left {
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Giá sản phẩm */
+.cost {
+    background: #fff8f0;
+    border: 2px solid #ffd9b3;
+    padding: 16px 20px;
+    border-radius: 8px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    max-width: 90%;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    margin-top: 20px;
+}
+
+.cost .price {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+}
+
+.cost > p,
+.cost .price p {
+    margin: 6px 0;
+}
+
+.old-price {
+    text-decoration: line-through;
+    color: #999;
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+.old-price span {
+    color: #c0392b;
+}
+
+.save {
+    font-size: 1rem;
+    background-color: #ff6a00;
+    color: #fff;
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 5px;
+    font-weight: 500;
+    margin-top: 6px;
+}
+
+.save span {
+    font-weight: bold;
+    color: #ffe600;
+    margin-left: 4px;
+}
+
+.new-price {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #27ae60;
+    margin-top: 10px;
+}
+
+.new-price span {
+    color: #2ecc71;
+}
+
+
+
+.size {
+    display: flex;
+    text-align: center;
+}
+
+.size p {
+    line-height: 44px;
+}
+
+.size-list {
+    width: 80%;
+    display: flex;
+    flex-direction: row;
+    margin-left: 46px;
+    gap: 16px;
+}
+
+.size-list input {
+    padding: 10px 36px;
+    font-size: 1.2rem;
+}
+
+.size-list input:hover {
+    background-color: red;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+
+
+/* Số lượng sản phẩm */
+.amount {
+    margin-top: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.amount button {
+    width: 30px;
+    height: 30px;
+    font-size: 18px;
+    border: none;
+    background-color: #ff6600;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.amount button:hover {
+    background-color: #e65c00;
+}
+
+.amount input {
+    width: 50px;
+    text-align: center;
+    font-size: 16px;
+    padding: 5px;
+}
+
+/* Ẩn spinner trên Chrome, Safari, Edge, Opera */
+.amount input::-webkit-outer-spin-button,
+.amount input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.total-payouts {
+    width: 80%;
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f9f9f9; 
+    border: 1px solid #ddd; 
+    border-radius: 8px; 
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); 
+    font-family: 'Arial', sans-serif; 
+}
+
+.total-payouts p {
+    font-size: 18px;
+    color: #333; 
+    margin: 0;
+}
+
+.total-payouts span {
+    font-weight: bold; 
+    color: #e74c3c; 
+    font-size: 20px; 
+}
+
+.title-right {
+    width: 40%;
+    height: 400px;
+    overflow-y: auto;
+    background-color: #d2caca;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    flex-direction: column;
+    border: 1px solid #000;
+}
+
+/* ================== Thẻ mã giảm giá ================== */
+.coupon-card {
+    width: 300px;
+    height: 170px;
+    border: 2px dashed #ff5733;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    background: #fff7f1;
+    font-family: Arial, sans-serif;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+.coupon-header h2 {
+    color: #ff5733;
+    margin-bottom: 5px;
+}
+
+.coupon-body {
+    margin: 15px 0;
+}
+
+.coupon-code {
+    font-size: 20px;
+    font-weight: bold;
+    background: #ff5733;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 5px;
+}
+
+.copy-btn {
+    margin-top: 10px;
+    background: #ff5733;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+.copy-btn:hover {
+    background: #e04e2a;
+}
+
+.coupon-footer {
+    font-size: 12px;
+    color: gray;
+}
+
+/* WebKit Browsers (Chrome, Edge, Safari) */
+.title-right-::-webkit-scrollbar {
+    width: 16px; 
+}
+
+.title-right::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.title-right::-webkit-scrollbar-thumb {
+    background-color: #aaa;
+    border-radius: 2px;
+}
+
+
+/* Nút "Thêm vào giỏ hàng" */
+.btn-nav {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 45px;
+    margin-top: 46px;
+    padding-bottom: 32px;
+}
+
+.btn-nav button {
+    padding: 16px 26px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+}
+
+.btn-nav i {
+    font-size: 1.4rem;
+    padding-right: 12px;
+}
+
+/* Nút "Thêm vào giỏ hàng" */
+.btn-add {
+    background-color: #ff9800;
+    color: white;
+}
+
+.btn-add:hover {
+    background-color: #e68900;
+}
+
+/* Nút "Mua hàng" */
+.btn-buy {
+    background-color: #f44336;
+    color: white;
+}
+
+.btn-buy:hover {
+    background-color: #d32f2f;
+}
+
+/* info restaurant */
+
+.info-restaurant {
+    width: 80%;
+    display: flex;
+    border: 1px solid #eee;
+    padding: 20px;
+    border-radius: 10px;
+    align-items: center;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+    transition: box-shadow 0.3s ease;
+}
+
+.info-restaurant:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.restaurant-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 20px;
+}
+
+.restaurant-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.btn-fav {
+    background-color: #ee4d2d;
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    font-size: 14px;
+    margin-top: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.restaurant-middle {
+    flex: 1;
+}
+
+.restaurant-name {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.restaurant-status {
+    color: #888;
+    margin-bottom: 10px;
+}
+
+.restaurant-actions button {
+    padding: 8px 15px;
+    margin-right: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-chat {
+    background-color: #fff1f0;
+    color: #ee4d2d;
+    border: 1px solid #ee4d2d;
+}
+
+.btn-view {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    color: #555;
+}
+
+.restaurant-right {
+    flex: 2;
+}
+
+.restaurant-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    min-width: 130px;
+}
+
+.stat span {
+    color: #888;
+    font-size: 14px;
+}
+
+.stat strong {
+    color: #ee4d2d;
+    font-size: 16px;
+}
+
+/* review section */
+.review-section {
+    width: 80%;
+    font-family: Arial, sans-serif;
+    margin: 30px 0;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+  }
+  
+.header-comment {
+    width: 100%;
+    margin: 30px 0;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+}
+  
+.rating-summary {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+}
+  
+.average-rating .score {
+    font-size: 36px;
+    font-weight: bold;
+    color: #ee4d2d;
+}
+  
+.stars {
+    color: #ee4d2d;
+    font-size: 16px;
+}
+  
+.rating-filters button {
+    margin: 5px;
+    padding: 8px 12px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+}
+  
+.rating-filters button:hover {
+    background: #fef0ef;
+    border-color: #ee4d2d;
+    color: #ee4d2d;
+}
+  
+  
+.review-list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 30px;
+    background-color: #fafafa;
+    border-radius: 10px;
+}
+
+.review-container {
+    width: 100%;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    border: 1px solid #eee;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-info img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-info strong {
+    font-size: 16px;
+    color: #333;
+}
+
+.stars {
+    color: #ffc107;
+    font-size: 14px;
+}
+
+.time {
+    font-size: 13px;
+    color: #888;
+}
+
+.review-content {
+    margin-left: 64px;
+}
+
+.review-content p {
+    margin: 5px 0;
+    font-size: 15px;
+    color: #444;
+}
+
+.review-content strong {
+    color: #000;
+}
+
+.media {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-left: 64px;
+}
+
+.media img {
+    width: 100px;
+    height: 100px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid #ddd;
+}
+
+.likes {
+    font-size: 14px;
+    color: #555;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: 64px;
+}
+
+  
+/* phân trang  */
+  .pagination {
+    width: 100%;
+    display: flex;
+    text-align: center;
+    justify-content: center;
+}
+  
+.page-btn {
+    background: white;
+    border: 1px solid #ccc;
+    margin: 3px;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.2s ease;
+}
+  
+.page-btn:hover {
+    background: #ee4d2d;
+    color: white;
+    border-color: #ee4d2d;
+}
+  

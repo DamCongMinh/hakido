@@ -1,0 +1,266 @@
+#Shiper_body {
+    width: 100%;
+    height: auto;
+    background-color: #FF9800;
+    margin-top: 90px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.shiper_container {
+    width: calc(100% - 20px);
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 80px;
+}
+
+
+.container_content {
+    width: calc(60% - 42px);
+    height: 100vh;
+    margin-top: 30px;
+}
+
+.content_top {
+    width: 100%;
+    height: 30%;
+    display: flex;
+}
+
+.top_shiper--avt {
+    width: 40%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.avt-img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 2px solid black;
+}
+
+.avt-img img {
+    width: 100%;
+    border-radius: 50%;
+}
+
+.avt-name {
+    width: 60%;
+}
+
+.avt-name p {
+    width: 100%;
+    font-size: 1.4rem;
+}
+.top_shiper--turnover {
+    width: 60%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.turnover-received {
+    width: 100%;
+}
+
+.turnover-received p {
+    width: 100%;
+    font-size: 1.3rem;
+    margin-top: 0;
+}
+
+.turnover-received #received {
+    width: 50%;
+    padding: 6px 0;
+    background-color: aliceblue;
+    margin: auto;
+    border: 2px solid black;
+}
+
+.turnover-money {
+    width: 100%;
+}
+
+.turnover-money p {
+    width: 100%;
+    font-size: 1.3rem;
+    margin-top: 0;
+}
+
+.turnover-money #money {
+    width: 50%;
+    padding: 6px 0;
+    background-color: aliceblue;
+    margin: auto;
+    border: 2px solid black;
+}
+
+.content_bottom {
+    width: 100%;
+    height: 66%;
+    background-color: white;
+    align-items: center;
+    text-align: center;
+    border: 2px solid black;
+    overflow: scroll;
+    margin-top: 32px;
+}
+
+.content_bottom p {
+    width: 100%;
+    padding-top: 16px;
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.content_bottom table {
+    width: 100%;
+}
+
+.content_bottom table th,
+.content_bottom table td {
+    max-width: 170px;
+}
+
+.content_bottom table img {
+    width: 50px;
+    height: 50px;
+}
+
+.content_bottom table button {
+    padding:0 6px;
+    font-weight: 600;
+    border-radius: 7px;
+}
+
+.content_bottom table button:hover {
+    cursor: pointer;
+    background-color: black;
+    color: aliceblue;
+}
+
+.container_list {
+    width: calc(40% - 42px);
+    height: 100vh;
+    margin-top: 30px;
+    background-color: aliceblue;
+    align-items: center;
+    text-align: center;
+    border: 2px solid black;
+    overflow: scroll;
+}
+
+.container_list p {
+    width: 100%;
+    padding-top: 16px;
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.container_list table {
+    width: 100%;
+}
+
+.container_list table th,
+.container_list table td {
+    max-width: 170px;
+}
+
+.container_list table img {
+    width: 50px;
+    height: 50px;
+}
+
+.container_list table button {
+    padding:4px 6px;
+    font-weight: 600;
+    border-radius: 5px;
+}
+
+.container_list table button:hover {
+    cursor: pointer;
+    background-color: black;
+    color: aliceblue;
+}
+
+
+
+.restaurant_map {
+    width: calc(100% - 64px);
+    margin: 84px 0;
+    background-color: aliceblue;
+    border: 2px solid black;
+}
+
+.restaurant_map h1 {
+    width: 100%;
+    text-align: center;
+}
+
+.restaurant_map .infor_restaurant {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+
+}
+
+.restaurant_map .infor_restaurant .restaurant_img {
+    width: calc(40% - 42px);
+}
+
+.infor_restaurant .restaurant_img img {
+    width: calc(100% - 12px);
+    align-items: center;
+}
+
+.restaurant_map .infor_restaurant .restaurant_detail {
+    width: calc(60% - 42px);
+}
+
+.infor_restaurant .restaurant_detail p {
+    margin-left: 24px;
+}
+
+.infor_restaurant .restaurant_detail .access-icons {
+    margin-left: 24px;
+    color: #F39C12;
+    display: flex;
+}
+
+.infor_restaurant .restaurant_detail .access-icons p {
+    margin-top: 0;
+    color: black;
+}
+
+.restaurant_map .infor_restaurant .detail-btn {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.infor_restaurant .detail-btn button {
+    width: 110px;
+    height: 40px;
+    font-weight: 600;
+    background-color: #F39C12;
+    border-radius: 12px;
+}
+
+.infor_restaurant .detail-btn button:hover {
+    cursor: pointer;
+    color: aliceblue;
+    background-color: black;
+}
+
+
+
+
