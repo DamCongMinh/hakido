@@ -21,14 +21,14 @@
                 <div class="content-slide">
                     <div class="slide-show">
                         <div class="show-left">
-                            <h1>Phở ngon cung đình, tâm tình với bạn</h1>
-                            <p>Nước dùng đậm đà , sợi phở tươi ngon</p>
-                            <p>chất lượng tốt</p>
-                            <a href="{{ route('detail') }}" class="btn">Order now</a>
+                            <h1 id="title">Phở ngon cung đình, tâm tình với bạn</h1>
+                            <p id="description1">Nước dùng đậm đà , sợi phở tươi ngon</p>
+                            <p id="description2">chất lượng tốt</p>
+                            <a href="{{ route('detail') }}" class="btn" id="button">Order now</a>
                         </div>
                         <div class="show-right">
-                            <img src="{{ asset('img/slide.png') }}" alt="">
-                        </div>
+                            <img id="image" src="{{ asset('img/slide.png') }}" alt="">
+                        </div>                                             
                     </div>
                 </div>
 

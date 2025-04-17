@@ -69,7 +69,7 @@
                         <ul>
                             <!-- Dành cho người chưa đăng nhập -->
                             <li class="guest"><a href="{{ route('register') }}">Đăng ký</a></li>
-                            <li class="guest"><a href="{{ route('login') }}">Đăng nhập</a></li>
+                            <li class="guest"><a href="{{ route('login.page') }}">Đăng nhập</a></li>
                         
                             <!-- Dành cho người đã đăng nhập -->
                             <li class="auth" style="display: none;">
@@ -87,5 +87,12 @@
         </div>
     </section>
     <script src="{{ asset('js/header.js') }}"></script>
+    @if (session('token') && session('user'))
+    <script>
+    // Lưu dữ liệu vào localStorage sau khi đăng nhập bằng Google
+        localStorage.setItem('token', '{{ session('token') }}');
+        localStorage.setItem('user', JSON.stringify({!! session('user') !!}));
+    </script>
+    @endif
 </body>
 </html>

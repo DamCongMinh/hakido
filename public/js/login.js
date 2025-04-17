@@ -3,15 +3,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const registerBtn = document.getElementById('register');
     const loginBtn = document.getElementById('login');
 
-    // Chuyển tab
+    // Chuyển tab Đăng ký / Đăng nhập
     if (registerBtn && loginBtn && container) {
-        registerBtn.addEventListener('click', () => {
-            container.classList.add("active");
-        });
-
-        loginBtn.addEventListener('click', () => {
-            container.classList.remove("active");
-        });
+        registerBtn.addEventListener('click', () => container.classList.add("active"));
+        loginBtn.addEventListener('click', () => container.classList.remove("active"));
     }
 
     // Xử lý đăng ký
@@ -20,39 +15,52 @@ document.addEventListener("DOMContentLoaded", function () {
         signupForm.addEventListener('submit', async function (e) {
             e.preventDefault();
 
-            const name = document.getElementById('signup--name').value;
-            const email = document.getElementById('email').value;
+            const name = document.getElementById('signup--name').value.trim();
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('signup--password').value;
             const repassword = document.getElementById('signup--repassword').value;
+            const role = document.getElementById('signup-role').value;
+
+            if (!name || !email || !password || !repassword) {
+                alert("Vui lòng điền đầy đủ thông tin!");
+                return;
+            }
+
+            if (password !== repassword) {
+                alert("Mật khẩu nhập lại không khớp!");
+                return;
+            }
 
             try {
                 const res = await fetch('http://127.0.0.1:8000/api/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
                     },
                     body: JSON.stringify({
                         name,
                         email,
                         password,
-                        password_confirmation: repassword
+                        password_confirmation: repassword,
+                        role
                     })
                 });
 
                 const data = await res.json();
+
                 if (res.ok) {
-                    alert("Đăng ký thành công!");
                     localStorage.setItem('token', data.token);
-                    container.classList.remove("active"); // chuyển sang tab login
+                    localStorage.setItem('user', JSON.stringify(data.user));
+
+                    // Điều hướng theo role
+                    window.location.href = data.redirect_url || "/home";
                 } else {
-                    const errorMsg = document.getElementById('signup-message');
-                    if (errorMsg) {
-                        errorMsg.innerText = data.message || "Đăng ký thất bại";
-                    }
+                    alert(data.message || "Đăng ký thất bại");
                 }
             } catch (error) {
                 console.error("Lỗi đăng ký:", error);
+                alert("Đã xảy ra lỗi khi đăng ký. Vui lòng thử lại!");
             }
         });
     }
@@ -63,40 +71,42 @@ document.addEventListener("DOMContentLoaded", function () {
         loginForm.addEventListener('submit', async function (e) {
             e.preventDefault();
 
-            const email = document.getElementById('login-email').value;
+            const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value;
+
+            if (!email || !password) {
+                alert("Vui lòng nhập email và mật khẩu!");
+                return;
+            }
 
             try {
                 const res = await fetch('http://127.0.0.1:8000/api/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
                     },
                     body: JSON.stringify({ email, password })
                 });
 
                 const data = await res.json();
+
                 if (res.ok) {
-                    alert("Đăng nhập thành công!");
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
-                    window.location.href = "home";
+
+                    window.location.href = data.redirect_url || "/home";
                 } else {
                     const errorMsg = document.getElementById('login-message');
                     if (errorMsg) {
-                        let message = data.message || "Sai thông tin đăng nhập";
-                    
-                        // Dịch một số thông báo quen thuộc sang tiếng Việt
-                        if (message === "Invalid login details") {
-                            message = "Thông tin đăng nhập không hợp lệ";
-                        }
-                    
-                        errorMsg.innerText = message;
+                        errorMsg.innerText = data.message || "Sai thông tin đăng nhập";
+                    } else {
+                        alert(data.message || "Sai thông tin đăng nhập");
                     }
                 }
             } catch (error) {
                 console.error("Lỗi đăng nhập:", error);
+                alert("Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại!");
             }
         });
     }

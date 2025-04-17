@@ -15,24 +15,33 @@ class GoogleController extends Controller
     }
 
     public function callback()
-    {
-        $googleUser = Socialite::driver('google')->stateless()->user();
+{
+    $googleUser = Socialite::driver('google')->stateless()->user();
 
-        $user = Socialite::driver('google')->user();
-        // Tạo token (nếu dùng Laravel Passport hoặc Sanctum)
-        $token = $user->token;
+    // Tìm hoặc tạo người dùng trong DB
+    $user = User::updateOrCreate(
+        ['email' => $googleUser->getEmail()],
+        [
+            'name' => $googleUser->getName(),
+            // có thể thêm google_id, avatar,...
+        ]
+    );
 
-        return redirect('/')->with([
-            'token' => $token,
-            'user' => json_encode([
-                'name' => $user->getName(),
-                'email' => $user->getEmail(),
-                'avatar' => $user->getAvatar()
-            ])
-        ]);
+    // Đăng nhập user
+    Auth::login($user);
 
-        Auth::login($user);
+    // Tạo token Sanctum
+    $token = $user->createToken('google_token')->plainTextToken;
 
-        return redirect('/home');
-    }
+    // Chuyển hướng về trang home kèm dữ liệu trong session (nếu cần)
+    return redirect('/home')->with([
+        'token' => $token,
+        'user' => json_encode([
+            'name' => $user->name,
+            'email' => $user->email,
+            'avatar' => $googleUser->getAvatar()
+        ])
+    ]);
+}
+
 }

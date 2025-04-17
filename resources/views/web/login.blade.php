@@ -17,7 +17,13 @@
     <div class="container" id="container">
         <div class="form-container sign-up">
             <form method="POST" id="formsign-up">
-                <h1>Create Account</h1>
+                @csrf
+                <h1>Đăng ký tài khoản</h1>
+                <select name="role" id="signup-role">
+                    <option value="customer">Khách hàng</option>
+                    <option value="restaurant">Nhà hàng</option>
+                    <option value="shipper">Shipper</option>
+                </select>                  
                 <input type="text" placeholder="Name" id="signup--name" name="name">
                 <input type="text" placeholder="Username" id="signup--username" name="sign-up-username">
                 <input type="password" placeholder="Password" id="signup--password" name="sign-up-password">
@@ -49,10 +55,10 @@
                 </p>
                 @endif
             
-                <a href="#">Quên mật khẩu?</a>
+                <a href="{{route('password.request')}}">Quên mật khẩu?</a>
             
                 <div class="social-icons">
-                    <a href="#"><i class="fa-brands fa-facebook"></i> Đăng nhập với Facebook</a>
+                    <a href="/login/facebook"><i class="fa-brands fa-facebook"></i> Đăng nhập với Facebook</a>
                     <a href="/login/google"><i class="fa-brands fa-google"></i> Đăng nhập với Google</a>
 
                 </div>

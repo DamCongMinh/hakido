@@ -1,0 +1,73 @@
+/* Các phần giao diện thống kê */
+.stats {
+    display: flex;
+    gap: 20px;
+    margin-top: 40px;
+}
+
+.card {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    text-align: center;
+}
+
+.card h3 {
+    font-size: 1.2rem;
+    color: #333;
+}
+
+.card p {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #10b981;
+}
+
+/* Phần đơn hàng gần đây */
+.recent-orders {
+    margin-top: 40px;
+}
+
+.recent-orders table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.recent-orders th, .recent-orders td {
+    padding: 15px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.recent-orders th {
+    background-color: #f3f4f6;
+    font-weight: bold;
+}
+
+.recent-orders td {
+    background-color: #fff;
+}
+
+/* Trạng thái đơn hàng */
+.status {
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.status.pending {
+    background-color: #ff9900;
+    color: white;
+}
+
+.status.processing {
+    background-color: #ffa500;
+    color: white;
+}
+
+.status.completed {
+    background-color: #28a745;
+    color: white;
+}
