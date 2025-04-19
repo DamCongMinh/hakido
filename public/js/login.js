@@ -68,45 +68,13 @@ document.addEventListener("DOMContentLoaded", function () {
     // Xử lý đăng nhập
     const loginForm = document.getElementById('formsign-in');
     if (loginForm) {
-        loginForm.addEventListener('submit', async function (e) {
-            e.preventDefault();
-
+        loginForm.addEventListener('submit', function (e) {
             const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value;
 
             if (!email || !password) {
+                e.preventDefault(); // ❗ chỉ chặn khi thiếu dữ liệu
                 alert("Vui lòng nhập email và mật khẩu!");
-                return;
-            }
-
-            try {
-                const res = await fetch('http://127.0.0.1:8000/api/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                    },
-                    body: JSON.stringify({ email, password })
-                });
-
-                const data = await res.json();
-
-                if (res.ok) {
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('user', JSON.stringify(data.user));
-
-                    window.location.href = data.redirect_url || "/home";
-                } else {
-                    const errorMsg = document.getElementById('login-message');
-                    if (errorMsg) {
-                        errorMsg.innerText = data.message || "Sai thông tin đăng nhập";
-                    } else {
-                        alert(data.message || "Sai thông tin đăng nhập");
-                    }
-                }
-            } catch (error) {
-                console.error("Lỗi đăng nhập:", error);
-                alert("Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại!");
             }
         });
     }

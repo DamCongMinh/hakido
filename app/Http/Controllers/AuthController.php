@@ -11,80 +11,57 @@ class AuthController extends Controller
 {
     public function register(Request $request)
     {
-    $request->validate([
-        'name' => 'required|string|max:100',
-        'email' => 'required|email|unique:users',
-        'password' => 'required|min:6|confirmed',
-        'role' => 'required|in:customer,restaurant,shipper'
-    ]);
+        $validated = $request->validate([
+            'name' => 'required|string|max:100',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:6|confirmed',
+            'role' => 'required|in:customer,restaurant,shipper',
+        ]);
 
-    $user = User::create([
-        'name' => $request->name,
-        'email' => $request->email,
-        'password' => bcrypt($request->password),
-        'role' => $request->role,
-    ]);
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'role' => $validated['role'],
+        ]);
 
-    $token = $user->createToken('auth_token')->plainTextToken;
+        Auth::login($user);
 
-    return response()->json([
-        'user' => $user,
-        'token' => $token,
-        'message' => 'Đăng ký thành công!'
-    ], 201);
-    }
-
-
-    public function login(Request $request)
-    {
-    if (!Auth::attempt($request->only('email', 'password'))) {
-        return response()->json(['message' => 'Thông tin đăng nhập không chính xác'], 401);
-    }
-
-    $user = User::where('email', $request->email)->first();
-    $token = $user->createToken('auth_token')->plainTextToken;
-
-    // Kiểm tra vai trò của người dùng để chuyển hướng
-    switch ($user->role) {
-        case 'customer':
-            return response()->json([
-                'user' => $user,
-                'token' => $token,
-                'message' => 'Đăng nhập thành công!',
-                'redirect_url' => '/home',
-            ]);
-        case 'restaurant':
-            return response()->json([
-                'user' => $user,
-                'token' => $token,
-                'message' => 'Đăng nhập thành công!',
-                'redirect_url' => '/restaurant', 
-            ]);
-        case 'shipper':
-            return response()->json([
-                'user' => $user,
-                'token' => $token,
-                'message' => 'Đăng nhập thành công!',
-                'redirect_url' => '/shiper', 
-            ]);
-        case 'admin': 
-            return response()->json([
-                'user' => $user,
-                'token' => $token,
-                'message' => 'Đăng nhập thành công!',
-                'redirect_url' => '/home_admin',
-            ]);
-        default:
-            return response()->json([
-                'user' => $user,
-                'token' => $token,
-                'message' => 'Đăng nhập thành công!',
-                'redirect_url' => '/home',
-            ]);
+        switch ($user->role) {
+            case 'customer': return redirect()->route('home');
+            case 'restaurant': return redirect()->route('restaurant');
+            case 'shipper': return redirect()->route('shiper');
+            default: return redirect('/');
         }
     }
 
+    public function login(Request $request)
+    {
+        $credentials = $request->only('email', 'password');
 
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
+            $user = Auth::user();
+
+            switch ($user->role) {
+                case 'admin': return redirect()->route('admin.dashboard');
+                case 'customer': return redirect()->route('home');
+                case 'restaurant': return redirect()->route('restaurant');
+                case 'shipper': return redirect()->route('shiper');
+                default: return redirect('/login');
+            }
+        }
+
+        return back()->with('status', 'Email hoặc mật khẩu không đúng!');
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect()->route('login');
+    }
 
 
 }

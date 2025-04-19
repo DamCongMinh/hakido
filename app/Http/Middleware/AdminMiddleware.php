@@ -13,7 +13,8 @@ class AdminMiddleware
             return $next($request);
         }
 
-        return redirect('/'); // hoặc trang lỗi 403
+        abort(403, 'Bạn không có quyền truy cập');
     }
+
 
 }

@@ -1,90 +1,98 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Login to Hakido Food</title>
+    <title>Đăng nhập / Đăng ký Hakido Food</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="{{ asset('css/login.css') }}">   
+    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
 </head>
 <body>
-<!-------------- Header của trang Login ---------------->
     @include('layout.header')
 
-<!-------------- Body của trang Login ---------------->
-<section id="body">
-    <div class="container" id="container">
-        <div class="form-container sign-up">
-            <form method="POST" id="formsign-up">
-                @csrf
-                <h1>Đăng ký tài khoản</h1>
-                <select name="role" id="signup-role">
-                    <option value="customer">Khách hàng</option>
-                    <option value="restaurant">Nhà hàng</option>
-                    <option value="shipper">Shipper</option>
-                </select>                  
-                <input type="text" placeholder="Name" id="signup--name" name="name">
-                <input type="text" placeholder="Username" id="signup--username" name="sign-up-username">
-                <input type="password" placeholder="Password" id="signup--password" name="sign-up-password">
-                <input type="password" placeholder="Repassword" id="signup--repassword" name="repassword">
-                <input type="email" placeholder="Email" id="email" name="email">
-                <button>Đăng ký</button>
-                <p id="signup-message" style="color:red;"></p>
-            </form>
-            
+    <section id="body">
+        <div class="container {{ session('show_signup') ? 'active' : '' }}" id="container">
+            <!-- Đăng ký -->
+            <div class="form-container sign-up">
+                <form method="POST" action="{{ route('register') }}">
+                    @csrf
+                    <h1>Đăng ký tài khoản</h1>
 
-        </div>
+                    <select name="role" required>
+                        <option value="">--Chọn vai trò--</option>
+                        <option value="customer">Khách hàng</option>
+                        <option value="restaurant">Nhà hàng</option>
+                        <option value="shipper">Shipper</option>
+                    </select>
 
-        <div class="form-container sign-in">
-            <form id="formsign-in" action="{{ route('postlogin') }}" method="POST">
-                <h1>Đăng Nhập</h1>
-            
-                @csrf
-            
-                <input type="text" id="login-email" name="email" placeholder="Email" required>
-                <input type="password" id="login-password" name="password" placeholder="Mật khẩu" required>
-            
-                <button type="submit">Đăng nhập</button>
-                <p id="login-message" style="color:red;"></p>
-            
-                @if(session('status'))
-                <p id="message"
-                    style="color: red; font-weight: bold; margin-top: 10px; {{ session('status') ? '' : 'display: none !important;' }}">
-                    {{ session('status') }}
-                </p>
-                @endif
-            
-                <a href="{{route('password.request')}}">Quên mật khẩu?</a>
-            
-                <div class="social-icons">
-                    <a href="/login/facebook"><i class="fa-brands fa-facebook"></i> Đăng nhập với Facebook</a>
-                    <a href="/login/google"><i class="fa-brands fa-google"></i> Đăng nhập với Google</a>
+                    <input type="text" name="name" placeholder="Họ và tên" value="{{ old('name') }}">
+                    <input type="email" name="email" placeholder="Email" value="{{ old('email') }}">
+                    <input type="password" name="password" placeholder="Mật khẩu">
+                    <input type="password" name="password_confirmation" placeholder="Nhập lại mật khẩu">
 
-                </div>
-            </form>
-                     
-              
-        </div>
+                    @if ($errors->any())
+                        <div style="color: red;">
+                            @foreach ($errors->all() as $error)
+                                <p>{{ $error }}</p>
+                            @endforeach
+                        </div>
+                    @endif
 
-        <div class="toggle-container">
-            <div class="toggle">
-                <div class="toggle-panel toggle-left">
-                    <h1>Wellcome Back!</h1>
-                    <p>Enter your personal details to use all of site features</p>
-                    <button class="hidden" id="login">Sign In</button>
-                </div>
+                    <button type="submit">Đăng ký</button>
+                </form>
+            </div>
 
-                <div class="toggle-panel toggle-right">
-                    <h1>Hello my Friends!</h1>
-                    <p>Enter your personal details to use all of site features</p>
-                    <button class="hidden" id="register">Sign Up</button>
+            <!-- Đăng nhập -->
+            <div class="form-container sign-in">
+                <form method="POST" action="{{ route('postlogin') }}">
+                    @csrf
+                    <h1>Đăng nhập</h1>
+                    <input type="email" name="email" placeholder="Email" required>
+                    <input type="password" name="password" placeholder="Mật khẩu" required>
+
+                    @if(session('status'))
+                        <p style="color:red">{{ session('status') }}</p>
+                    @endif
+
+                    <button type="submit">Đăng nhập</button>
+                    <a href="{{ route('password.request') }}">Quên mật khẩu?</a>
+
+                    <div class="social-icons">
+                        <a href="/login/facebook"><i class="fab fa-facebook"></i> Đăng nhập với Facebook</a>
+                        <a href="/login/google"><i class="fab fa-google"></i> Đăng nhập với Google</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Toggle -->
+            <div class="toggle-container">
+                <div class="toggle">
+                    <div class="toggle-panel toggle-left">
+                        <h1>Chào mừng trở lại!</h1>
+                        <p>Đăng nhập để sử dụng tất cả tính năng</p>
+                        <button class="hidden" id="login">Đăng nhập</button>
+                    </div>
+                    <div class="toggle-panel toggle-right">
+                        <h1>Xin chào!</h1>
+                        <p>Tạo tài khoản mới để khám phá</p>
+                        <button class="hidden" id="register">Đăng ký</button>
+                    </div>
                 </div>
             </div>
         </div>
+    </section>
 
-    </div>
-</section>
-<script src="{{ url('js/login.js') }}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const container = document.getElementById('container');
+        const registerBtn = document.getElementById('register');
+        const loginBtn = document.getElementById('login');
+
+        if (registerBtn && loginBtn && container) {
+            registerBtn.addEventListener('click', () => container.classList.add("active"));
+            loginBtn.addEventListener('click', () => container.classList.remove("active"));
+        }
+    });
+</script>
 </body>
 </html>

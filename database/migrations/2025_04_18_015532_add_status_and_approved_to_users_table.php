@@ -12,17 +12,18 @@ return new class extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('facebook_id')->nullable()->unique();
+            $table->boolean('is_approved')->default(false); // Duyệt tài khoản
+            $table->boolean('is_active')->default(true);    // Khóa / mở
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            if (Schema::hasColumn('users', 'facebook_id')) {
-                $table->dropColumn('facebook_id');
-            }
+            //
         });
     }
-
 };

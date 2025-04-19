@@ -19,17 +19,28 @@ class RedirectIfAuthenticated
     {
         $guard = $guards[0] ?? null;
 
-        // Kiểm tra nếu người dùng đã đăng nhập, sẽ chuyển hướng về home hoặc trang nào đó
         if (Auth::guard($guard)->check()) {
-            // Nếu người dùng đã đăng nhập và truy cập vào trang quên mật khẩu hoặc reset mật khẩu, không chuyển hướng
+            $user = Auth::user();
+
+            // Trường hợp ngoại lệ: không redirect khi đang ở forgot-password hoặc reset-password
             if ($request->is('forgot-password') || $request->is('reset-password/*')) {
                 return $next($request);
             }
 
-            // Nếu không phải là trang quên mật khẩu hoặc reset mật khẩu, chuyển hướng về home
-            return redirect('/');
+            // Chuyển hướng theo role
+            switch ($user->role) {
+                case 'admin':
+                    return redirect()->route('admin.dashboard');
+                case 'shiper':
+                    return redirect()->route('shiper');
+                case 'restaurant':
+                    return redirect()->route('restaurant');
+                default:
+                    return redirect()->route('home');
+            }
         }
 
         return $next($request);
     }
+
 }

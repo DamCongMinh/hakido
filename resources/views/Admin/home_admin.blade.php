@@ -12,11 +12,12 @@
     
     <nav>
         <ul>
-            <li><a href="{{ route('admin.accounts') }}">Quản lý người dùng</a></li>
-            <li><a href="#">Quản lý đơn hàng</a></li>
+            <li><a href="{{ route('admin.accounts.index') }}">Quản lý người dùng</a></li>
+            <li><a href="{{ route('admin.orders.index') }}">Quản lý đơn hàng</a></li>
             <li><a href="#">Quản lý nhà hàng</a></li>
-            <li><a href="#">Quản lý shipper</a></li>
+            <li><a href="{{ route('control_product') }}">Quản lý sản phẩm</a></li>
         </ul>
     </nav>
+    
 </body>
 </html>

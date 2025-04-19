@@ -67,17 +67,27 @@
                     <div class="account-icon"><i class="fa-solid fa-user"></i></div>
                     <div class="account-nav">
                         <ul>
-                            <!-- Dành cho người chưa đăng nhập -->
-                            <li class="guest"><a href="{{ route('register') }}">Đăng ký</a></li>
-                            <li class="guest"><a href="{{ route('login.page') }}">Đăng nhập</a></li>
-                        
-                            <!-- Dành cho người đã đăng nhập -->
-                            <li class="auth" style="display: none;">
-                                <img class="avatar" src="{{ asset('img/shiper_avt.jpg') }}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%;">
-                                <h3>Tên người dùng</h3>
-                                <a href="#">Tài khoản của tôi</a>
-                                <button id="logout-btn">Đăng xuất</button>
-                            </li>
+                            
+                            <!-- Nếu chưa đăng nhập -->
+                            @guest
+                                <li><a href="{{ route('register') }}">Đăng ký</a></li>
+                                <li><a href="{{ route('login') }}">Đăng nhập</a></li>
+                            @endguest
+
+                            <!-- Nếu đã đăng nhập -->
+                            @auth
+                                <li>
+                                    <img class="avatar" src="{{ asset('img/shiper_avt.jpg') }}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%;">
+                                    <h3>{{ Auth::user()->name }}</h3>
+                                    <a href="#">Tài khoản của tôi</a>
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button type="submit">Đăng xuất</button>
+                                    </form>
+                                </li>
+                            @endauth
+
+
                         </ul>                                      
                         
                     </div>
