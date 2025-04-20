@@ -22,11 +22,13 @@
 
             <div class="header_center">
                 <div class="header_center--directory">
-                    <div class="directory--title"><a href="{{ route('list-product') }}"><p>đồ ăn</p></a></div>
-                    <div class="directory--title"><a href="{{ route('list-product') }}"><p>đồ uống</p></a></div>
-                    <div class="directory--title"><a href="{{ route('list-product') }}"><p>nhà hàng</p></a></div>
-                    <div class="directory--title"><a href="{{ route('list-product') }}"><p>bán chạy</p></a></div>
-                    <div class="directory--title"><a href="{{ route('list-product') }}"><p>tất cả</p></a></div>
+                    @foreach ($categories as $category)
+                        <div class="directory--title">
+                            <a href="{{ route('category.show', $category->id) }}">
+                                <p>{{ $category->name }}</p>
+                            </a>
+                        </div>
+                    @endforeach
                 </div>
 
                 <div class="header_center--classify">

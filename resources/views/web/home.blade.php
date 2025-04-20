@@ -181,6 +181,10 @@
         </div>
         <!-------------- js của trang home ---------------->
         <script src="{{ url('js/home.js') }}"></script>
+        
+        <script>
+            const slidesData = @json($slidesData);
+        </script>
     </section>
 
 

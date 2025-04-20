@@ -10,11 +10,12 @@ class FoodController extends Controller
 {
     public function index()
     {
-        $foodsApproved = Food::where('status', 'approved')->get();
-        $foodsPending = Food::where('status', 'pending')->get();
+        $foodsApproved = Food::with('restaurant')->where('status', 'approved')->get();
+        $foodsPending = Food::with('restaurant')->where('status', 'pending')->get();
 
         return view('admin.foods.index', compact('foodsApproved', 'foodsPending'));
     }
+
 
     public function edit($id)
     {

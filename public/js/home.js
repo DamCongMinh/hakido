@@ -1,30 +1,3 @@
-const slidesData = [
-    {
-        title: "Phở ngon cung đình, tâm tình với bạn",
-        description1: "Nước dùng đậm đà, sợi phở tươi ngon",
-        description2: "Chất lượng tốt",
-        image: "/img/slide.png"
-    },
-    {
-        title: "Bánh mì giòn tan, hương vị đậm đà",
-        description1: "Nhân đầy đủ, sốt đặc biệt",
-        description2: "Thơm ngon khó cưỡng",
-        image: "/img/slide6.png"
-    },
-    {
-        title: "Gỏi cuốn tươi ngon, ăn là mê",
-        description1: "Nguyên liệu tươi sạch, nước chấm đậm vị",
-        description2: "Sức khỏe và ngon miệng",
-        image: "/img/slide3.png"
-    },
-    {
-        title: "Gỏi cuốn tươi ngon, ăn là mê",
-        description1: "Nguyên liệu tươi sạch, nước chấm đậm vị",
-        description2: "Sức khỏe và ngon miệng",
-        image: "/img/slide6.png"
-    }
-];
-
 let currentIndex = 0;
 let lastDirection = "next"; // Mặc định hướng đầu tiên là "next" (phải)
 

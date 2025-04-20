@@ -1,4 +1,7 @@
 <?php
+use App\Http\Controllers\Admin\SlideController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ContentManagementController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\FoodController;
@@ -12,9 +15,12 @@ use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use Laravel\Socialite\Facades\Socialite;
+use App\Http\Controllers\HomeController;
 
 // Giao diện chính (FE)
-Route::get('/', fn () => view('web.home'))->name('home');
+
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
 Route::get('/list-product', fn () => view('web.list-product'))->name('list-product');
 Route::get('/detail', fn () => view('web.detail_product'))->name('detail');
 
@@ -111,3 +117,16 @@ Route::middleware(['auth', 'admin'])->prefix('admin/orders')->name('admin.orders
     Route::post('/{order}/cancel', [AdminOrderController::class, 'cancel'])->name('cancel');
 });
 
+// Quản trị nội dung
+Route::get('/admin/content', [ContentManagementController::class, 'index'])
+    ->middleware(['auth', 'admin'])
+    ->name('admin.content');
+Route::get('/category/{id}', [CategoryController::class, 'show'])->name('category.show');
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::resource('slides', SlideController::class);
+    Route::resource('categories', CategoryController::class);
+});
+    
+
+    
+    
