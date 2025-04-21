@@ -7,6 +7,13 @@
     <link rel="stylesheet" href="{{ asset('css/Admin/products/product_control_management.css') }}">
 </head>
 <body>
+    @include('layout.header') {{-- Sử dụng header dùng chung --}}
+    @if(session('success'))
+    <div style="color: green; font-weight: bold;">
+        {{ session('success') }}
+    </div>
+    @endif
+
 
     <!-- Đồ Ăn - Đã Duyệt -->
     <h2>Đồ Ăn - Đã Duyệt</h2>

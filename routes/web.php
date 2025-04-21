@@ -1,4 +1,6 @@
 <?php
+use App\Models\User;
+use App\Http\Controllers\Admin\AdminStatisticController;
 use App\Http\Controllers\Admin\SlideController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ContentManagementController;
@@ -11,11 +13,13 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\FacebookController;
 use App\Http\Controllers\Auth\GoogleController;
-use App\Models\User;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\AuthController;
-use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\HomeController;
+use Illuminate\Support\Facades\Route;
+use Laravel\Socialite\Facades\Socialite;
+
+use App\Http\Controllers\Restaurant\RestaurantProductController;
 
 // Giao diện chính (FE)
 
@@ -45,6 +49,10 @@ Route::get('/login', function () {
 
 // hiển thị giao diện quản lý sản phẩm
 Route::get('/control_product', [ProductController::class, 'index'])->name('control_product')->middleware(['auth', 'admin']);
+
+// load image
+Route::post('/update/{id}', [FoodController::class, 'update'])->name('foods.update');
+
 
 
 // Xử lý đăng nhập
@@ -127,6 +135,20 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('categories', CategoryController::class);
 });
     
+//Thống kê doanh thu và số lượng đơn hàng
+Route::get('/admin/statistics', [AdminStatisticController::class, 'index'])->name('admin.statistics');
+Route::get('/api/statistics', [StatisticsController::class, 'apiStatistics']);
 
-    
+
+ // Restaurant quản lý sản phẩm
+
+ Route::middleware(['auth', 'role:restaurant'])->prefix('restaurant')->name('restaurant.')->group(function () {
+    Route::get('/products', [RestaurantProductController::class, 'home'])->name('products.home');
+    Route::get('/products/create', [RestaurantProductController::class, 'create'])->name('products.create');
+    Route::post('/products', [RestaurantProductController::class, 'store'])->name('products.store');
+    Route::get('/products/{id}/edit', [RestaurantProductController::class, 'edit'])->name('products.edit');
+    Route::put('/products/{id}', [RestaurantProductController::class, 'update'])->name('products.update');
+    Route::delete('/products/{id}', [RestaurantProductController::class, 'destroy'])->name('products.destroy');
+});
+   
     

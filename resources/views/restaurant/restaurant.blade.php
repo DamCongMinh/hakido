@@ -64,6 +64,7 @@
                     </tr>
                 </tbody>
             </table>
+            <div><a href="{{ route('restaurant.products.home') }}">Quản lý sản phẩm</a></div>
         </section>
     </main>
     

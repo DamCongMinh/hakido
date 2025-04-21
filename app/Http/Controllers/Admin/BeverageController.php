@@ -5,41 +5,67 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Beverage;
+use App\Models\Food;
 
 class BeverageController extends Controller
 {
     public function index()
     {
+        $foodsApproved = Food::with('restaurant')->where('status', 'approved')->get();
+        $foodsPending = Food::with('restaurant')->where('status', 'pending')->get();
+
         $beveragesApproved = Beverage::with('restaurant')->where('status', 'approved')->get();
         $beveragesPending = Beverage::with('restaurant')->where('status', 'pending')->get();
 
-        return view('admin.beverages.index', compact('beveragesApproved', 'beveragesPending'));
+        return view('products.product_control_management', compact(
+            'foodsApproved',
+            'foodsPending',
+            'beveragesApproved',
+            'beveragesPending'
+        ));
     }
 
 
     public function edit($id)
     {
         $beverage = Beverage::findOrFail($id);
-        return view('admin.beverages.edit', compact('beverage'));
+
+        return view('products.edit',[
+            'item' => $beverage,
+            'type' => 'beverage',
+            'updateRoute' => route('beverages.update', $beverage->id),
+            'indexRoute' => route('beverages.index'),
+        ]);
     }
+
 
     public function update(Request $request, $id)
     {
         $beverage = Beverage::findOrFail($id);
 
-        $beverage->update($request->only('name', 'description', 'price'));
+        $data = $request->only('name', 'description', 'price', 'status');
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('beverages', 'public');
+        }
+
+        $beverage->update($data);
 
         return redirect()->route('beverages.index')->with('success', 'Cập nhật đồ uống thành công.');
     }
 
+
     public function approve($id)
     {
         $beverage = Beverage::findOrFail($id);
-        $beverage->status = 'approved';
+        $beverage->is_approved = true;
+        $beverage->status = 'approved'; // <--- thêm dòng này
         $beverage->save();
 
-        return redirect()->route('beverages.index')->with('success', 'Duyệt đồ uống thành công.');
+        return redirect()->back()->with('success', 'Đồ uống đã được duyệt!');
     }
+
+
 
     public function destroy($id)
     {

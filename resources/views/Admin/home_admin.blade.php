@@ -16,7 +16,7 @@
             <li><a href="{{ route('admin.orders.index') }}">Quản lý đơn hàng</a></li>
             <li><a href="{{ route('control_product') }}">Quản lý sản phẩm</a></li>
             <li><a href="{{ route('admin.content') }}">Quản lý nội dung</a></li>
-            <li><a href="#">Thống kê doanh thu và số lượng đơn hàng</a></li>
+            <li><a href="{{ route('admin.statistics') }}">Thống kê doanh thu và số lượng đơn hàng</a></li>
         </ul>
     </nav>
     

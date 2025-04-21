@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Food;
@@ -23,5 +24,25 @@ class ProductController extends Controller
             'beveragesApproved', 'beveragesPending'
         ));
     }
+
+    public function uploadImage(Request $request, $id)
+    {
+        $product = Product::findOrFail($id);
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('products', 'public');
+
+            $product->image_path = 'storage/' . $path;
+            $product->save();
+
+            return response()->json([
+                'success' => true,
+                'image_url' => asset('storage/' . $path),
+            ]);
+        }
+
+        return response()->json(['success' => false], 400);
+    }
+
 
 }

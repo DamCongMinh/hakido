@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'guest' => RedirectIfAuthenticated::class,
             'admin' => AdminMiddleware::class, 
+            'role' => \App\Http\Middleware\CheckRole::class,
         ]);
 
         // 🟢 Bổ sung middleware xử lý session
