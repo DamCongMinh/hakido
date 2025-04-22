@@ -37,7 +37,7 @@ class RestaurantProductController extends Controller
 
         $data = $request->only('name', 'description', 'price');
         $data['restaurant_id'] = Auth::id();
-        $data['status'] = 'chờ duyệt';
+        $data['status'] = 'pending';
         $data['image'] = $request->file('image')->store('products', 'public');
 
         if ($request->type === 'food') {
@@ -80,8 +80,7 @@ class RestaurantProductController extends Controller
         $item->name = $request->name;
         $item->description = $request->description;
         $item->price = $request->price;
-        $item->status = 'chờ duyệt';
-
+        $item->status = 'pending'; 
         if ($request->hasFile('image')) {
             $item->image = $request->file('image')->store('products', 'public');
         }

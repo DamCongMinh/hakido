@@ -30,6 +30,7 @@ class AuthController extends Controller
         switch ($user->role) {
             case 'customer': return redirect()->route('home');
             case 'restaurant': return redirect()->route('restaurant');
+            // case 'restaurant': return redirect()->route('restaurant.redirect');
             case 'shipper': return redirect()->route('shiper');
             default: return redirect('/');
         }
@@ -47,6 +48,7 @@ class AuthController extends Controller
                 case 'admin': return redirect()->route('admin.dashboard');
                 case 'customer': return redirect()->route('home');
                 case 'restaurant': return redirect()->route('restaurant');
+                // case 'restaurant': return redirect()->route('restaurant.redirect');
                 case 'shipper': return redirect()->route('shiper');
                 default: return redirect('/login');
             }

@@ -13,14 +13,14 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\FacebookController;
 use App\Http\Controllers\Auth\GoogleController;
-use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
 
 use App\Http\Controllers\Restaurant\RestaurantProductController;
-
+use App\Http\Controllers\Restaurant\RestaurantStatisticsController;
+// use App\Http\Controllers\Restaurant\RestaurantProfileController;
 // Giao diện chính (FE)
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -29,10 +29,12 @@ Route::get('/list-product', fn () => view('web.list-product'))->name('list-produ
 Route::get('/detail', fn () => view('web.detail_product'))->name('detail');
 
 // Trang theo role
+// Route trang Restaurant (đúng Controller, đúng dữ liệu)
 Route::middleware(['auth'])->group(function () {
-    Route::get('/restaurant', fn () => view('restaurant.restaurant'))->name('restaurant');
+    Route::get('/restaurant', [RestaurantStatisticsController::class, 'index'])->name('restaurant');
     Route::get('/shiper', fn () => view('shiper.shiper'))->name('shiper');
 });
+
 
 // Admin routes
 Route::middleware(['auth', 'admin'])->prefix('admin/accounts')->name('admin.accounts.')->group(function () {
@@ -137,10 +139,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     
 //Thống kê doanh thu và số lượng đơn hàng
 Route::get('/admin/statistics', [AdminStatisticController::class, 'index'])->name('admin.statistics');
-Route::get('/api/statistics', [StatisticsController::class, 'apiStatistics']);
 
 
- // Restaurant quản lý sản phẩm
+ // Restaurant quản lý sản phẩm và thống kê doanh thu
 
  Route::middleware(['auth', 'role:restaurant'])->prefix('restaurant')->name('restaurant.')->group(function () {
     Route::get('/products', [RestaurantProductController::class, 'home'])->name('products.home');
@@ -149,6 +150,24 @@ Route::get('/api/statistics', [StatisticsController::class, 'apiStatistics']);
     Route::get('/products/{id}/edit', [RestaurantProductController::class, 'edit'])->name('products.edit');
     Route::put('/products/{id}', [RestaurantProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{id}', [RestaurantProductController::class, 'destroy'])->name('products.destroy');
+
+    //thống kê
+    Route::get('/statistics', [RestaurantStatisticsController::class, 'index'])->name('statistics.index');
+    Route::get('/statistics/home', [RestaurantStatisticsController::class, 'home'])->name('statistics.home');
+
+    //tạo hồ sơ nhà hàng
+    // Route::get('/create', [RestaurantProfileController::class, 'create'])->name('create');
+    // Route::post('/store', [RestaurantProfileController::class, 'store'])->name('store');
+    // Route::get('/dashboard', [RestaurantProfileController::class, 'dashboard'])->name('dashboard');
+
 });
+
+// Route kiểm tra hồ sơ nhà hàng và redirect phù hợp
+// Route::middleware(['auth', 'role:restaurant'])->get('/restaurant', function () {
+//     $user = Auth::user();
+//     return $user->restaurant
+//         ? redirect()->route('restaurant.dashboard')
+//         : redirect()->route('restaurant.create');
+// })->name('restaurant.redirect');
    
     

@@ -1,0 +1,208 @@
+/* --- Tổng thể --- */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f9fafb;
+    margin-top: 120px;
+    padding: 0;
+}
+
+/* Header trang */
+.main-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.main-header h1 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.main-header p {
+    color: #666;
+}
+
+/* --- Stats Section --- */
+.stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin: 40px 0;
+}
+
+.stat-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    padding: 24px;
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    flex: 1;
+    margin: 0 12px;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
+}
+
+.stat-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: bold;
+    color: #00B894;
+}
+
+
+.card {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.08);
+    padding: 30px 20px;
+    flex: 1;
+    min-width: 250px;
+    max-width: 300px;
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Nội dung trong card */
+.card-content {
+    transition: opacity 0.3s ease;
+}
+
+.card:hover .card-content {
+    opacity: 0.4; /* chỉ làm mờ nhẹ, còn thấy rõ */
+}
+
+
+.card h3 {
+    font-size: 1.3rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.card p {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #00b894;
+}
+
+/* Icon */
+.eye-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0;
+    color: #6a0dad;
+    font-size: 48px;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+}
+
+.card:hover .eye-icon {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* Link thẻ card */
+.card-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* --- Đơn hàng gần đây --- */
+.recent-orders {
+    margin: 60px 20px;
+}
+
+.recent-orders h2 {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.recent-orders table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.recent-orders th,
+.recent-orders td {
+    padding: 15px 20px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.recent-orders th {
+    background-color: #f3f4f6;
+    font-weight: bold;
+}
+
+.recent-orders td {
+    background-color: #fff;
+}
+
+/* Trạng thái */
+.status {
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    display: inline-block;
+    font-weight: bold;
+    text-align: center;
+}
+
+.status.pending {
+    background-color: #ff9900;
+    color: #fff;
+}
+
+.status.processing {
+    background-color: #ffa500;
+    color: #fff;
+}
+
+.status.completed {
+    background-color: #28a745;
+    color: #fff;
+}
+
+/* Link điều hướng */
+.action-links {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.action-links a {
+    color: #3490dc;
+    text-decoration: none;
+    margin: 0 5px;
+}
+
+.action-links a:hover {
+    text-decoration: underline;
+}
