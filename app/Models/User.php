@@ -16,6 +16,9 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'restaurant_id',
+        'customer_id',
+        'shipper_id',
     ];
 
     protected $hidden = [
@@ -31,25 +34,35 @@ class User extends Authenticatable
         ];
     }
 
-    //  Quan hệ với bảng phụ theo role
+    
+
     public function customer()
     {
-        return $this->hasOne(Customer::class);
+        return $this->belongsTo(Customer::class, 'customer_id');
     }
 
     public function restaurant()
     {
-        return $this->hasOne(Restaurant::class);
+        return $this->belongsTo(Restaurant::class, 'restaurant_id');
     }
 
     public function shipper()
     {
-        return $this->hasOne(Shipper::class);
+        return $this->belongsTo(Shipper::class, 'shipper_id');
     }
 
-    // Gợi ý thêm nếu có đơn hàng (nếu user là customer)
     public function orders()
     {
         return $this->hasMany(Order::class, 'customer_id');
+    }
+
+    public function getProfileInfo()
+    {
+        return match($this->role) {
+            'customer' => $this->customer,
+            'restaurant' => $this->restaurant,
+            'shipper' => $this->shipper,
+            default => null
+        };
     }
 }

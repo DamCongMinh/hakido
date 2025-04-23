@@ -15,12 +15,12 @@ use App\Http\Controllers\Auth\FacebookController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
 
 use App\Http\Controllers\Restaurant\RestaurantProductController;
 use App\Http\Controllers\Restaurant\RestaurantStatisticsController;
-// use App\Http\Controllers\Restaurant\RestaurantProfileController;
 // Giao diện chính (FE)
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -71,6 +71,18 @@ Route::get('login/facebook/callback', [FacebookController::class, 'callback']);
 
 Route::get('login/google', [GoogleController::class, 'redirect']);
 Route::get('login/google/callback', [GoogleController::class, 'callback']);
+
+// Trang thông tin cá nhân
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'home_info'])->name('profile.home_info');
+    Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/destroy', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Route đổi mật khẩu
+    Route::get('/profile/change-password', [ProfileController::class, 'showChangePasswordForm'])->name('profile.change_password_form');
+    Route::post('/profile/change-password', [ProfileController::class, 'changePassword'])->name('profile.change_password');
+});
+
 
 
 // Quên mật khẩu
@@ -155,19 +167,6 @@ Route::get('/admin/statistics', [AdminStatisticController::class, 'index'])->nam
     Route::get('/statistics', [RestaurantStatisticsController::class, 'index'])->name('statistics.index');
     Route::get('/statistics/home', [RestaurantStatisticsController::class, 'home'])->name('statistics.home');
 
-    //tạo hồ sơ nhà hàng
-    // Route::get('/create', [RestaurantProfileController::class, 'create'])->name('create');
-    // Route::post('/store', [RestaurantProfileController::class, 'store'])->name('store');
-    // Route::get('/dashboard', [RestaurantProfileController::class, 'dashboard'])->name('dashboard');
-
 });
 
-// Route kiểm tra hồ sơ nhà hàng và redirect phù hợp
-// Route::middleware(['auth', 'role:restaurant'])->get('/restaurant', function () {
-//     $user = Auth::user();
-//     return $user->restaurant
-//         ? redirect()->route('restaurant.dashboard')
-//         : redirect()->route('restaurant.create');
-// })->name('restaurant.redirect');
-   
     

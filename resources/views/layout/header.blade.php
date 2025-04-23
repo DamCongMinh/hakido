@@ -81,13 +81,17 @@
                                 <li>
                                     <img class="avatar" src="{{ asset('img/shiper_avt.jpg') }}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%;">
                                     <h3>{{ Auth::user()->name }}</h3>
-                                    <a href="#">Tài khoản của tôi</a>
+
+                                    <!-- Đường dẫn tới trang home_info -->
+                                    <a href="{{ route('profile.home_info') }}">Tài khoản của tôi</a>
+
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf
                                         <button type="submit">Đăng xuất</button>
                                     </form>
                                 </li>
                             @endauth
+
 
 
                         </ul>                                      

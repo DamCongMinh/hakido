@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Thiết lập hò sơ cho nhà hàng của bạn!</title>
+    <title>Thiết lập hồ sơ nhà hàng</title>
+    <link rel="stylesheet" href="{{ asset('css/restaurant_register.css') }}">
 </head>
 <body>
     <div class="container">
@@ -25,14 +26,38 @@
             </div>
             <div class="mb-3">
                 <label for="description">Mô tả</label>
-                <textarea name="description" class="form-control"></textarea>
+                <textarea name="description" class="form-control" rows="4"></textarea>
             </div>
             <div class="mb-3">
                 <label for="logo">Logo</label>
-                <input type="file" name="logo" class="form-control">
+                <input type="file" name="logo" class="form-control" onchange="previewImage(event)">
             </div>
+            <div class="preview" id="preview"></div>
+
             <button type="submit" class="btn btn-primary">Lưu hồ sơ</button>
         </form>
+
+        @if(session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        @if($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
     </div>
 </body>
 </html>

@@ -1,11 +1,20 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 class Restaurant extends Model
 {
-    protected $fillable = ['user_id', 'restaurant_name', 'address', 'phone', 'description', 'logo'];
+    protected $fillable = [
+        'user_id', 'name_restaurant', 'email', 'password', 'phone',
+        'avata', 'address', 'time_open', 'time_close', 'is_approved', 'is_active'
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function foods()
     {
@@ -17,9 +26,14 @@ class Restaurant extends Model
         return $this->hasMany(Beverage::class);
     }
 
-    public function user()
+    public function getNameAttribute()
     {
-        return $this->belongsTo(User::class);
+        return $this->name_restaurant;
+    }
+
+    public function getAvatarAttribute()
+    {
+        return $this->avata;
     }
 
 }
