@@ -140,12 +140,23 @@ class ProfileController extends Controller
             return back()->withErrors(['current_password' => 'Mật khẩu hiện tại không đúng.']);
         }
 
-        $user->update([
-            'password' => Hash::make($request->new_password),
-        ]);
+        $hashedNewPassword = Hash::make($request->new_password);
+
+        // Cập nhật ở bảng users
+        $user->password = $hashedNewPassword;
+        $user->save();
+
+        // Đồng bộ mật khẩu sang bảng phụ theo role
+        match ($user->role) {
+            'customer' => $user->customer?->update(['password' => $hashedNewPassword]),
+            'restaurant' => $user->restaurant?->update(['password' => $hashedNewPassword]),
+            'shipper' => $user->shipper?->update(['password' => $hashedNewPassword]),
+            default => null,
+        };
 
         return back()->with('success', 'Đổi mật khẩu thành công!');
     }
+
 
 
 

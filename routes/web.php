@@ -105,11 +105,11 @@ Route::post('/reset-password', [NewPasswordController::class, 'store'])
 
 // Quản lý tài khoản
 Route::middleware(['auth', 'admin'])->prefix('admin/accounts')->name('admin.accounts.')->group(function () {
-    Route::get('/', [AdminAccountController::class, 'index'])->name('index');
-    
-    Route::post('/approve/{id}', [AdminAccountController::class, 'approve'])->name('approve');
+    Route::get('/', [AdminAccountController::class, 'account'])->name('index');
     Route::post('/toggle/{id}', [AdminAccountController::class, 'toggleActive'])->name('toggle');
     Route::delete('/delete/{id}', [AdminAccountController::class, 'destroy'])->name('delete');
+    Route::post('/{id}/approve', [AdminAccountController::class, 'approveUser'])->name('approve');
+
 });
 
 // Quản lý Đồ Ăn
@@ -137,6 +137,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin/orders')->name('admin.orders
     Route::post('/{order}/update-status', [AdminOrderController::class, 'updateStatus'])->name('updateStatus');
     Route::post('/{order}/assign-shipper', [AdminOrderController::class, 'assignShipper'])->name('assignShipper');
     Route::post('/{order}/cancel', [AdminOrderController::class, 'cancel'])->name('cancel');
+    
 });
 
 // Quản trị nội dung

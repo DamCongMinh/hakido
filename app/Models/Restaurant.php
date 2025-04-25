@@ -7,8 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Restaurant extends Model
 {
     protected $fillable = [
-        'user_id', 'name_restaurant', 'email', 'password', 'phone',
-        'avata', 'address', 'time_open', 'time_close', 'is_approved', 'is_active'
+        'user_id', 'name', 'phone', 'avatar', 'date_of_birth', 'address'
     ];
 
     public function user()
@@ -25,15 +24,4 @@ class Restaurant extends Model
     {
         return $this->hasMany(Beverage::class);
     }
-
-    public function getNameAttribute()
-    {
-        return $this->name_restaurant;
-    }
-
-    public function getAvatarAttribute()
-    {
-        return $this->avata;
-    }
-
 }

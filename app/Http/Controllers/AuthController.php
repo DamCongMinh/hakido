@@ -9,81 +9,59 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    // Đăng ký tài khoản mới
+    // Đăng ký
     public function register(Request $request)
     {
-        $validated = $request->validate([
+        $validated = Validator::make($request->all(), [
+            'role' => 'required|in:customer,shipper,restaurant',
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
-            'role' => 'required|in:customer,restaurant,shipper',
+            'password' => 'required|min:6|confirmed',
         ]);
 
-        $hashedPassword = Hash::make($validated['password']);
-
-        // Tạo user trước
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => $hashedPassword,
-            'role' => $validated['role'],
-        ]);
-
-        // Tạo record theo role
-        switch ($validated['role']) {
-            case 'customer':
-                $customer = Customer::create([
-                    'name_customer' => $validated['name'],
-                    'email' => $validated['email'],
-                    'password' => $hashedPassword,
-                    // các trường nullable thì để trống
-                    'phone' => null,
-                    'address' => null,
-                    'avata' => null,
-                ]);
-                $user->update(['customer_id' => $customer->id]);
-                break;
-
-            case 'restaurant':
-                $restaurant = Restaurant::create([
-                    'user_id' => $user->id,
-                    'name_restaurant' => $validated['name'],
-                    'email' => $validated['email'],
-                    'password' => $hashedPassword,
-                    'phone' => null,
-                    'address' => null,
-                    'avata' => null,
-                    'time_open' => null,
-                    'time_close' => null,
-                    'is_approved' => false,
-                    'is_active' => false,
-                ]);
-                $user->update(['restaurant_id' => $restaurant->id]);
-                break;
-
-            case 'shipper':
-                $shipper = Shipper::create([
-                    'name_shipper' => $validated['name'],
-                    'email' => $validated['email'],
-                    'password' => $hashedPassword,
-                    'phone' => null,
-                    'address' => null,
-                    'avata' => null,
-                    'area' => null,
-                ]);
-                $user->update(['shipper_id' => $shipper->id]);
-                break;
+        if ($validated->fails()) {
+            return redirect()->back()
+                ->withErrors($validated)
+                ->withInput()
+                ->with('show_signup', true);
         }
 
+        $role = $request->role;
+
+        // ✅ Tạo user trước
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => $role,
+            'is_active' => true,
+            'is_approved' => false,
+        ]);
+
+        // ✅ Tạo bảng phụ gắn với user_id
+        $commonData = [
+            'user_id' => $user->id,
+            'name' => $user->name,
+            'phone' => '',
+            'avatar' => null,
+            'date_of_birth' => null,
+            'address' => null,
+        ];
+
+        match ($role) {
+            'customer'   => Customer::create($commonData),
+            'shipper'    => Shipper::create($commonData),
+            'restaurant' => Restaurant::create($commonData),
+        };
+
         Auth::login($user);
-        return redirect()->route('home')->with('success', 'Đăng ký thành công!');
+
+        return redirect()->route('home')->with('status', 'Đăng ký và đăng nhập thành công!');
     }
-
-
-
 
     // Đăng nhập
     public function login(Request $request)
@@ -94,13 +72,13 @@ class AuthController extends Controller
             $request->session()->regenerate();
             $user = Auth::user();
 
-            switch ($user->role) {
-                case 'admin': return redirect()->route('admin.dashboard');
-                case 'customer': return redirect()->route('home');
-                case 'restaurant': return redirect()->route('restaurant');
-                case 'shipper': return redirect()->route('shiper');
-                default: return redirect('/login');
-            }
+            return match ($user->role) {
+                'admin' => redirect()->route('admin.dashboard'),
+                'customer' => redirect()->route('home'),
+                'restaurant' => redirect()->route('restaurant'),
+                'shipper' => redirect()->route('shiper'),
+                default => redirect('/login'),
+            };
         }
 
         return back()->with('status', 'Email hoặc mật khẩu không đúng!');
@@ -115,7 +93,7 @@ class AuthController extends Controller
         return redirect()->route('login');
     }
 
-    // Cập nhật thông tin
+    // Cập nhật thông tin người dùng
     public function update(Request $request)
     {
         $user = auth()->user();
@@ -130,46 +108,32 @@ class AuthController extends Controller
         ]);
 
         if ($request->hasFile('avatar')) {
-            $path = $request->file('avatar')->store('avatars', 'public');
-            $validated['avatar'] = $path;
+            $validated['avatar'] = $request->file('avatar')->store('avatars', 'public');
+        }
+
+        // Cập nhật thông tin bảng phụ tương ứng
+        $profileData = [
+            'phone' => $validated['phone'],
+            'address' => $validated['address'],
+            'extra' => $validated['extra'],
+        ];
+        if (isset($validated['avatar'])) {
+            $profileData['avatar'] = $validated['avatar'];
         }
 
         switch ($user->role) {
             case 'restaurant':
-                $user->restaurant?->update([
-                    'name_restaurant' => $validated['name'],
-                    'email' => $validated['email'],
-                    'phone' => $validated['phone'],
-                    'address' => $validated['address'],
-                    'extra' => $validated['extra'],
-                    'avatar' => $validated['avatar'] ?? $user->restaurant->avatar,
-                ]);
+                $user->restaurant?->update(array_merge($profileData, ['name_restaurant' => $validated['name']]));
                 break;
             case 'shipper':
-                $user->shipper?->update([
-                    'name_shipper' => $validated['name'],
-                    'email' => $validated['email'],
-                    'phone' => $validated['phone'],
-                    'address' => $validated['address'],
-                    'extra' => $validated['extra'],
-                    'avatar' => $validated['avatar'] ?? $user->shipper->avatar,
-                ]);
+                $user->shipper?->update(array_merge($profileData, ['name_shipper' => $validated['name']]));
                 break;
             case 'customer':
-                $user->customer?->update([
-                    'name_customer' => $validated['name'],
-                    'email' => $validated['email'],
-                    'phone' => $validated['phone'],
-                    'address' => $validated['address'],
-                    'extra' => $validated['extra'],
-                    'avatar' => $validated['avatar'] ?? $user->customer->avatar,
-                ]);
+                $user->customer?->update(array_merge($profileData, ['name_customer' => $validated['name']]));
                 break;
         }
 
-        $user->update([
-            'email' => $validated['email']
-        ]);
+        $user->update(['email' => $validated['email']]);
 
         return redirect()->route('profile.home_info')->with('success', 'Cập nhật thành công!');
     }

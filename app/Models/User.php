@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -16,9 +15,6 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
-        'restaurant_id',
-        'customer_id',
-        'shipper_id',
     ];
 
     protected $hidden = [
@@ -26,43 +22,33 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
-
-    
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
 
     public function customer()
     {
-        return $this->belongsTo(Customer::class, 'customer_id');
+        return $this->hasOne(Customer::class);
     }
 
     public function restaurant()
     {
-        return $this->belongsTo(Restaurant::class, 'restaurant_id');
+        return $this->hasOne(Restaurant::class);
     }
 
     public function shipper()
     {
-        return $this->belongsTo(Shipper::class, 'shipper_id');
-    }
-
-    public function orders()
-    {
-        return $this->hasMany(Order::class, 'customer_id');
+        return $this->hasOne(Shipper::class);
     }
 
     public function getProfileInfo()
     {
-        return match($this->role) {
+        return match ($this->role) {
             'customer' => $this->customer,
             'restaurant' => $this->restaurant,
             'shipper' => $this->shipper,
-            default => null
+            default => null,
         };
     }
 }

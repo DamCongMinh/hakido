@@ -6,7 +6,7 @@ use App\Models\User;
 
 class AdminAccountController extends Controller
 {
-    public function index()
+    public function account()
     {
         $customers = User::where('role', 'customer')->get();
         $restaurants = User::where('role', 'restaurant')->get();
@@ -15,14 +15,28 @@ class AdminAccountController extends Controller
         return view('admin.accounts.index', compact('customers', 'restaurants', 'shippers'));
     }
 
-    public function approve($id)
+    public function approveUser($id)
     {
         $user = User::findOrFail($id);
-        $user->is_approved = true;
+        $user->is_approved = 1;
         $user->save();
 
-        return redirect()->back()->with('success', 'Duyệt tài khoản thành công.');
+        // Nếu là restaurant, customer hoặc shipper thì update thêm bảng liên quan
+        switch ($user->role) {
+            case 'restaurant':
+                \DB::table('restaurants')->where('user_id', $user->id)->update(['is_approved' => 1]);
+                break;
+            case 'shipper':
+                \DB::table('shippers')->where('user_id', $user->id)->update(['is_approved' => 1]);
+                break;
+            case 'customer':
+                \DB::table('customers')->where('user_id', $user->id)->update(['is_approved' => 1]);
+                break;
+        }
+
+        return back()->with('success', 'Duyệt tài khoản thành công!');
     }
+
 
     public function toggleActive($id)
     {

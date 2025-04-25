@@ -2,30 +2,19 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Customer extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name_customer', 'email', 'password', 'avata', 'phone', 'date_of_birth', 'address'];
+    protected $fillable = [
+        'user_id', 'name', 'phone', 'avatar', 'date_of_birth', 'address'
+    ];
 
-    // Quan hệ ngược với User
     public function user()
     {
-        return $this->hasOne(User::class, 'customer_id', 'id');
+        return $this->belongsTo(User::class);
     }
-
-    public function getNameAttribute()
-    {
-        return $this->name_customer;
-    }
-
-    public function getAvatarAttribute()
-    {
-        return $this->avata;
-    }
-
-
 }
