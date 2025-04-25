@@ -18,7 +18,6 @@ class ProfileController extends Controller
     {
         return view('profile.change_password');
     }
-    
 
     public function update(Request $request)
     {
@@ -40,7 +39,6 @@ class ProfileController extends Controller
                     'date_of_birth' => 'nullable|date',
                 ]);
                 break;
-
             case 'restaurant':
                 $rules = array_merge($commonRules, [
                     'time_open' => 'nullable|date_format:H:i',
@@ -48,13 +46,11 @@ class ProfileController extends Controller
                     'is_active' => 'nullable|boolean',
                 ]);
                 break;
-
             case 'shipper':
                 $rules = array_merge($commonRules, [
                     'area' => 'nullable|string|max:255',
                 ]);
                 break;
-
             default:
                 $rules = $commonRules;
                 break;
@@ -74,11 +70,11 @@ class ProfileController extends Controller
                 $customer = $user->customer;
                 if ($customer) {
                     $customer->update([
-                        'name_customer' => $validated['name'],
+                        'name' => $validated['name'],
                         'phone' => $validated['phone'],
                         'email' => $validated['email'],
                         'address' => $validated['address'],
-                        'avata' => $validated['avatar'] ?? $customer->avata,
+                        'avatar' => $validated['avatar'] ?? $customer->avatar,
                         'date_of_birth' => $validated['date_of_birth'] ?? $customer->date_of_birth,
                         'extra' => $validated['extra'] ?? $customer->extra,
                     ]);
@@ -89,11 +85,11 @@ class ProfileController extends Controller
                 $restaurant = $user->restaurant;
                 if ($restaurant) {
                     $restaurant->update([
-                        'name_restaurant' => $validated['name'],
+                        'name' => $validated['name'],
                         'phone' => $validated['phone'],
                         'email' => $validated['email'],
                         'address' => $validated['address'],
-                        'avata' => $validated['avatar'] ?? $restaurant->avata,
+                        'avatar' => $validated['avatar'] ?? $restaurant->avatar,
                         'time_open' => $validated['time_open'] ?? $restaurant->time_open,
                         'time_close' => $validated['time_close'] ?? $restaurant->time_close,
                         'is_active' => $validated['is_active'] ?? $restaurant->is_active,
@@ -106,11 +102,11 @@ class ProfileController extends Controller
                 $shipper = $user->shipper;
                 if ($shipper) {
                     $shipper->update([
-                        'name_shipper' => $validated['name'],
+                        'name' => $validated['name'],
                         'phone' => $validated['phone'],
                         'email' => $validated['email'],
                         'address' => $validated['address'],
-                        'avata' => $validated['avatar'] ?? $shipper->avata,
+                        'avatar' => $validated['avatar'] ?? $shipper->avatar,
                         'area' => $validated['area'] ?? $shipper->area,
                         'extra' => $validated['extra'] ?? $shipper->extra,
                     ]);
@@ -118,7 +114,7 @@ class ProfileController extends Controller
                 break;
         }
 
-        // Cập nhật bảng users (đồng bộ name và email)
+        // Cập nhật bảng users
         $user->update([
             'name' => $validated['name'],
             'email' => $validated['email'],
@@ -127,6 +123,7 @@ class ProfileController extends Controller
         return redirect()->route('profile.home_info')->with('success', 'Cập nhật thành công!');
     }
 
+
     public function changePassword(Request $request)
     {
         $request->validate([
@@ -134,29 +131,18 @@ class ProfileController extends Controller
             'new_password' => 'required|string|min:8|confirmed',
         ]);
 
-        $user = auth()->user();
+        $user = Auth::user();
 
         if (!Hash::check($request->current_password, $user->password)) {
             return back()->withErrors(['current_password' => 'Mật khẩu hiện tại không đúng.']);
         }
 
-        $hashedNewPassword = Hash::make($request->new_password);
-
-        // Cập nhật ở bảng users
-        $user->password = $hashedNewPassword;
-        $user->save();
-
-        // Đồng bộ mật khẩu sang bảng phụ theo role
-        match ($user->role) {
-            'customer' => $user->customer?->update(['password' => $hashedNewPassword]),
-            'restaurant' => $user->restaurant?->update(['password' => $hashedNewPassword]),
-            'shipper' => $user->shipper?->update(['password' => $hashedNewPassword]),
-            default => null,
-        };
+        $user->update([
+            'password' => Hash::make($request->new_password),
+        ]);
 
         return back()->with('success', 'Đổi mật khẩu thành công!');
     }
-
 
 
 

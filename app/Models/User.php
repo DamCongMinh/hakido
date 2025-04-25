@@ -44,11 +44,21 @@ class User extends Authenticatable
 
     public function getProfileInfo()
     {
-        return match ($this->role) {
+        $profile = match ($this->role) {
             'customer' => $this->customer,
             'restaurant' => $this->restaurant,
             'shipper' => $this->shipper,
             default => null,
         };
+
+        if ($profile) {
+            // Gộp thêm các thông tin từ bảng users
+            foreach (['email', 'name', 'password'] as $field) {
+                $profile->$field = $this->$field;
+            }
+        }
+
+        return $profile;
     }
+
 }

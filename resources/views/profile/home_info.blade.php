@@ -64,8 +64,6 @@
                 <input type="email" id="email" name="email" value="{{ old('email', $info->email) }}" required>
             </div>
             
-            
-
             @switch($user->role)
                 @case('customer')
                     <div>
@@ -102,9 +100,13 @@
                     @break
             @endswitch
 
-
             <button type="submit">Cập nhật</button>
-            <a href="{{ route('profile.change_password_form') }}" class="change-password-btn">Đổi mật khẩu</a>
+        </form>
+        <hr>
+        
+        <!-- Đổi mật khẩu -->
+        <form action="{{ route('profile.change_password_form') }}" method="GET">
+            <button type="submit">Đổi mật khẩu</button>
         </form>
         @endif
 

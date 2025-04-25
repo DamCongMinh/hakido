@@ -41,7 +41,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin/accounts')->name('admin.acco
     Route::get('/', [AdminAccountController::class, 'index'])->name('index');
     // Các route khác của admin...
 });
-Route::get('/home_admin', fn () => view('admin.home_admin'))->name('admin.dashboard');
+
+Route::get('/home_admin', fn () => view('admin.home_admin'))
+    ->middleware(['auth', 'admin'])
+    ->name('admin.dashboard');
+
 
 
 // Hiển thị giao diện đăng nhập + đăng ký (gộp chung 1 view)
@@ -151,7 +155,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 });
     
 //Thống kê doanh thu và số lượng đơn hàng
-Route::get('/admin/statistics', [AdminStatisticController::class, 'index'])->name('admin.statistics');
+Route::get('/admin/statistics', [AdminStatisticController::class, 'index'])
+    ->middleware(['auth', 'admin'])
+    ->name('admin.statistics');
+
 
 
  // Restaurant quản lý sản phẩm và thống kê doanh thu
