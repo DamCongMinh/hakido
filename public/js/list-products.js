@@ -1,17 +1,25 @@
+// Xử lý ảnh nổi bật (carousel giữa các ảnh)
 document.addEventListener("DOMContentLoaded", function () {
     const imagesContainer = document.querySelector(".prominient");
     let images = Array.from(document.querySelectorAll(".prominient-product"));
+
+    if (images.length === 0) {
+        return; // Không có ảnh thì không làm gì cả
+    }
+
     let centerIndex = Math.floor(images.length / 2);
 
-    // Gán chỉ mục ban đầu cho từng ảnh
     images.forEach((img, index) => img.dataset.index = index);
 
     function updateImageOrder() {
+        if (images.length === 0) return; // Bảo vệ thêm trong function
         images.forEach((img, index) => {
-            img.style.order = index; 
+            img.style.order = index;
             img.classList.remove("main-product");
         });
-        images[centerIndex].classList.add("main-product");
+        if (images[centerIndex]) {
+            images[centerIndex].classList.add("main-product");
+        }
     }
 
     function moveImagesToCenter(clickedIndex) {
@@ -42,135 +50,112 @@ document.addEventListener("DOMContentLoaded", function () {
 
     updateImageOrder();
 });
-// bộ lọc
+
+
+// Bộ lọc trượt (filter slide)
 function toggleFilter() {
-    let filter = document.querySelector(".products-filter");
-    let filterIcon = document.querySelector(".filter-float");
-    // Lấy phần tử input và span
+    const filterForm = document.querySelector(".filter-form"); // <<< đổi từ getElementById thành querySelector
     const priceInput = document.getElementById("price-filter");
     const priceValue = document.getElementById("price-value");
-    //Lấy products-title
-    let productsTitle = document.querySelector(".products-title");
 
-    productsTitle.classList.add("active");
-    // Kiểm tra xem bộ lọc có đang hiển thị không
-    if (filter.classList.contains("active")) {
-        filter.classList.remove("active"); // Ẩn bộ lọc
-        filterIcon.style.display = "block"; // Hiển thị lại icon
-        productsTitle.classList.remove("third");
-        productsTitle.classList.add("active"); // Hiển thị lại title
-    } else {
-        filter.classList.add("active"); // Hiện bộ lọc
-        filterIcon.style.display = "none"; // Ẩn icon
-        productsTitle.classList.remove("active");
-        productsTitle.classList.add("third");
-    }
+    filterForm.classList.toggle("show");
 
-    // Hàm cập nhật giá trị hiển thị
     function updatePrice() {
         priceValue.textContent = parseInt(priceInput.value).toLocaleString("vi-VN") + "đ";
     }
 
-    // Gán sự kiện khi kéo
     priceInput.addEventListener("input", updatePrice);
-
-    // Cập nhật giá trị ngay khi load trang
     updatePrice();
 }
 
-// Lấy địa chỉ
+
+// Lấy địa chỉ từ API tỉnh/huyện/xã
 document.addEventListener("DOMContentLoaded", function () {
     const provinceFilter = document.getElementById("province-filter");
     const districtFilter = document.getElementById("district-filter");
     const wardFilter = document.getElementById("ward-filter");
 
-    // Gọi API để lấy danh sách tỉnh/thành phố
-    fetch("https://provinces.open-api.vn/api/?depth=3")
-        .then(response => response.json())
-        .then(data => {
-            data.forEach(province => {
-                let option = document.createElement("option");
-                option.value = province.code;
-                option.textContent = province.name;
-                provinceFilter.appendChild(option);
-            });
+    provinceFilter.addEventListener("change", function () {
+        const provinceId = this.value;
 
-            // Sự kiện thay đổi tỉnh/thành phố
-            provinceFilter.addEventListener("change", function () {
-                districtFilter.innerHTML = '<option value="all">Tất cả</option>'; // Reset huyện
-                wardFilter.innerHTML = '<option value="all">Tất cả</option>'; // Reset xã
+        if (provinceId === "all") {
+            districtFilter.innerHTML = '<option value="all">Tất cả quận huyện</option>';
+            wardFilter.innerHTML = '<option value="all">Tất cả phường xã</option>';
+            return;
+        }
 
-                let selectedProvince = data.find(p => p.code == this.value);
-                if (selectedProvince) {
-                    selectedProvince.districts.forEach(district => {
-                        let option = document.createElement("option");
-                        option.value = district.code;
-                        option.textContent = district.name;
-                        districtFilter.appendChild(option);
-                    });
-                }
-            });
+        fetch(`https://provinces.open-api.vn/api/p/${provinceId}?depth=2`)
+            .then(response => response.json())
+            .then(data => {
+                districtFilter.innerHTML = '<option value="all">Tất cả quận huyện</option>';
+                wardFilter.innerHTML = '<option value="all">Tất cả phường xã</option>';
 
-            // Sự kiện thay đổi huyện/quận
-            districtFilter.addEventListener("change", function () {
-                wardFilter.innerHTML = '<option value="all">Tất cả</option>'; // Reset xã
+                data.districts.forEach(district => {
+                    const option = document.createElement("option");
+                    option.value = district.code;  // chú ý dùng code
+                    option.textContent = district.name;
+                    districtFilter.appendChild(option);
+                });
+            })
+            .catch(error => console.error("Lỗi khi lấy danh sách quận huyện:", error));
+    });
 
-                let selectedProvince = data.find(p => p.code == provinceFilter.value);
-                if (selectedProvince) {
-                    let selectedDistrict = selectedProvince.districts.find(d => d.code == this.value);
-                    if (selectedDistrict) {
-                        selectedDistrict.wards.forEach(ward => {
-                            let option = document.createElement("option");
-                            option.value = ward.code;
-                            option.textContent = ward.name;
-                            wardFilter.appendChild(option);
-                        });
-                    }
-                }
-            });
-        })
-        .catch(error => console.error("Lỗi khi lấy dữ liệu:", error));
+    districtFilter.addEventListener("change", function () {
+        const districtId = this.value;
+
+        if (districtId === "all") {
+            wardFilter.innerHTML = '<option value="all">Tất cả phường xã</option>';
+            return;
+        }
+
+        fetch(`https://provinces.open-api.vn/api/d/${districtId}?depth=2`)
+            .then(response => response.json())
+            .then(data => {
+                wardFilter.innerHTML = '<option value="all">Tất cả phường xã</option>';
+
+                data.wards.forEach(ward => {
+                    const option = document.createElement("option");
+                    option.value = ward.code; // chú ý dùng code
+                    option.textContent = ward.name;
+                    wardFilter.appendChild(option);
+                });
+            })
+            .catch(error => console.error("Lỗi khi lấy danh sách phường xã:", error));
+    });
 });
 
-// phân trang cho list-product   
 
-// Giả lập danh sách đánh giá (bạn có thể thay bằng dữ liệu từ server)
+
+// Phân trang list-products
 document.addEventListener('DOMContentLoaded', function () {
-  const productsPage = 6;
-  const listProducts = document.querySelector('.list-products');
-  const title = listProducts.querySelectorAll('.title-list');
-  const paginationButtons = document.querySelectorAll('.page-btn');
+    const productsPage = 6;
+    const listProducts = document.querySelector('.list-products');
+    const titles = listProducts.querySelectorAll('.title-list');
+    const paginationButtons = document.querySelectorAll('.page-btn');
 
-  function showPage(page) {
-      const start = (page - 1) * productsPage;
-      const end = start + productsPage;
+    function showPage(page) {
+        const start = (page - 1) * productsPage;
+        const end = start + productsPage;
 
-      title.forEach((title, index) => {
-          if (index >= start && index < end) {
-              title.style.display = 'block';
-          } else {
-              title.style.display = 'none';
-          }
-      });
+        titles.forEach((title, index) => {
+            if (index >= start && index < end) {
+                title.style.display = 'flex';
+            } else {
+                title.style.display = 'none';
+            }
+        });
 
-      // Highlight current button
-      paginationButtons.forEach(btn => btn.classList.remove('active'));
-      const currentBtn = document.querySelector(`.page-btn[data-page="${page}"]`);
-      if (currentBtn) currentBtn.classList.add('active');
-  }
+        paginationButtons.forEach(btn => btn.classList.remove('active'));
+        const currentBtn = document.querySelector(`.page-btn[data-page="${page}"]`);
+        if (currentBtn) currentBtn.classList.add('active');
+    }
 
-  paginationButtons.forEach(button => {
-      button.addEventListener('click', function () {
-          const page = parseInt(this.dataset.page);
-          showPage(page);
-      });
-  });
+    paginationButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const page = parseInt(this.dataset.page);
+            showPage(page);
+        });
+    });
 
-    // Mặc định load trang đầu tiên
-  showPage(1);
+    showPage(1);
 });
-
-
-
-
-

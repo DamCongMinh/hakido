@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 
 class ProfileController extends Controller
 {
@@ -22,6 +23,7 @@ class ProfileController extends Controller
     public function update(Request $request)
     {
         $user = auth()->user();
+        // $user->address = $request->address;
 
         // Validate dữ liệu
         $commonRules = [
@@ -32,6 +34,29 @@ class ProfileController extends Controller
             'extra' => 'nullable|string|max:255',
             'avatar' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
         ];
+
+        $request->validate([
+            'province' => 'required',
+            'district' => 'required',
+            'ward' => 'required',
+            'address' => 'required|string|max:255',
+        ]);
+
+        // Gọi API để lấy dữ liệu
+        $province = Http::get("https://provinces.open-api.vn/api/p/{$request->province}")->json();
+        $district = Http::get("https://provinces.open-api.vn/api/d/{$request->district}")->json();
+        $ward = Http::get("https://provinces.open-api.vn/api/w/{$request->ward}")->json();
+
+        // Check nếu không có name thì để trống
+        $provinceName = $province['name'] ?? '';
+        $districtName = $district['name'] ?? '';
+        $wardName = $ward['name'] ?? '';
+        
+        // Ghép địa chỉ
+        $fullAddress = "{$request->address}, {$wardName}, {$districtName}, {$provinceName}";
+        
+
+       
 
         switch ($user->role) {
             case 'customer':
@@ -73,7 +98,7 @@ class ProfileController extends Controller
                         'name' => $validated['name'],
                         'phone' => $validated['phone'],
                         'email' => $validated['email'],
-                        'address' => $validated['address'],
+                        'address' => $fullAddress,
                         'avatar' => $validated['avatar'] ?? $customer->avatar,
                         'date_of_birth' => $validated['date_of_birth'] ?? $customer->date_of_birth,
                         'extra' => $validated['extra'] ?? $customer->extra,
@@ -88,7 +113,7 @@ class ProfileController extends Controller
                         'name' => $validated['name'],
                         'phone' => $validated['phone'],
                         'email' => $validated['email'],
-                        'address' => $validated['address'],
+                        'address' => $fullAddress,
                         'avatar' => $validated['avatar'] ?? $restaurant->avatar,
                         'time_open' => $validated['time_open'] ?? $restaurant->time_open,
                         'time_close' => $validated['time_close'] ?? $restaurant->time_close,
@@ -105,7 +130,7 @@ class ProfileController extends Controller
                         'name' => $validated['name'],
                         'phone' => $validated['phone'],
                         'email' => $validated['email'],
-                        'address' => $validated['address'],
+                        'address' => $fullAddress,
                         'avatar' => $validated['avatar'] ?? $shipper->avatar,
                         'area' => $validated['area'] ?? $shipper->area,
                         'extra' => $validated['extra'] ?? $shipper->extra,
@@ -152,5 +177,18 @@ class ProfileController extends Controller
         $user->delete();
         Auth::logout();
         return redirect('/')->with('success', 'Tài khoản đã được xóa!');
+    }
+
+    public function getDistricts($provinceId)
+    {
+        $districts = District::where('province_id', $provinceId)->get();
+        return response()->json($districts);
+    }
+
+    // API lấy danh sách phường/xã theo quận
+    public function getWards($districtId)
+    {
+        $wards = Ward::where('district_id', $districtId)->get();
+        return response()->json($wards);
     }
 }

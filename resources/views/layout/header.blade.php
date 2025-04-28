@@ -24,7 +24,7 @@
                 <div class="header_center--directory">
                     @foreach ($categories as $category)
                         <div class="directory--title">
-                            <a href="{{ route('category.show', $category->id) }}">
+                            <a href="{{ route('products.byCategory', ['category_id' => $category->id]) }}">
                                 <p>{{ $category->name }}</p>
                             </a>
                         </div>
@@ -82,8 +82,32 @@
                                     <img class="avatar" src="{{ asset('img/shiper_avt.jpg') }}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%;">
                                     <h3>{{ Auth::user()->name }}</h3>
 
-                                    <!-- Đường dẫn tới trang home_info -->
+                                    <!-- Link cho tất cả user -->
                                     <a href="{{ route('profile.home_info') }}">Tài khoản của tôi</a>
+
+                                    <!-- Nếu là admin -->
+                                    @if (Auth::user()->role === 'admin')
+                                        <a href="{{ route('admin.dashboard') }}">Quản lý của admin</a>
+                                    @endif
+
+                                    <!-- Nếu là restaurant -->
+                                    @if (Auth::user()->role === 'restaurant')
+                                        <a href="{{ route('restaurant.products.home') }}">Quản lý sản phẩm</a>
+                                        <a href="{{ route('restaurant') }}">Quản lý đơn hàng</a>
+                                        <a href="{{ route('restaurant.statistics.home') }}">Thống kê</a>
+                                    @endif
+
+                                    <!-- Nếu là shipper -->
+                                    @if (Auth::user()->role === 'shipper')
+                                        <a href="{{ route('shiper') }}">Đơn hàng giao</a> 
+                                        
+                                    @endif
+
+                                    <!-- Nếu là customer -->
+                                    {{-- @if (Auth::user()->role === 'customer')
+                                        <a href="{{ route('customer.orders') }}">Đơn mua của tôi</a>
+                                        
+                                    @endif --}}
 
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf
@@ -91,6 +115,7 @@
                                     </form>
                                 </li>
                             @endauth
+
 
 
 

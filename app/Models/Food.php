@@ -7,11 +7,36 @@ class Food extends Model
 {
     protected $table = 'foods';
 
-    protected $fillable = ['name','image', 'price', 'description', 'status', 'restaurant_id'];
+    protected $fillable = [
+        'restaurant_id',
+        'category_id',
+        'name',
+        'description',
+        'old_price',
+        'discount_percent',
+        'image',
+        'status',
+        'is_active',
+    ];
+
+    // protected $casts = [
+    //     'is_active' => 'boolean',
+    // ];
 
     public function restaurant()
     {
         return $this->belongsTo(Restaurant::class, 'restaurant_id');
     }
 
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    // Accessor để tự động có new_price
+    public function getNewPriceAttribute()
+    {
+        $discount = $this->discount_percent ?? 0;
+        return round($this->old_price * (1 - $discount / 100), 2);
+    }
 }

@@ -111,10 +111,10 @@
                 </tbody>
             </table>
 
-            <div class="action-links">
+            {{-- <div class="action-links">
                 <a href="{{ route('restaurant.products.home') }}">Quản lý sản phẩm</a> |
                 <a href="{{ route('admin.dashboard') }}">← Quay lại trang Admin</a>
-            </div>
+            </div> --}}
         </section>
     </main>
 

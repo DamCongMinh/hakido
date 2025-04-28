@@ -75,8 +75,8 @@ class AuthController extends Controller
             return match ($user->role) {
                 'admin' => redirect()->route('admin.dashboard'),
                 'customer' => redirect()->route('home'),
-                'restaurant' => redirect()->route('restaurant'),
-                'shipper' => redirect()->route('shiper'),
+                'restaurant' => redirect()->route('home'),
+                'shipper' => redirect()->route('home'),
                 default => redirect('/login'),
             };
         }

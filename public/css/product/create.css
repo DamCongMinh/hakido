@@ -1,0 +1,92 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f9fafb;
+    padding: 20px;
+}
+
+h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+form {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+    color: #555;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="file"],
+select,
+textarea {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #fdfdfd;
+    transition: border-color 0.3s;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="file"]:focus,
+select:focus,
+textarea:focus {
+    border-color: #4f46e5; /* Indigo-600 */
+    outline: none;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 12px 0;
+    background-color: #4f46e5; /* Indigo-600 */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button[type="submit"]:hover {
+    background-color: #4338ca; /* Indigo-700 */
+}
+
+#sizeOptions > div {
+    margin-bottom: 15px;
+}
+
+#sizeOptions label {
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #444;
+}
+
+#foodFields {
+    margin-bottom: 20px;
+}
+
+@media (max-width: 640px) {
+    form {
+        padding: 20px;
+    }
+}

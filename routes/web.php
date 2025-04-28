@@ -16,6 +16,8 @@ use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ShowListProductController;
+use App\Http\Controllers\SearchAndFilterController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -25,7 +27,17 @@ use App\Http\Controllers\Restaurant\RestaurantStatisticsController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-Route::get('/list-product', fn () => view('web.list-product'))->name('list-product');
+// hiển thị danh sách sản phẩm trong trang list_product
+Route::get('/products/category/{category_id}', [ShowListProductController::class, 'byCategory'])->name('products.byCategory');
+
+// lọc sản phẩm
+Route::get('/products', [SearchAndFilterController::class, 'index'])->name('products.index');
+Route::get('/products/filter', [SearchAndFilterController::class, 'filter'])->name('products.filter');
+
+
+
+
+// Route::get('/list-product', fn () => view('web.list-product'))->name('list-product');
 Route::get('/detail', fn () => view('web.detail_product'))->name('detail');
 
 // Trang theo role
@@ -39,7 +51,7 @@ Route::middleware(['auth'])->group(function () {
 // Admin routes
 Route::middleware(['auth', 'admin'])->prefix('admin/accounts')->name('admin.accounts.')->group(function () {
     Route::get('/', [AdminAccountController::class, 'index'])->name('index');
-    // Các route khác của admin...
+    
 });
 
 Route::get('/home_admin', fn () => view('admin.home_admin'))
@@ -56,8 +68,9 @@ Route::get('/login', function () {
 // hiển thị giao diện quản lý sản phẩm
 Route::get('/control_product', [ProductController::class, 'index'])->name('control_product')->middleware(['auth', 'admin']);
 
+
 // load image
-Route::post('/update/{id}', [FoodController::class, 'update'])->name('foods.update');
+// Route::post('/update/{id}', [FoodController::class, 'update'])->name('foods.update');
 
 
 
@@ -154,7 +167,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('categories', CategoryController::class);
 });
     
-//Thống kê doanh thu và số lượng đơn hàng
+//Thống kê doanh thu và số lượng đơn hàng Admin
 Route::get('/admin/statistics', [AdminStatisticController::class, 'index'])
     ->middleware(['auth', 'admin'])
     ->name('admin.statistics');

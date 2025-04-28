@@ -55,54 +55,120 @@
             </div>
 
             <div>
-                <label for="address">Địa chỉ:</label>
-                <input type="text" id="address" name="address" value="{{ old('address', $info->address) }}" required>
-            </div>
-
-            <div>
                 <label for="email">Email:</label>
                 <input type="email" id="email" name="email" value="{{ old('email', $info->email) }}" required>
             </div>
-            
-            @switch($user->role)
-                @case('customer')
-                    <div>
-                        <label for="date_of_birth">Ngày sinh:</label>
-                        <input type="date" id="date_of_birth" name="date_of_birth" value="{{ old('date_of_birth', $info->date_of_birth) }}">
-                    </div>
-                    @break
 
-                @case('restaurant')
-                    <div>
-                        <label for="time_open">Giờ mở cửa:</label>
-                        <input type="time" id="time_open" name="time_open" value="{{ old('time_open', $info->time_open) }}">
-                    </div>
+            <select name="province" id="provinceSelect">
+                <option value="">--Chọn Tỉnh--</option>
+            </select>
+        
+            <select name="district" id="districtSelect">
+                <option value="">--Chọn Huyện--</option>
+            </select>
+        
+            <select name="ward" id="wardSelect">
+                <option value="">--Chọn Xã--</option>
+            </select>
+        
+            <input type="text" id="addressDetail" placeholder="Địa chỉ chi tiết (số nhà, thôn xóm...)" value="{{ old('address', $info->address) }}">
+        
+            <!-- Cái này mới là cái thực lưu xuống DB -->
+            <input type="hidden" name="address" id="address" value="{{ old('address', $info->address) }}">
 
-                    <div>
-                        <label for="time_close">Giờ đóng cửa:</label>
-                        <input type="time" id="time_close" name="time_close" value="{{ old('time_close', $info->time_close) }}">
-                    </div>
-
-                    <div>
-                        <label for="is_active">Hoạt động:</label>
-                        <select id="is_active" name="is_active">
-                            <option value="1" {{ $info->is_active ? 'selected' : '' }}>Có</option>
-                            <option value="0" {{ !$info->is_active ? 'selected' : '' }}>Không</option>
-                        </select>
-                    </div>
-                    @break
-
-                @case('shipper')
-                    <div>
-                        <label for="area">Khu vực hoạt động:</label>
-                        <input type="text" id="area" name="area" value="{{ old('area', $info->area) }}">
-                    </div>
-                    @break
-            @endswitch
 
             <button type="submit">Cập nhật</button>
         </form>
         <hr>
+        <!-- JS xử lý preview avatar -->
+    <script>
+
+        // Lấy danh sách tỉnh từ API ngoài
+       document.addEventListener('DOMContentLoaded', function () {
+            const provinceSelect = document.getElementById('provinceSelect');
+            const districtSelect = document.getElementById('districtSelect');
+            const wardSelect = document.getElementById('wardSelect');
+            const addressDetail = document.getElementById('addressDetail');
+            const addressInput = document.getElementById('address');
+
+            function updateAddress() {
+                const province = provinceSelect.options[provinceSelect.selectedIndex]?.text || '';
+                const district = districtSelect.options[districtSelect.selectedIndex]?.text || '';
+                const ward = wardSelect.options[wardSelect.selectedIndex]?.text || '';
+                const detail = addressDetail.value.trim();
+
+                // Gộp lại thành 1 chuỗi address
+                const fullAddress = [detail, ward, district, province].filter(Boolean).join(', ');
+                addressInput.value = fullAddress;
+            }
+
+            fetch('https://provinces.open-api.vn/api/p/')
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(province => {
+                        const option = document.createElement('option');
+                        option.value = province.code;
+                        option.text = province.name;
+                        provinceSelect.appendChild(option);
+                    });
+                });
+
+            provinceSelect.addEventListener('change', function() {
+                const provinceId = this.value;
+                districtSelect.innerHTML = '<option value="">--Chọn Huyện--</option>';
+                wardSelect.innerHTML = '<option value="">--Chọn Xã--</option>';
+                updateAddress();
+
+                if (provinceId) {
+                    fetch(`https://provinces.open-api.vn/api/p/${provinceId}?depth=2`)
+                        .then(response => response.json())
+                        .then(data => {
+                            data.districts.forEach(district => {
+                                const option = document.createElement('option');
+                                option.value = district.code;
+                                option.text = district.name;
+                                districtSelect.appendChild(option);
+                            });
+                        });
+                }
+            });
+
+            districtSelect.addEventListener('change', function() {
+                const districtId = this.value;
+                wardSelect.innerHTML = '<option value="">--Chọn Xã--</option>';
+                updateAddress();
+
+                if (districtId) {
+                    fetch(`https://provinces.open-api.vn/api/d/${districtId}?depth=2`)
+                        .then(response => response.json())
+                        .then(data => {
+                            data.wards.forEach(ward => {
+                                const option = document.createElement('option');
+                                option.value = ward.code;
+                                option.text = ward.name;
+                                wardSelect.appendChild(option);
+                            });
+                        });
+                }
+            });
+
+            wardSelect.addEventListener('change', updateAddress);
+            addressDetail.addEventListener('input', updateAddress);
+        });
+
+
+        const avatarUpload = document.getElementById('avatar-upload');
+        const avatarPreview = document.getElementById('avatar-preview');
+
+        avatarUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                avatarPreview.src = URL.createObjectURL(file);
+            }
+        });
+
+
+    </script>
         
         <!-- Đổi mật khẩu -->
         <form action="{{ route('profile.change_password_form') }}" method="GET">
@@ -119,17 +185,6 @@
         </form>
     </div>
 
-    <!-- JS xử lý preview avatar -->
-    <script>
-        const avatarUpload = document.getElementById('avatar-upload');
-        const avatarPreview = document.getElementById('avatar-preview');
-
-        avatarUpload.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                avatarPreview.src = URL.createObjectURL(file);
-            }
-        });
-    </script>
+    
 </body>
 </html>
