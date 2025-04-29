@@ -35,6 +35,8 @@
         <label>Mô tả:</label>
         <textarea name="description">{{ $item->description }}</textarea><br><br>
 
+
+
         @if($type === 'beverage')
             <div id="sizeOptions">
                 <label>Giá theo Size:</label><br>
@@ -42,16 +44,19 @@
                     Size S:
                     <input type="number" name="sizes[S][old_price]" placeholder="Giá gốc Size S" value="{{ $item->sizes['S']['old_price'] ?? '' }}">
                     <input type="number" name="sizes[S][discount_percent]" placeholder="Giảm giá Size S" value="{{ $item->sizes['S']['discount_percent'] ?? '' }}">
+                    <input type="number" name="sizes[S][quantity]" placeholder="Số lượng Size S" value="{{ $item->sizes['S']['quantity'] ?? '' }}">
                 </div>
                 <div>
                     Size M:
                     <input type="number" name="sizes[M][old_price]" placeholder="Giá gốc Size M" value="{{ $item->sizes['M']['old_price'] ?? '' }}">
                     <input type="number" name="sizes[M][discount_percent]" placeholder="Giảm giá Size M" value="{{ $item->sizes['M']['discount_percent'] ?? '' }}">
+                    <input type="number" name="sizes[M][quantity]" placeholder="Số lượng Size M" value="{{ $item->sizes['M']['quantity'] ?? '' }}">
                 </div>
                 <div>
                     Size L:
                     <input type="number" name="sizes[L][old_price]" placeholder="Giá gốc Size L" value="{{ $item->sizes['L']['old_price'] ?? '' }}">
                     <input type="number" name="sizes[L][discount_percent]" placeholder="Giảm giá Size L" value="{{ $item->sizes['L']['discount_percent'] ?? '' }}">
+                    <input type="number" name="sizes[L][quantity]" placeholder="Số lượng Size L" value="{{ $item->sizes['L']['quantity'] ?? '' }}">
                 </div>
             </div><br>
         @else
@@ -60,6 +65,9 @@
 
             <label>Phần trăm giảm giá:</label>
             <input type="number" name="discount_percent" min="0" max="100" step="1" value="{{ $item->discount_percent }}"><br><br>
+            
+            <label>Số lượng:</label>
+            <input type="number" name="quantity" min="0" value="{{ $item->quantity ?? 0 }}"><br><br>
         @endif
 
         <label>Hình ảnh hiện tại:</label><br>

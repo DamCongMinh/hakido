@@ -12,7 +12,8 @@ class BeverageSize extends Model
         'beverage_id', 
         'size', 
         'old_price', 
-        'discount_percent'
+        'discount_percent',
+        'quantity',
     ];
 
     public function beverage()

@@ -6,8 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Restaurant extends Model
 {
+    protected $casts = [
+        'last_active_at' => 'datetime',
+    ];
+
     protected $fillable = [
-        'user_id', 'name', 'phone', 'avatar', 'date_of_birth', 'address'
+        'user_id', 'name', 'phone', 'avatar', 'date_of_birth', 'address' , 'last_active_at',
     ];
 
     public function user()

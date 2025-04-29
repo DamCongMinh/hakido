@@ -24,6 +24,7 @@
             <th>Hình</th>
             <th>Tên</th>
             <th>Danh mục</th>
+            <th>Số lượng</th>
             <th>Giá</th>
             <th>Trạng thái</th>
             <th>Hành động</th>
@@ -34,6 +35,7 @@
                 <td><img src="{{ asset('storage/' . $item->image) }}" width="60"></td>
                 <td>{{ $item->name }}</td>
                 <td>{{ $item->category?->name ?? 'Không có' }}</td>
+                <td>{{ $item->quantity }}</td> 
                 <td>
                     {{ number_format($item->old_price * (1 - ($item->discount_percent / 100))) }}đ
                 </td>
@@ -63,6 +65,7 @@
             <th>Hình</th>
             <th>Tên</th>
             <th>Danh mục</th>
+            <th>Tổng Số lượng</th>
             <th>Giá</th>
             <th>Trạng thái</th>
             <th>Hành động</th>
@@ -73,18 +76,15 @@
                 <td><img src="{{ asset('storage/' . $beverage->image) }}" width="60"></td>
                 <td>{{ $beverage->name }}</td>
                 <td>{{ $beverage->category?->name ?? 'Không có' }}</td>
+                <td>{{ $beverage->beverageSizes->sum('quantity') }}</td>
                 <td>
-                    @php
-                        $minSize = $beverage->beverageSizes->sortBy(function($size) {
-                            return $size->old_price * (1 - $size->discount_percent / 100);
-                        })->first();
-                    @endphp
-
-                    @if($minSize)
-                        {{ number_format($minSize->old_price * (1 - ($minSize->discount_percent / 100))) }}đ
-                    @else
-                        Chưa có giá
-                    @endif
+                    @foreach ($beverage->beverageSizes as $size)
+                        <div>
+                            <strong>{{ strtoupper($size->size) }}</strong>: 
+                            {{ number_format($size->old_price * (1 - $size->discount_percent / 100)) }}đ 
+                            (SL: {{ $size->quantity }})
+                        </div>
+                    @endforeach
                 </td>
                 <td>
                     <span class="{{ $beverage->status === 'approved' ? 'status-approved' : ($beverage->status === 'pending' ? 'status-pending' : 'status-rejected') }}">

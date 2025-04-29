@@ -18,8 +18,13 @@
         <div class="container">
             <div class="infor-product">
                 <div class="product-show">
-                    <img src="{{ asset('img/slide.png') }}" alt="product image">
+                    <img 
+                        src="{{ asset('storage/' . $product->image) }}" 
+                        alt="{{ $product->name }}"
+                        onerror="this.src='{{ asset('img/slide.png') }}'"
+                    >
                 </div>
+                
                 <div class="image-slider">
                     <button class="prev-btn">&#10094;</button> <!-- Nút trái -->
                     <div class="list-img">
@@ -34,44 +39,84 @@
                 </div>                
             </div>
             <div class="detail-product">
-                <h2>Product Name</h2>
+                <h2>{{ $product->name }}</h2>
                 <div class="restaurant">Tên Nhà Hàng :
-                    <p class="name-restaurant">Lorem ipsum dolor sit amet consectetur adipisicing elit. Earum esse qui eaque quis voluptate nobis voluptatibus nisi voluptates distinctio molestias! Quasi modi neque doloribus adipisci inventore necessitatibus ex iure veritatis?</p>
+                    <p class="name-restaurant">{{ $product->restaurant->name ?? 'Không rõ' }}</p>
                 </div>
-                <div class="descripttion">Mo ta :
-                    <p class="description">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Alias recusandae eos temporibus molestiae dolore non deleniti ipsam adipisci debitis accusantium ipsum, at impedit molestias tempora, autem ullam quasi. Blanditiis, illum.</p>
+                <div class="descripttion">Mô tả :
+                    <p class="description">{{ $product->description }}</p>
                 </div>
                 <div class="title">
                     <div class="title-left">
                         <div class="cost">
                             Giá Sản Phẩm :
                             <div class="price">
-                                <p class="old-price">Giá Cũ: <span id="old-price">$100</span></p>
-                                <p class="save">Tiết kiệm tới <span id="discount">20%</span></p>
+                                <p class="old-price">Giá Cũ:
+                                    <span id="old-price">
+                                        @if ($type === 'food')
+                                            {{ number_format($product->old_price ?? 0) }}₫
+                                        @else
+                                            {{ number_format($product->beverageSizes[0]->old_price ?? 0) }}₫
+                                        @endif
+                                    </span>
+                                </p>
+                                <p class="save">Tiết kiệm tới
+                                    <span id="discount">
+                                        @if ($type === 'food')
+                                            {{ $product->discount_percent ?? 0 }}%
+                                        @else
+                                            {{ $product->beverageSizes[0]->discount_percent ?? 0 }}%
+                                        @endif
+                                    </span>
+                                </p>
                             </div>
-                            <p class="new-price">Giá Mới: <span id="new-price">$80</span></p>
+                            
+                            <p class="new-price">Giá Mới:
+                                <span id="new-price">
+                                    @if ($type === 'food')
+                                        {{ number_format(($product->old_price ?? 0) * (100 - ($product->discount_percent ?? 0)) / 100) }}₫                                 
+                                    @endif
+                                </span>
+                            </p>
+                            
                         </div>
-                        
-                        <div class="size">
-                            <p class="size-title">Size:</p>
-                            <div class="size-list">
-                                <div class="size-item">
-                                    <input type="button" class="size-btn" value="S" data-price="80" data-old="100">
-                                    <input type="button" class="size-btn" value="M" data-price="90" data-old="110">
-                                    <input type="button" class="size-btn" value="L" data-price="100" data-old="120">
-                                    <input type="button" class="size-btn" value="XL" data-price="110" data-old="130">
+                    
+                        @if ($type === 'beverage' && $product->beverageSizes)
+                            <div class="size">
+                                <p class="size-title">Size:</p>
+                                <div class="size-list">
+                                    <div class="size-item">
+                                        @foreach($product->beverageSizes as $size)
+                                            @php
+                                                $price = $size->old_price * (100 - $size->discount_percent) / 100;
+                                            @endphp
+                                            <input 
+                                                type="button" 
+                                                class="size-btn"
+                                                value="{{ $size->size }}"
+                                                data-price="{{ $price }}" 
+                                                data-old="{{ $size->old_price }}" 
+                                                data-discount="{{ $size->discount_percent }}"
+                                                data-quantity="{{ $size->quantity }}"
+                                            >
+                                        @endforeach
+
+                                    </div>
                                 </div>
-                            </div>    
-                        </div>
+                            </div>
+                        @endif
+
+                    
                         <div class="amount">
                             <label for="quantity">Số lượng sản phẩm:</label>
                             <button class="decrease">-</button>
-                            <input type="number" id="quantity" value="1" min="1" max="100">
+                            <input type="number" id="quantity" value="1" min="1"
+                                max="{{ $type === 'food' ? $product->quantity : ($product->beverageSizes[0]->quantity ?? 1) }}">
                             <button class="increase">+</button>
-                        </div>
-                        
+                        </div>                        
+                    
                         <div class="total-payouts">
-                            <p>Tổng tiền cần thanh toán: <span id="total-amount">$80</span></p>
+                            <p>Tổng tiền cần thanh toán: <span id="total-amount">{{ number_format($product->price ?? 0) }}₫</span></p>
                         </div>                               
                         <div class="btn-nav">
                             <button class="btn-add">
@@ -127,12 +172,34 @@
         </div>
         <div class="info-restaurant">
             <div class="restaurant-left">
-                <img src="{{ asset ('img/restaurant_img1.jpg') }}" alt="Restaurant Avatar" class="restaurant-avatar">
+                <img 
+                    src="{{ asset('storage/' . $product->restaurant->avatar) }}" 
+                    alt="{{ $product->restaurant->name }}"
+                    onerror="this.src='{{ asset('img/restaurant_img1.jpg') }}'"
+                    class="restaurant-avatar"
+                />
                 <button class="btn-fav">Yêu Thích</button>
             </div>
             <div class="restaurant-middle">
-                <h3 class="restaurant-name">mini.house123</h3>
-                <p class="restaurant-status">Online 8 Phút Trước</p>
+                <h3 class="restaurant-name">{{ $product->restaurant->name }}</h3>
+
+                @php
+                    $restaurant = $product->restaurant;
+                    $lastActive = $restaurant->last_active_at;
+                    $isOnline = $lastActive && $lastActive->gt(now()->subMinutes(10));
+                    $totalProducts = $restaurant->foods_count + $restaurant->beverages_count;
+                @endphp
+
+                <p class="restaurant-status">
+                    @if ($isOnline)
+                        <span style="color: green;">Đang hoạt động</span>
+                    @elseif ($lastActive)
+                        Online {{ $lastActive->diffForHumans() }}
+                    @else
+                        Chưa có hoạt động gần đây
+                    @endif
+                </p>
+
                 <div class="restaurant-actions">
                     <button class="btn-chat"><i class="fa-solid fa-message"></i> Chat Ngay</button>
                     <button class="btn-view">Xem Nhà Hàng</button>
@@ -140,12 +207,15 @@
             </div>
             <div class="restaurant-right">
                 <div class="restaurant-stats">
-                    <div class="stat"><span>Đánh Giá</span><strong>149,9k</strong></div>
-                    <div class="stat"><span>Sản Phẩm</span><strong>50</strong></div>
-                    <div class="stat"><span>Tỉ Lệ Phản Hồi</span><strong>82%</strong></div>
-                    <div class="stat"><span>Thời Gian Phản Hồi</span><strong>trong vài giờ</strong></div>
-                    <div class="stat"><span>Tham Gia</span><strong>6 năm trước</strong></div>
-                    <div class="stat"><span>Người Theo Dõi</span><strong>539,9k</strong></div>
+                    <div class="stat"><span>Đánh Giá</span><strong>{{ number_format($product->restaurant->rating_count ?? 0) }}</strong></div>
+                    <div class="stat">
+                        <span>Sản Phẩm</span>
+                        <strong>{{ $totalProducts }}</strong>
+                    </div>
+                    <div class="stat"><span>Tỉ Lệ Phản Hồi</span><strong>{{ $product->restaurant->reply_rate ?? 'N/A' }}</strong></div>
+                    <div class="stat"><span>Thời Gian Phản Hồi</span><strong>{{ $product->restaurant->reply_time ?? 'N/A' }}</strong></div>
+                    <div class="stat"><span>Tham Gia</span><strong>{{ $product->restaurant->created_at->diffForHumans() }}</strong></div>
+                    <div class="stat"><span>Người Theo Dõi</span><strong>{{ number_format($product->restaurant->follower_count ?? 0) }}</strong></div>
                 </div>
             </div>
         </div>

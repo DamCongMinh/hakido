@@ -50,14 +50,20 @@
                 
             </div>
             <div class="header_right">
-                <div class="header_right--search">
-                    <div class="search-icon">
-                        <i class="fa-solid fa-magnifying-glass"></i>
+                <form id="searchForm" action="/search" method="GET" style="position: relative;">
+                    <div class="header_right--search">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" id="searchInput" name="keyword" placeholder="Tìm kiếm sản phẩm..." autocomplete="off">
+                        <input type="hidden" id="searchType" name="type" value="product"> 
                     </div>
-                    <div class="search-text">
-                        <input type="search" placeholder="Tìm kiếm sản phẩm">
+                
+                    <div id="suggestionsBox" class="search-suggestions">
+                        <ul id="suggestionsList"></ul>
                     </div>
-                </div>
+                </form>
+                
+                
+                
                 <div class="header_right--email">
                     <i class="fa-solid fa-envelope"></i>
                 </div>

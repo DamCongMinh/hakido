@@ -41,6 +41,10 @@
         
             <label>Phần trăm giảm giá:</label>
             <input type="number" name="discount_percent" min="0" max="100" step="1"><br><br>
+
+            <label>Số lượng:</label>
+            <input type="number" name="quantity" min="0"><br><br>
+
         </div>        
 
 
@@ -50,16 +54,19 @@
                 Size S:
                 <input type="number" name="sizes[S][old_price]" placeholder="Giá gốc Size S">
                 <input type="number" name="sizes[S][discount_percent]" placeholder="Giảm giá Size S">
+                <input type="number" name="sizes[S][quantity]" placeholder="Số lượng Size S">
             </div>
             <div>
                 Size M:
                 <input type="number" name="sizes[M][old_price]" placeholder="Giá gốc Size M">
                 <input type="number" name="sizes[M][discount_percent]" placeholder="Giảm giá Size M">
+                <input type="number" name="sizes[M][quantity]" placeholder="Số lượng Size M">
             </div>
             <div>
                 Size L:
                 <input type="number" name="sizes[L][old_price]" placeholder="Giá gốc Size L">
                 <input type="number" name="sizes[L][discount_percent]" placeholder="Giảm giá Size L">
+                <input type="number" name="sizes[L][quantity]" placeholder="Số lượng Size L">
             </div>
         </div>
 

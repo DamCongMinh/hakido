@@ -24,9 +24,12 @@ return Application::configure(basePath: dirname(__DIR__))
         // 🟢 Bổ sung middleware xử lý session
         $middleware->append([
             StartSession::class,
+            \App\Http\Middleware\UpdateLastActiveAt::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })
     ->create();
+
+    

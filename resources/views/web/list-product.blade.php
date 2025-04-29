@@ -99,7 +99,10 @@
 
                                         </div>
                                     </div>
-                                    <button class="btn btn-primary">Mua ngay</button>
+                                    <a href="{{ route('product.show', ['type' => $product->type, 'id' => $product->id]) }}">
+                                        <button class="btn btn-primary">Mua ngay</button>
+                                    </a>
+                                    
                                 </div>
                             </div>
                         @endforeach

@@ -14,6 +14,7 @@ class Food extends Model
         'description',
         'old_price',
         'discount_percent',
+        'quantity',
         'image',
         'status',
         'is_active',

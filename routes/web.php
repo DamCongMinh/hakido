@@ -18,6 +18,8 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ShowListProductController;
 use App\Http\Controllers\SearchAndFilterController;
+use App\Http\Controllers\SearchRestaurantController;
+use App\Http\Controllers\ShowDetailController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -34,6 +36,13 @@ Route::get('/products/category/{category_id}', [ShowListProductController::class
 Route::get('/products', [SearchAndFilterController::class, 'index'])->name('products.index');
 Route::get('/products/filter', [SearchAndFilterController::class, 'filter'])->name('products.filter');
 
+// tim kiem
+Route::get('/search', [SearchAndFilterController::class, 'search']);
+Route::get('/search-suggestions', [SearchAndFilterController::class, 'suggestions']);
+Route::get('/search-restaurant', [SearchRestaurantController::class, 'search'])->name('search.restaurant');
+
+//show detail product
+Route::get('/product/{type}/{id}', [ShowDetailController::class, 'show'])->name('product.show');
 
 
 

@@ -124,32 +124,35 @@
     gap: 32px;
 }
 
-.detail-product h2 {
-    font-size: 24px;
-    color: #333;
-    margin-bottom: 10px;
+/* Tên sản phẩm */
+h2 {
+    font-size: 28px;
+    font-weight: 800;
+    color: #1a1a1a;
+    margin-bottom: 16px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* Nhóm chung cho nhà hàng và mô tả */
 .restaurant,
-.descripttion,
-.cost,
-.size p ,
-.amount {
-    font-size: 1.4rem;
+.descripttion {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 12px;
 }
 
-.name-restaurant, 
+/* Phần nội dung bên trong */
+.name-restaurant,
 .description {
+    font-weight: 400;
+    font-size: 16px;
+    margin-top: 4px;
+    margin-left: 12px;
     color: #666;
-    font-size: 1.3rem;
-    line-height: 1.5;
-    margin-left: 15px;
+    font-style: italic;
 }
 
-.name-restaurant p, 
-.description p {
-    font-size: 1.2rem;
-}
 
 .title {
     width: 100%;
@@ -257,6 +260,15 @@
     font-weight: 600;
     cursor: pointer;
 }
+
+.size-btn.active {
+    background-color: #24c43c;
+    color: #fff;
+    border-color: #3b1e99;
+    font-weight: bold;
+    transform: scale(1.05);
+}
+
 
 
 
