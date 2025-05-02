@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Chi tiết sản phẩm</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/detail_product.css') }}">
     <link rel="stylesheet" href="{{ asset('css/base.css') }}">   
@@ -119,10 +119,33 @@
                             <p>Tổng tiền cần thanh toán: <span id="total-amount">{{ number_format($product->price ?? 0) }}₫</span></p>
                         </div>                               
                         <div class="btn-nav">
-                            <button class="btn-add">
-                                <i class="fa fa-shopping-cart"></i>
-                                Thêm vào giỏ hàng
-                            </button>                
+                            <form action="{{ route('cart.add') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="type" value="{{ $type }}">
+                                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                <input type="hidden" name="quantity" id="form-quantity" value="1">
+                                @if($type === 'beverage')
+                                    <input type="hidden" name="size" id="selected-size" value="">
+                                @endif
+                                <button type="submit" class="btn-add">
+                                    <i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
+                                </button>
+
+                            </form>
+
+                            @if(session('success'))
+                                <div class="alert alert-success">
+                                    {{ session('success') }}
+                                </div>
+                            @endif
+
+                            @if(session('error'))
+                                <div class="alert alert-danger">
+                                    {{ session('error') }}
+                                </div>
+                            @endif
+
+                                           
                             <button class="btn-buy"> Mua hàng</button>
                         </div>
                     </div>

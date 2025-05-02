@@ -110,10 +110,10 @@
                                     @endif
 
                                     <!-- Nếu là customer -->
-                                    {{-- @if (Auth::user()->role === 'customer')
-                                        <a href="{{ route('customer.orders') }}">Đơn mua của tôi</a>
+                                    @if (Auth::user()->role === 'customer')
+                                        <a href="{{ route('cart.show') }}">Giỏ hàng của tôi</a>
                                         
-                                    @endif --}}
+                                    @endif
 
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf

@@ -54,6 +54,10 @@ document.addEventListener("DOMContentLoaded", function () {
     
             sizeButtons.forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
+
+            if (selectedSizeInput) {
+                selectedSizeInput.value = button.value;
+            }
     
             // 👉 Hiển thị phần tổng tiền nếu đang ẩn
             const totalBox = document.querySelector('.total-payouts');

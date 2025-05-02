@@ -12,9 +12,12 @@ class Order extends Model
         'shipper_id',
         'status',
         'total',
-        'address',
+        'receiver_name',
+        'receiver_phone',
+        'receiver_address',
+        'payment_method',
+        'note',
     ];
-
     // Mối quan hệ với khách hàng (customer)
     public function customer()
     {
@@ -36,6 +39,7 @@ class Order extends Model
     // Mối quan hệ với chi tiết đơn hàng (nếu có)
     public function orderItems()
     {
-        return $this->hasMany(OrderItem::class);
+        return $this->hasMany(OrderItem::class, 'order_id');
     }
+
 }

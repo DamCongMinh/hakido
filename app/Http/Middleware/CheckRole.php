@@ -16,4 +16,5 @@ class CheckRole
 
         return $next($request);
     }
+
 }

@@ -20,9 +20,10 @@ use App\Http\Controllers\ShowListProductController;
 use App\Http\Controllers\SearchAndFilterController;
 use App\Http\Controllers\SearchRestaurantController;
 use App\Http\Controllers\ShowDetailController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\OrderController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
-
 use App\Http\Controllers\Restaurant\RestaurantProductController;
 use App\Http\Controllers\Restaurant\RestaurantStatisticsController;
 // Giao diện chính (FE)
@@ -43,8 +44,6 @@ Route::get('/search-restaurant', [SearchRestaurantController::class, 'search'])-
 
 //show detail product
 Route::get('/product/{type}/{id}', [ShowDetailController::class, 'show'])->name('product.show');
-
-
 
 // Route::get('/list-product', fn () => view('web.list-product'))->name('list-product');
 Route::get('/detail', fn () => view('web.detail_product'))->name('detail');
@@ -98,6 +97,25 @@ Route::get('login/facebook/callback', [FacebookController::class, 'callback']);
 Route::get('login/google', [GoogleController::class, 'redirect']);
 Route::get('login/google/callback', [GoogleController::class, 'callback']);
 
+//customer
+
+Route::middleware(['auth', 'role:customer'])->group(function () {
+    // Giỏ hàng
+    Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+    Route::get('/cart', [CartController::class, 'show'])->name('cart.show');
+    Route::get('/cart/checkout', [CartController::class, 'showCheckout'])->name('cart.checkout');
+    Route::post('/cart/checkout', [CartController::class, 'processCheckout'])->name('cart.processCheckout'); 
+    Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+    Route::delete('/cart/remove', [CartController::class, 'removeItem'])->name('cart.removeItem');
+
+    // Đặt hàng
+    Route::post('/orders/store', [OrderController::class, 'store'])->name('orders.store');
+
+    // Đặt hàng thành công
+    Route::get('/order/success/{id}', [OrderController::class, 'success'])->name('order.success');
+});
+
+
 // Trang thông tin cá nhân
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'home_info'])->name('profile.home_info');
@@ -107,6 +125,8 @@ Route::middleware(['auth'])->group(function () {
     // Route đổi mật khẩu
     Route::get('/profile/change-password', [ProfileController::class, 'showChangePasswordForm'])->name('profile.change_password_form');
     Route::post('/profile/change-password', [ProfileController::class, 'changePassword'])->name('profile.change_password');
+
+
 });
 
 
