@@ -99,15 +99,17 @@
                                     <!-- Nếu là restaurant -->
                                     @if (Auth::user()->role === 'restaurant')
                                         <a href="{{ route('restaurant.products.home') }}">Quản lý sản phẩm</a>
-                                        <a href="{{ route('restaurant') }}">Quản lý đơn hàng</a>
+                                        <a href="{{ route('restaurant.statistics.index') }}">Quản lý đơn hàng</a>
                                         <a href="{{ route('restaurant.statistics.home') }}">Thống kê</a>
                                     @endif
 
                                     <!-- Nếu là shipper -->
                                     @if (Auth::user()->role === 'shipper')
-                                        <a href="{{ route('shiper') }}">Đơn hàng giao</a> 
-                                        
+                                        <a href="{{ route('shipper.orders.available') }}">🛒 Đơn hàng đang chờ</a>
+                                        <a href="{{ route('shipper.orders.current') }}">🚚 Đơn đang giao</a>
+                                        <a href="{{ route('shipper.orders.history') }}">📜 Lịch sử giao hàng</a>
                                     @endif
+
 
                                     <!-- Nếu là customer -->
                                     @if (Auth::user()->role === 'customer')

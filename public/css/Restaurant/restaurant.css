@@ -131,6 +131,7 @@ body {
 }
 
 /* --- Đơn hàng gần đây --- */
+
 .recent-orders {
     margin: 60px 20px;
 }
@@ -154,12 +155,13 @@ body {
 .recent-orders td {
     padding: 15px 20px;
     text-align: left;
-    border-bottom: 1px solid #eee;
+    border: 1px solid #282626;
 }
 
 .recent-orders th {
-    background-color: #f3f4f6;
+    background-color: #1bbe49;
     font-weight: bold;
+    border: 1px solid #242323;
 }
 
 .recent-orders td {
@@ -168,41 +170,65 @@ body {
 
 /* Trạng thái */
 .status {
-    padding: 5px 10px;
-    border-radius: 8px;
-    font-size: 0.9rem;
     display: inline-block;
-    font-weight: bold;
-    text-align: center;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: white;
+    text-transform: capitalize;
 }
 
 .status.pending {
-    background-color: #ff9900;
-    color: #fff;
+    background-color: #f0ad4e; /* vàng */
 }
 
 .status.processing {
-    background-color: #ffa500;
-    color: #fff;
+    background-color: #0275d8; /* xanh dương */
+}
+
+.status.shipping {
+    background-color: #5bc0de; /* xanh trời */
 }
 
 .status.completed {
-    background-color: #28a745;
-    color: #fff;
+    background-color: #5cb85c; /* xanh lá */
 }
 
-/* Link điều hướng */
-.action-links {
-    margin-top: 20px;
-    text-align: center;
+.status.cancelled {
+    background-color: #d9534f; /* đỏ */
 }
 
-.action-links a {
-    color: #3490dc;
-    text-decoration: none;
-    margin: 0 5px;
+.status.other {
+    background-color: #999;
 }
 
-.action-links a:hover {
-    text-decoration: underline;
+.btn-approve,
+.btn-cancel {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
 }
+
+.btn-approve {
+    background-color: #5cb85c;
+    color: white;
+}
+
+.btn-approve:hover {
+    background-color: #4cae4c;
+}
+
+.btn-cancel {
+    background-color: #d9534f;
+    color: white;
+    margin-left: 5px;
+}
+
+.btn-cancel:hover {
+    background-color: #c9302c;
+}
+

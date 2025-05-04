@@ -50,6 +50,13 @@
 
     <h4>Tổng tiền: {{ number_format($totalAmount) }}₫</h4>
 
+    <h4>Khoảng cách: {{ number_format($distance, 2) }} km</h4>
+    <h4>Phí ship: {{ number_format($shippingFee) }}₫</h4>
+
+
+
+
+
     <form action="{{ route('orders.store') }}" method="POST">
         @csrf
     
@@ -76,12 +83,14 @@
 
 
 
-        <label>Phương thức thanh toán</label>
-        <select name="payment_method" required>
-            <option value="cod">Thanh toán khi nhận hàng</option>
-            <option value="bank">Chuyển khoản ngân hàng</option>
-            <option value="vnpay">VNPAY</option>
+        <label for="payment_method">Chọn phương thức thanh toán</label>
+        <select name="payment_method" id="payment_method" required>
+            <option value="" disabled selected>-- Vui lòng chọn --</option>
+            <option value="cod">🛵 Thanh toán khi nhận hàng (COD)</option>
+            <option value="bank">🏦 Chuyển khoản ngân hàng</option>
+            <option value="vnpay">💳 Thanh toán qua VNPAY</option>
         </select>
+
     
         <!-- FIXED: safely encode items to hidden input -->
         <input type="hidden" name="items" value='@json($items)'>

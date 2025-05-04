@@ -1,5 +1,6 @@
 <?php
 use App\Models\User;
+use App\Http\Controllers\Shipper\ShipperOrderController;
 use App\Http\Controllers\Admin\AdminStatisticController;
 use App\Http\Controllers\Admin\SlideController;
 use App\Http\Controllers\Admin\CategoryController;
@@ -22,6 +23,7 @@ use App\Http\Controllers\SearchRestaurantController;
 use App\Http\Controllers\ShowDetailController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\Restaurant\RestaurantProductController;
@@ -77,9 +79,6 @@ Route::get('/login', function () {
 Route::get('/control_product', [ProductController::class, 'index'])->name('control_product')->middleware(['auth', 'admin']);
 
 
-// load image
-// Route::post('/update/{id}', [FoodController::class, 'update'])->name('foods.update');
-
 
 
 // Xử lý đăng nhập
@@ -110,6 +109,15 @@ Route::middleware(['auth', 'role:customer'])->group(function () {
 
     // Đặt hàng
     Route::post('/orders/store', [OrderController::class, 'store'])->name('orders.store');
+    
+   // Demo chuyển khoản ngân hàng
+    Route::get('/payment/bank/{order}', [PaymentController::class, 'bank'])->name('payment.bank');
+
+    // Demo VNPAY giả lập
+    Route::get('/payment/vnpay/{order}', [PaymentController::class, 'vnpay'])->name('payment.vnpay');
+
+    // Tùy chọn: route callback từ VNPAY (nếu tích hợp thật sau này)
+    Route::get('/vnpay-return', [PaymentController::class, 'vnpayReturn'])->name('vnpay.return');
 
     // Đặt hàng thành công
     Route::get('/order/success/{id}', [OrderController::class, 'success'])->name('order.success');
@@ -213,10 +221,20 @@ Route::get('/admin/statistics', [AdminStatisticController::class, 'index'])
     Route::put('/products/{id}', [RestaurantProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{id}', [RestaurantProductController::class, 'destroy'])->name('products.destroy');
 
-    //thống kê
+    //thống kê và quản lý đơn hàng
     Route::get('/statistics', [RestaurantStatisticsController::class, 'index'])->name('statistics.index');
     Route::get('/statistics/home', [RestaurantStatisticsController::class, 'home'])->name('statistics.home');
-
+    Route::post('/orders/{id}/approve', [RestaurantStatisticsController::class, 'approveOrder'])->name('order.approve');
+    Route::post('/orders/{id}/cancel', [RestaurantStatisticsController::class, 'cancelOrder'])->name('order.cancel');
+    
 });
 
-    
+// shipper
+Route::prefix('shipper/orders')->name('shipper.orders.')->middleware(['auth'])->group(function () {
+    Route::get('/available', [ShipperOrderController::class, 'availableOrders'])->name('available');
+    Route::post('/accept/{id}', [ShipperOrderController::class, 'acceptOrder'])->name('accept');
+    Route::get('/current', [ShipperOrderController::class, 'currentDelivery'])->name('current');
+    Route::post('/update-status/{id}', [ShipperOrderController::class, 'updateStatus'])->name('updateStatus');
+    Route::get('/history', [ShipperOrderController::class, 'deliveryHistory'])->name('history');
+});
+

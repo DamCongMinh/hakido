@@ -24,7 +24,6 @@ class OrderController extends Controller
                 return response()->json(['error' => 'Giỏ hàng trống hoặc dữ liệu không hợp lệ'], 400);
             }
 
-            // Lấy tất cả restaurant_id từ các sản phẩm
             $restaurantIds = [];
 
             foreach ($items as $item) {
@@ -51,7 +50,24 @@ class OrderController extends Controller
 
             $restaurantId = $uniqueRestaurantIds[0];
 
-            // Tạo đơn hàng
+            // ==== TÍNH KHOẢNG CÁCH & PHÍ SHIP ====
+            $restaurant = DB::table('restaurants')->where('id', $restaurantId)->first();
+            $customer = auth()->user()->customer;
+
+            // Nếu có cùng tỉnh thì dùng phí cố định
+            if (isset($restaurant->province, $customer->province) && $restaurant->province === $customer->province) {
+                $shippingFee = 30000; 
+                $distance = 0;
+            } else {
+                $distance = $this->haversineDistance(
+                    $restaurant->latitude, $restaurant->longitude,
+                    $customer->latitude, $customer->longitude
+                );
+                $shippingFee = min(100000, max(15000, round($distance * 4000)));
+            }
+
+
+            // ==== TẠO ĐƠN HÀNG ====
             $order = Order::create([
                 'customer_id' => auth()->id(),
                 'restaurant_id' => $restaurantId,
@@ -61,6 +77,7 @@ class OrderController extends Controller
                 'payment_method' => $request->input('payment_method'),
                 'note' => $request->input('note'),
                 'status' => 'pending',
+                'shipping_fee' => $shippingFee,
             ]);
 
             foreach ($items as $item) {
@@ -75,8 +92,8 @@ class OrderController extends Controller
                         ->where('size', $item['size'])
                         ->first();
 
-                    if (!$size || !isset($size->old_price)) {
-                        throw new \Exception('Không tìm thấy thông tin giá cho size đồ uống');
+                    if (!$size) {
+                        throw new \Exception('Không tìm thấy thông tin size đồ uống');
                     }
 
                     $discount = $size->discount_percent ?? 0;
@@ -92,17 +109,13 @@ class OrderController extends Controller
                         ->where('id', $item['product_id'])
                         ->first();
 
-                    if (!$food || !isset($food->old_price)) {
-                        throw new \Exception('Dữ liệu món ăn không hợp lệ');
+                    if (!$food) {
+                        throw new \Exception('Không tìm thấy món ăn');
                     }
 
                     $discount = $food->discount_percent ?? 0;
                     $price = $food->old_price * (1 - ($discount / 100));
                     $productName = $food->name ?? 'Món ăn';
-                }
-
-                if ($price === null) {
-                    throw new \Exception('Không tìm thấy giá sản phẩm');
                 }
 
                 $quantity = $item['quantity'] ?? 1;
@@ -123,17 +136,47 @@ class OrderController extends Controller
             }
 
             $total = OrderItem::where('order_id', $order->id)->sum('total_price');
-            $order->update(['total' => $total]);
+            $order->update(['total' => $total + $shippingFee]);
 
             DB::commit();
 
-            return redirect()->route('order.success', $order->id);
+            switch ($order->payment_method) {
+                case 'cod':
+                    return redirect()->route('order.success', $order->id)
+                        ->with('success', 'Đặt hàng thành công. Thanh toán khi nhận hàng.');
+
+                case 'bank':
+                    return redirect()->route('payment.bank', $order->id);
+
+                case 'vnpay':
+                    return redirect()->route('payment.vnpay', $order->id);
+
+                default:
+                    return redirect()->route('order.success', $order->id)
+                        ->with('warning', 'Phương thức thanh toán không xác định. Đã xử lý đơn hàng.');
+            }
 
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Lỗi lưu đơn hàng: ' . $e->getMessage());
             return response()->json(['error' => 'Đã có lỗi xảy ra: ' . $e->getMessage()], 500);
         }
+    }
+
+    // Haversine helper (thêm vào trong controller)
+    private function haversineDistance($lat1, $lon1, $lat2, $lon2)
+    {
+        $earthRadius = 6371; // km
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
+
+        $a = sin($dLat / 2) ** 2 +
+            cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+            sin($dLon / 2) ** 2;
+
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        return $earthRadius * $c;
     }
 
     public function success($id)

@@ -6,18 +6,33 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
+
+    public static function statusMapping(): array
+    {
+        return [
+            'pending'    => 'Chờ xác nhận',
+            'processing' => 'Chờ Shipper nhận đơn',
+            'delivering' => 'Đang giao',
+            'completed'  => 'Hoàn thành',
+            'canceled'   => 'Đã hủy',
+        ];
+    }
+
     protected $fillable = [
         'customer_id',
         'restaurant_id',
         'shipper_id',
         'status',
         'total',
+        'shipping_fee',
         'receiver_name',
         'receiver_phone',
         'receiver_address',
         'payment_method',
         'note',
     ];
+    
+    
     // Mối quan hệ với khách hàng (customer)
     public function customer()
     {

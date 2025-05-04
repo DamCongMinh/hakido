@@ -78,6 +78,7 @@ class CartController extends Controller
         $cart = $user->cart()->with('items')->first();
 
         $cartItems = [];
+        $restaurantId = null;
 
         if ($cart) {
             foreach ($cart->items as $item) {
@@ -85,11 +86,13 @@ class CartController extends Controller
                     $product = Food::find($item->product_id);
                     $name = $product?->name ?? 'Không rõ';
                     $image = $product?->image ?? null;
+                    $restaurantId = $product?->restaurant_id;
                 } else {
                     $product = Beverage::find($item->product_id);
                     $size = $item->size;
                     $name = $product ? $product->name . ' (Size ' . $size . ')' : 'Không rõ';
                     $image = $product?->image ?? null;
+                    $restaurantId = $product?->restaurant_id;
                 }
 
                 $cartItems[] = [
@@ -107,11 +110,55 @@ class CartController extends Controller
 
         $totalAmount = collect($cartItems)->sum('total');
 
+        $restaurant = $restaurantId ? \App\Models\Restaurant::find($restaurantId) : null;
+        $customer = $user->customer;
+
+        $distance = null;
+        $shippingFee = 0;
+
+        if ($restaurant && $customer && $restaurant->latitude && $restaurant->longitude && $customer->latitude && $customer->longitude) {
+            $distance = $this->haversineDistance(
+                $restaurant->latitude,
+                $restaurant->longitude,
+                $customer->latitude,
+                $customer->longitude
+            );
+            $shippingFee = min(100000, max(15000, round($distance * 1000)));
+
+        }
+
         return view('web.checkout', [
             'items' => $cartItems,
             'totalAmount' => $totalAmount,
+            'distance' => $distance,
+            'shippingFee' => $shippingFee,
+            'restaurant' => $restaurant,
+            'customer' => $customer,
         ]);
     }
+
+    private function haversineDistance($lat1, $lon1, $lat2, $lon2)
+    {
+        $earthRadius = 6371; // km
+
+        $lat1 = deg2rad($lat1);
+        $lon1 = deg2rad($lon1);
+        $lat2 = deg2rad($lat2);
+        $lon2 = deg2rad($lon2);
+
+        $latDelta = $lat2 - $lat1;
+        $lonDelta = $lon2 - $lon1;
+
+        $a = sin($latDelta / 2) ** 2 +
+            cos($lat1) * cos($lat2) *
+            sin($lonDelta / 2) ** 2;
+
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        return $earthRadius * $c;
+    }
+
+
 
     // ✅ POST /cart/checkout (submit đơn hàng)
     public function processCheckout(Request $request)
@@ -177,31 +224,31 @@ class CartController extends Controller
         ]);
     }
 
-    // public function removeItem(Request $request)
-    // {
-    //     $request->validate([
-    //         'product_id' => 'required|integer',
-    //         'product_type' => 'required|in:food,beverage',
-    //         'size' => 'nullable|string',
-    //     ]);
+    public function removeItem(Request $request)
+    {
+        $request->validate([
+            'product_id' => 'required|integer',
+            'product_type' => 'required|in:food,beverage',
+            'size' => 'nullable|string',
+        ]);
 
-    //     $user = auth()->user();
-    //     if (!$user || !$user->cart) {
-    //         return back()->with('error', 'Không thể thực hiện thao tác.');
-    //     }
+        $user = auth()->user();
+        if (!$user || !$user->cart) {
+            return back()->with('error', 'Không thể thực hiện thao tác.');
+        }
 
-    //     $query = $user->cart->items()
-    //         ->where('product_id', $request->product_id)
-    //         ->where('product_type', $request->product_type);
+        $query = $user->cart->items()
+            ->where('product_id', $request->product_id)
+            ->where('product_type', $request->product_type);
 
-    //     if ($request->product_type === 'beverage') {
-    //         $query->where('size', $request->size);
-    //     }
+        if ($request->product_type === 'beverage') {
+            $query->where('size', $request->size);
+        }
 
-    //     $query->delete();
+        $query->delete();
 
-    //     return back()->with('success', 'Đã xóa sản phẩm khỏi giỏ hàng.');
-    // }
+        return back()->with('success', 'Đã xóa sản phẩm khỏi giỏ hàng.');
+    }
 
 
     public function clear()

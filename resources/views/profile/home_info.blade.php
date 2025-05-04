@@ -23,7 +23,7 @@
         @endif
 
         @if ($info)
-        <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
+        <form id="profile-form" method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
             @csrf
 
             <!-- Avatar khu vực -->
@@ -72,6 +72,10 @@
             </select>
         
             <input type="text" id="addressDetail" placeholder="Địa chỉ chi tiết (số nhà, thôn xóm...)" value="{{ old('address', $info->address) }}">
+
+            <input type="hidden" id="latitude" name="latitude">
+            <input type="hidden" id="longitude" name="longitude">
+
         
             <!-- Cái này mới là cái thực lưu xuống DB -->
             <input type="hidden" name="address" id="address" value="{{ old('address', $info->address) }}">
@@ -80,96 +84,7 @@
             <button type="submit">Cập nhật</button>
         </form>
         <hr>
-        <!-- JS xử lý preview avatar -->
-    <script>
-
-        // Lấy danh sách tỉnh từ API ngoài
-       document.addEventListener('DOMContentLoaded', function () {
-            const provinceSelect = document.getElementById('provinceSelect');
-            const districtSelect = document.getElementById('districtSelect');
-            const wardSelect = document.getElementById('wardSelect');
-            const addressDetail = document.getElementById('addressDetail');
-            const addressInput = document.getElementById('address');
-
-            function updateAddress() {
-                const province = provinceSelect.options[provinceSelect.selectedIndex]?.text || '';
-                const district = districtSelect.options[districtSelect.selectedIndex]?.text || '';
-                const ward = wardSelect.options[wardSelect.selectedIndex]?.text || '';
-                const detail = addressDetail.value.trim();
-
-                // Gộp lại thành 1 chuỗi address
-                const fullAddress = [detail, ward, district, province].filter(Boolean).join(', ');
-                addressInput.value = fullAddress;
-            }
-
-            fetch('https://provinces.open-api.vn/api/p/')
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(province => {
-                        const option = document.createElement('option');
-                        option.value = province.code;
-                        option.text = province.name;
-                        provinceSelect.appendChild(option);
-                    });
-                });
-
-            provinceSelect.addEventListener('change', function() {
-                const provinceId = this.value;
-                districtSelect.innerHTML = '<option value="">--Chọn Huyện--</option>';
-                wardSelect.innerHTML = '<option value="">--Chọn Xã--</option>';
-                updateAddress();
-
-                if (provinceId) {
-                    fetch(`https://provinces.open-api.vn/api/p/${provinceId}?depth=2`)
-                        .then(response => response.json())
-                        .then(data => {
-                            data.districts.forEach(district => {
-                                const option = document.createElement('option');
-                                option.value = district.code;
-                                option.text = district.name;
-                                districtSelect.appendChild(option);
-                            });
-                        });
-                }
-            });
-
-            districtSelect.addEventListener('change', function() {
-                const districtId = this.value;
-                wardSelect.innerHTML = '<option value="">--Chọn Xã--</option>';
-                updateAddress();
-
-                if (districtId) {
-                    fetch(`https://provinces.open-api.vn/api/d/${districtId}?depth=2`)
-                        .then(response => response.json())
-                        .then(data => {
-                            data.wards.forEach(ward => {
-                                const option = document.createElement('option');
-                                option.value = ward.code;
-                                option.text = ward.name;
-                                wardSelect.appendChild(option);
-                            });
-                        });
-                }
-            });
-
-            wardSelect.addEventListener('change', updateAddress);
-            addressDetail.addEventListener('input', updateAddress);
-        });
-
-
-        const avatarUpload = document.getElementById('avatar-upload');
-        const avatarPreview = document.getElementById('avatar-preview');
-
-        avatarUpload.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                avatarPreview.src = URL.createObjectURL(file);
-            }
-        });
-
-
-    </script>
-        
+                
         <!-- Đổi mật khẩu -->
         <form action="{{ route('profile.change_password_form') }}" method="GET">
             <button type="submit">Đổi mật khẩu</button>
@@ -183,8 +98,144 @@
             @csrf
             <button type="submit" style="color:red;">Xóa tài khoản</button>
         </form>
+
+
+        
     </div>
 
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('profile-form');
+            const provinceSelect = document.getElementById('provinceSelect');
+            const districtSelect = document.getElementById('districtSelect');
+            const wardSelect = document.getElementById('wardSelect');
+            const addressDetail = document.getElementById('addressDetail');
+            const addressInput = document.getElementById('address');
+            const latInput = document.getElementById('latitude');
+            const lonInput = document.getElementById('longitude');
+        
+            const apiKey = '5b3ce3597851110001cf6248e923306a50f44e078f6f068d3c8f1661'; // 🔐 thay bằng API key thật nếu cần
+        
+            function updateAddress() {
+                const province = provinceSelect.options[provinceSelect.selectedIndex]?.text || '';
+                const district = districtSelect.options[districtSelect.selectedIndex]?.text || '';
+                const ward = wardSelect.options[wardSelect.selectedIndex]?.text || '';
+                const detail = addressDetail.value.trim();
+                const fullAddress = [detail, ward, district, province].filter(Boolean).join(', ');
+                addressInput.value = fullAddress;
+            }
+        
+            // Fetch tỉnh
+            fetch('https://provinces.open-api.vn/api/p/')
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(province => {
+                        const option = document.createElement('option');
+                        option.value = province.code;
+                        option.text = province.name;
+                        provinceSelect.appendChild(option);
+                    });
+                });
+        
+            // Fetch huyện khi chọn tỉnh
+            provinceSelect.addEventListener('change', function() {
+                const provinceId = this.value;
+                districtSelect.innerHTML = '<option value="">--Chọn Huyện--</option>';
+                wardSelect.innerHTML = '<option value="">--Chọn Xã--</option>';
+                updateAddress();
+        
+                if (provinceId) {
+                    fetch(`https://provinces.open-api.vn/api/p/${provinceId}?depth=2`)
+                        .then(response => response.json())
+                        .then(data => {
+                            data.districts.forEach(district => {
+                                const option = document.createElement('option');
+                                option.value = district.code;
+                                option.text = district.name;
+                                districtSelect.appendChild(option);
+                            });
+                        });
+                }
+            });
+        
+            // Fetch xã khi chọn huyện
+            districtSelect.addEventListener('change', function() {
+                const districtId = this.value;
+                wardSelect.innerHTML = '<option value="">--Chọn Xã--</option>';
+                updateAddress();
+        
+                if (districtId) {
+                    fetch(`https://provinces.open-api.vn/api/d/${districtId}?depth=2`)
+                        .then(response => response.json())
+                        .then(data => {
+                            data.wards.forEach(ward => {
+                                const option = document.createElement('option');
+                                option.value = ward.code;
+                                option.text = ward.name;
+                                wardSelect.appendChild(option);
+                            });
+                        });
+                }
+            });
+        
+            // Cập nhật địa chỉ khi thay đổi
+            wardSelect.addEventListener('change', updateAddress);
+            addressDetail.addEventListener('input', updateAddress);
+        
+            // Avatar preview
+            const avatarUpload = document.getElementById('avatar-upload');
+            const avatarPreview = document.getElementById('avatar-preview');
+            avatarUpload.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    avatarPreview.src = URL.createObjectURL(file);
+                }
+            });
+        
+            // Gọi API lấy tọa độ
+            async function fetchCoordinates(address) {
+                const url = `https://api.openrouteservice.org/geocode/search?api_key=${apiKey}&text=${encodeURIComponent(address)}&size=1`;
+        
+                try {
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    if (data.features && data.features.length > 0) {
+                        const [lon, lat] = data.features[0].geometry.coordinates;
+                        return { lat, lon };
+                    } else {
+                        return { lat: null, lon: null };
+                    }
+                } catch (err) {
+                    console.error("Lỗi khi fetch tọa độ:", err);
+                    return { lat: null, lon: null };
+                }
+            }
+        
+            // Handle submit form
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+        
+                updateAddress(); // cập nhật lại địa chỉ đầy đủ
+        
+                const fullAddress = addressInput.value.trim();
+                if (!fullAddress) {
+                    alert("Vui lòng nhập đầy đủ địa chỉ.");
+                    return;
+                }
+        
+                const { lat, lon } = await fetchCoordinates(fullAddress);
+                if (lat && lon) {
+                    latInput.value = lat;
+                    lonInput.value = lon;
+                    form.submit(); // sau khi có tọa độ mới submit
+                } else {
+                    alert("Không lấy được tọa độ cho địa chỉ đã nhập.");
+                }
+            });
+        });
+        </script>
+        
     
 </body>
 </html>

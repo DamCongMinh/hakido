@@ -23,31 +23,13 @@
                     @if (isset($todayOrders))
                         <p>Hôm nay có {{ $todayOrders }} đơn hàng</p>
                     @endif
-
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-content">
-                    <h3>Đơn đang giao</h3>
-                    <p>{{ $shippingOrders ?? 0 }} đơn</p>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-content">
-                    <h3>Đơn đã huỷ</h3>
-                    <p>{{ $canceledOrders ?? 0 }} đơn</p>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-content">
-                    <h3>Đơn hoàn thành</h3>
-                    <p>{{ $totalOrders ?? 0 }} đơn</p>
-                </div>
-            </div>
-            
+            <div class="card"><div class="card-content"><h3>Đơn đang giao</h3><p>{{ $shippingOrders ?? 0 }} đơn</p></div></div>
+            <div class="card"><div class="card-content"><h3>Đơn đã huỷ</h3><p>{{ $canceledOrders ?? 0 }} đơn</p></div></div>
+            <div class="card"><div class="card-content"><h3>Đơn hoàn thành</h3><p>{{ $totalOrders ?? 0 }} đơn</p></div></div>
+
             <div class="card">
                 <div class="card-content">
                     <h3>Tỷ lệ hoàn thành</h3>
@@ -59,19 +41,16 @@
                     </p>
                 </div>
             </div>
-            
 
             <div class="card">
                 <div class="card-content">
                     @if (isset($processingOrders))
                         <p>Đơn đang xử lý: {{ $processingOrders }}</p>
                     @endif
-
                 </div>
             </div>
 
             <a href="{{ route('restaurant.statistics.home') }}" class="card-link">
-
                 <div class="card">
                     <div class="card-content">
                         <h3>Doanh thu</h3>
@@ -93,6 +72,7 @@
                         <th>Khách hàng</th>
                         <th>Ngày đặt</th>
                         <th>Tình trạng</th>
+                        <th>Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -103,35 +83,70 @@
                             <td>{{ \Carbon\Carbon::parse($order->created_at)->format('d/m/Y') }}</td>
                             <td>
                                 <span class="status {{ getStatusClass($order->status) }}">
-                                    {{ ucfirst($order->status) }}
+                                    {{ getStatusLabel($order->status) }}
                                 </span>
                             </td>
+                            <td>
+                                @if(in_array($order->status, ['pending', 'processing', 'delivering']))
+                                    <form method="POST" action="{{ route('restaurant.order.approve', $order->id) }}" style="display:inline;">
+                                        @csrf
+                                        <button type="submit" class="btn-approve">
+                                            @switch($order->status)
+                                                @case('pending')
+                                                    Duyệt
+                                                    @break
+                                                @case('processing')
+                                                    Xác nhận giao
+                                                    @break
+                                                @case('delivering')
+                                                    Hoàn tất
+                                                    @break
+                                            @endswitch
+                                        </button>
+                                    </form>
+                                @endif
+
+
+                                @if(in_array($order->status, ['pending', 'processing', 'delivering']))
+                                    <form method="POST" action="{{ route('restaurant.order.cancel', $order->id) }}" style="display:inline;">
+                                        @csrf
+                                        <button type="submit" class="btn-cancel">Hủy</button>
+                                    </form>
+                                @endif
+
+
+                            </td>
+                            
                         </tr>
                     @endforeach
                 </tbody>
             </table>
-
-            {{-- <div class="action-links">
-                <a href="{{ route('restaurant.products.home') }}">Quản lý sản phẩm</a> |
-                <a href="{{ route('admin.dashboard') }}">← Quay lại trang Admin</a>
-            </div> --}}
         </section>
     </main>
 
 </body>
 </html>
 
+@php
+function getStatusClass($status) {
+    return match (strtolower($status)) {
+        'pending' => 'pending',
+        'processing' => 'processing',
+        'completed' => 'completed',
+        'canceled' => 'cancelled',
+        'delivering' => 'shipping',
+        default => 'other',
+    };
+}
 
-    @php
-    function getStatusClass($status) {
-        return match (strtolower($status)) {
-            'chờ xác nhận' => 'pending',
-            'đang xử lý' => 'processing',
-            'hoàn thành' => 'completed',
-            'đã hủy' => 'cancelled',
-            'đang giao' => 'shipping',
-            default => 'other',
-        };
-    }
-    @endphp
-
+function getStatusLabel($status) {
+    return match (strtolower($status)) {
+        'pending' => 'Chờ xác nhận',
+        'processing' => 'Chờ shipper nhận đơn',
+        'completed' => 'Hoàn thành',
+        'canceled' => 'Đã hủy',
+        'delivering' => 'Đang giao',
+        default => ucfirst($status),
+    };
+}
+@endphp

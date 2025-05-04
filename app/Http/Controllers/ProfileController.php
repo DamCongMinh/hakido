@@ -40,6 +40,8 @@ class ProfileController extends Controller
             'district' => 'required',
             'ward' => 'required',
             'address' => 'required|string|max:255',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
         ]);
 
         // Gọi API để lấy dữ liệu
@@ -52,9 +54,9 @@ class ProfileController extends Controller
         $districtName = $district['name'] ?? '';
         $wardName = $ward['name'] ?? '';
         
-        // Ghép địa chỉ
-        $fullAddress = "{$request->address}, {$wardName}, {$districtName}, {$provinceName}";
-        
+        //  địa chỉ
+        $fullAddress = $request->address;
+
 
        
 
@@ -99,6 +101,8 @@ class ProfileController extends Controller
                         'phone' => $validated['phone'],
                         'email' => $validated['email'],
                         'address' => $fullAddress,
+                        'latitude' => $request->latitude,
+                        'longitude' => $request->longitude,
                         'avatar' => $validated['avatar'] ?? $customer->avatar,
                         'date_of_birth' => $validated['date_of_birth'] ?? $customer->date_of_birth,
                         'extra' => $validated['extra'] ?? $customer->extra,
@@ -114,6 +118,8 @@ class ProfileController extends Controller
                         'phone' => $validated['phone'],
                         'email' => $validated['email'],
                         'address' => $fullAddress,
+                        'latitude' => $request->latitude,
+                        'longitude' => $request->longitude,
                         'avatar' => $validated['avatar'] ?? $restaurant->avatar,
                         'time_open' => $validated['time_open'] ?? $restaurant->time_open,
                         'time_close' => $validated['time_close'] ?? $restaurant->time_close,

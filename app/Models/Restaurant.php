@@ -11,7 +11,7 @@ class Restaurant extends Model
     ];
 
     protected $fillable = [
-        'user_id', 'name', 'phone', 'avatar', 'date_of_birth', 'address' , 'last_active_at',
+        'user_id', 'name', 'phone', 'avatar', 'date_of_birth', 'address' , 'last_active_at','latitude' ,'longitude'
     ];
 
     public function user()
