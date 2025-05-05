@@ -9,52 +9,56 @@
     <link rel="stylesheet" href="{{ asset('css/checkout.css') }}">
 </head>
 <body>
-    @if(session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
-    @endif
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+    @if (!isset($restaurantTotalAmounts))
+        <div class="alert alert-warning">
+            Dữ liệu thanh toán chưa sẵn sàng. Vui lòng chọn sản phẩm từ giỏ hàng để tiến hành thanh toán.
+        </div>
+        @php return; @endphp
     @endif
 
     <h2>Xác nhận thanh toán</h2>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Hình ảnh</th>
-                <th>Sản phẩm</th>
-                <th>Số lượng</th>
-                <th>Đơn giá</th>
-                <th>Tổng</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($items as $item)
+    
+    @foreach ($groupedItems as $restaurantId => $items)
+        <h3>Nhà hàng: {{ $restaurantNames[$restaurantId] ?? 'Không rõ' }}</h3>
+        <table>
+            <thead>
                 <tr>
-                    <td data-label="Hình ảnh">
-                        <img 
-                            src="{{ asset('storage/' . $item['image']) }}" 
-                            alt="{{ $item['name'] }}" 
-                            style="width: 80px; height: auto;"
-                            onerror="this.src='{{ asset('img/slide.png') }}'"
-                        >
-                    </td>
-                    <td>{{ $item['name'] }}</td>
-                    <td>{{ $item['quantity'] }}</td>
-                    <td>{{ number_format($item['price']) }}₫</td>
-                    <td>{{ number_format($item['total']) }}₫</td>
+                    <th>Hình ảnh</th>
+                    <th>Sản phẩm</th>
+                    <th>Số lượng</th>
+                    <th>Đơn giá</th>
+                    <th>Tổng tiền sản phẩm</th>
                 </tr>
-            @endforeach
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach ($items as $item)
+                    <tr>
+                        <td data-label="Hình ảnh">
+                            <img 
+                                src="{{ asset('storage/' . $item['image']) }}" 
+                                alt="{{ $item['name'] }}" 
+                                style="width: 80px; height: auto;"
+                                onerror="this.src='{{ asset('img/slide.png') }}'"
+                            >
+                        </td>
+                        <td>{{ $item['name'] }}</td>
+                        <td>{{ $item['quantity'] }}</td>
+                        <td>{{ number_format($item['price']) }}₫</td>
+                        <td>{{ number_format($item['total']) }}₫</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
 
-    <h4>Tổng tiền: {{ number_format($totalAmount) }}₫</h4>
+        <h4>Khoảng cách: {{ number_format($restaurantDistances[$restaurantId], 2) ?? 'N/A' }} km</h4>
+        <h4>Phí ship: {{ number_format($restaurantShippingFees[$restaurantId]) }}₫</h4>
+        <h4>Tổng tiền tất cả sản phẩm: {{ number_format($restaurantTotalAmounts[$restaurantId]) }}₫</h4>
+        <h3>Tổng cộng: {{ number_format($restaurantTotalSums[$restaurantId]) }}₫</h3>
 
-    <h4>Khoảng cách: {{ number_format($distance, 2) }} km</h4>
-    <h4>Phí ship: {{ number_format($shippingFee) }}₫</h4>
+        <hr>
+    @endforeach
 
-
-
+    <h3>Tổng tiền cần thanh toán: {{ number_format($finalTotal) }}₫</h3>
 
 
     <form action="{{ route('orders.store') }}" method="POST">
@@ -92,44 +96,68 @@
         </select>
 
     
-        <!-- FIXED: safely encode items to hidden input -->
-        <input type="hidden" name="items" value='@json($items)'>
+        <!-- gửi dũ liệu sang ordercontroller -->
+        <input type="hidden" name="items" id="items-input">
+        <input type="hidden" name="shipping_fees" id="shipping-fees-input">
+        <input type="hidden" name="distances" id="distances-input">
+        <input type="hidden" name="restaurantTotalAmounts" id="restaurant-total-amounts-input">
+
+
+
+
+        
+
+
 
         <button type="submit">Xác nhận & Thanh toán</button>
     </form>
 
-    <script>
+    <<script>
         document.addEventListener('DOMContentLoaded', function () {
             const form = document.querySelector('form');
             const submitButton = form.querySelector('button[type="submit"]');
             const checkbox = document.getElementById('use-default-info');
-
+    
             const defaultName = @json($user->name);
             const defaultPhone = @json($customer->phone ?? '');
             const defaultAddress = @json($customer->address ?? '');
-
+    
             const nameInput = document.getElementById('receiver_name');
             const phoneInput = document.getElementById('receiver_phone');
             const addressInput = document.getElementById('receiver_address');
-
+    
+            const groupedItems = @json($groupedItems, JSON_PRETTY_PRINT);
+            const shippingFees = @json($restaurantShippingFees, JSON_PRETTY_PRINT);
+            const distances = @json($restaurantDistances, JSON_PRETTY_PRINT);
+            const totalAmounts = @json($restaurantTotalAmounts, JSON_PRETTY_PRINT);
+    
+            // 🛠 Gán dữ liệu JSON có key đầy đủ vào các input hidden
+            document.getElementById('items-input').value = JSON.stringify(groupedItems);
+            document.getElementById('shipping-fees-input').value = JSON.stringify(shippingFees);
+            document.getElementById('distances-input').value = JSON.stringify(distances);
+            document.getElementById('restaurant-total-amounts-input').value = JSON.stringify(totalAmounts);
+    
+            // ✅ Tự động điền thông tin khi checkbox thay đổi
             checkbox.addEventListener('change', function () {
-            if (this.checked) {
-                nameInput.value = defaultName;
-                phoneInput.value = defaultPhone;
-                addressInput.value = defaultAddress;
-            } else {
-                nameInput.value = '';
-                phoneInput.value = '';
-                addressInput.value = '';
-            }
+                if (this.checked) {
+                    nameInput.value = defaultName;
+                    phoneInput.value = defaultPhone;
+                    addressInput.value = defaultAddress;
+                } else {
+                    nameInput.value = '';
+                    phoneInput.value = '';
+                    addressInput.value = '';
+                }
             });
-        
+    
+            // ✅ Disable nút submit khi đang gửi form
             form.addEventListener('submit', function () {
                 submitButton.disabled = true;
                 submitButton.textContent = 'Đang xử lý...';
             });
         });
-
     </script>
+    
+    
 </body>
 </html>

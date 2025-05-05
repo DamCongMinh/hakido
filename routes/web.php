@@ -120,7 +120,11 @@ Route::middleware(['auth', 'role:customer'])->group(function () {
     Route::get('/vnpay-return', [PaymentController::class, 'vnpayReturn'])->name('vnpay.return');
 
     // Đặt hàng thành công
-    Route::get('/order/success/{id}', [OrderController::class, 'success'])->name('order.success');
+    Route::get('/order/success', [OrderController::class, 'success'])->name('order.success');
+
+    // danh sách order
+    Route::get('/ordered-items', [OrderController::class, 'orderedItems'])->name('orders.items');
+
 });
 
 

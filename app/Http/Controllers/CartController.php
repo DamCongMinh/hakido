@@ -76,86 +76,120 @@ class CartController extends Controller
     {
         $user = auth()->user();
         $cart = $user->cart()->with('items')->first();
-
-        $cartItems = [];
-        $restaurantId = null;
-
-        if ($cart) {
-            foreach ($cart->items as $item) {
-                if ($item->product_type === 'food') {
-                    $product = Food::find($item->product_id);
-                    $name = $product?->name ?? 'Không rõ';
-                    $image = $product?->image ?? null;
-                    $restaurantId = $product?->restaurant_id;
+        $customer = $user->customer;
+    
+        if (!$cart || !$customer) {
+            return redirect()->route('cart.show')->with('error', 'Không có sản phẩm để thanh toán.');
+        }
+    
+        $groupedItems = [];
+        $restaurantShippingFees = [];
+        $restaurantDistances = [];
+        $restaurantNames = [];
+    
+        foreach ($cart->items as $item) {
+            if ($item->product_type === 'food') {
+                $product = Food::find($item->product_id);
+            } else {
+                $product = Beverage::find($item->product_id);
+            }
+    
+            if (!$product) continue;
+    
+            $restaurantId = $product->restaurant_id;
+    
+            if (!isset($restaurantNames[$restaurantId])) {
+                $restaurant = $product->restaurant;
+                $restaurantNames[$restaurantId] = $restaurant ? $restaurant->name : 'Không rõ';
+            }
+    
+            $groupedItems[$restaurantId][] = [
+                'product_id' => $item->product_id,
+                'product_type' => $item->product_type,
+                'size' => $item->size,
+                'name' => $product->name . ($item->size ? " (Size {$item->size})" : ''),
+                'image' => $product->image,
+                'price' => $item->unit_price,
+                'quantity' => $item->quantity,
+                'total' => $item->unit_price * $item->quantity,
+            ];
+    
+            if (!isset($restaurantShippingFees[$restaurantId])) {
+                $restaurant = $product->restaurant;
+    
+                if (
+                    $restaurant && $restaurant->latitude && $restaurant->longitude &&
+                    $customer->latitude && $customer->longitude
+                ) {
+                    $distance = $this->haversineDistance(
+                        $restaurant->latitude,
+                        $restaurant->longitude,
+                        $customer->latitude,
+                        $customer->longitude
+                    );
+    
+                    $restaurantDistances[$restaurantId] = $distance;
+    
+                    // Nếu cùng tỉnh thì phí cố định là 30.000
+                    if ($restaurant->province === $customer->province) {
+                        $shippingFee = 30000;
+                    } else {
+                        $shippingFee = min(100000, max(15000, round($distance * 1000)));
+                    }
+    
+                    $restaurantShippingFees[$restaurantId] = $shippingFee;
                 } else {
-                    $product = Beverage::find($item->product_id);
-                    $size = $item->size;
-                    $name = $product ? $product->name . ' (Size ' . $size . ')' : 'Không rõ';
-                    $image = $product?->image ?? null;
-                    $restaurantId = $product?->restaurant_id;
+                    $restaurantDistances[$restaurantId] = null;
+                    $restaurantShippingFees[$restaurantId] = 0;
                 }
-
-                $cartItems[] = [
-                    'product_id' => $item->product_id,
-                    'product_type' => $item->product_type,
-                    'size' => $item->size,
-                    'name' => $name,
-                    'price' => $item->unit_price,
-                    'quantity' => $item->quantity,
-                    'total' => $item->unit_price * $item->quantity,
-                    'image' => $image,
-                ];
             }
         }
-
-        $totalAmount = collect($cartItems)->sum('total');
-
-        $restaurant = $restaurantId ? \App\Models\Restaurant::find($restaurantId) : null;
-        $customer = $user->customer;
-
-        $distance = null;
-        $shippingFee = 0;
-
-        if ($restaurant && $customer && $restaurant->latitude && $restaurant->longitude && $customer->latitude && $customer->longitude) {
-            $distance = $this->haversineDistance(
-                $restaurant->latitude,
-                $restaurant->longitude,
-                $customer->latitude,
-                $customer->longitude
-            );
-            $shippingFee = min(100000, max(15000, round($distance * 1000)));
-
+    
+        // Tính tổng tiền theo từng nhà hàng
+        $restaurantTotalAmounts = [];
+        $restaurantTotalSums = [];
+    
+        foreach ($groupedItems as $restaurantId => $items) {
+            $totalItems = collect($items)->sum('total');
+            $shipping = $restaurantShippingFees[$restaurantId] ?? 0;
+    
+            $restaurantTotalAmounts[$restaurantId] = $totalItems;
+            $restaurantTotalSums[$restaurantId] = $totalItems + $shipping;
         }
-
+    
+        $totalAmount = array_sum($restaurantTotalAmounts);
+        $totalShippingFee = array_sum($restaurantShippingFees);
+        $finalTotal = array_sum($restaurantTotalSums);
+    
         return view('web.checkout', [
-            'items' => $cartItems,
+            'groupedItems' => $groupedItems,
+            'restaurantDistances' => $restaurantDistances,
+            'restaurantShippingFees' => $restaurantShippingFees,
+            'restaurantNames' => $restaurantNames,
+            'restaurantTotalAmounts' => $restaurantTotalAmounts,
+            'restaurantTotalSums' => $restaurantTotalSums,
             'totalAmount' => $totalAmount,
-            'distance' => $distance,
-            'shippingFee' => $shippingFee,
-            'restaurant' => $restaurant,
+            'totalShippingFee' => $totalShippingFee,
+            'finalTotal' => $finalTotal,
             'customer' => $customer,
         ]);
     }
+    
 
     private function haversineDistance($lat1, $lon1, $lat2, $lon2)
     {
         $earthRadius = 6371; // km
-
         $lat1 = deg2rad($lat1);
         $lon1 = deg2rad($lon1);
         $lat2 = deg2rad($lat2);
         $lon2 = deg2rad($lon2);
-
         $latDelta = $lat2 - $lat1;
         $lonDelta = $lon2 - $lon1;
 
-        $a = sin($latDelta / 2) ** 2 +
-            cos($lat1) * cos($lat2) *
-            sin($lonDelta / 2) ** 2;
+        $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) +
+            cos($lat1) * cos($lat2) * pow(sin($lonDelta / 2), 2)));
 
-        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
-
-        return $earthRadius * $c;
+        return $earthRadius * $angle;
     }
 
 
@@ -171,7 +205,14 @@ class CartController extends Controller
 
         $user = auth()->user();
         $cart = $user->cart;
-        $cartItems = [];
+        $customer = $user->customer;
+
+        $groupedItems = [];
+        $restaurantShippingFees = [];
+        $restaurantDistances = [];
+        $restaurantTotalAmounts = []; // Tổng tiền sản phẩm từng nhà hàng
+        $restaurantTotalSums = [];    // Tổng cộng từng nhà hàng
+        $restaurantNames = [];
 
         foreach ($selectedItems as $data) {
             if (empty($data['selected']) || !isset($data['product_id'], $data['product_type'])) {
@@ -188,41 +229,99 @@ class CartController extends Controller
 
             $item = $query->first();
 
-            if ($item) {
-                if ($item->product_type === 'food') {
-                    $product = Food::find($item->product_id);
-                    $productName = $product?->name ?? 'Không rõ';
-                    $image = $product?->image;
-                } else {
-                    $product = Beverage::find($item->product_id);
-                    $productName = $product ? $product->name . ' (Size ' . $item->size . ')' : 'Không rõ';
-                    $image = $product?->image;
-                }
+            if (!$item) continue;
 
-                $cartItems[] = [
-                    'product_id' => $item->product_id,
-                    'product_type' => $item->product_type,
-                    'size' => $item->size,
-                    'name' => $productName,
-                    'image' => $image,
-                    'quantity' => $item->quantity,
-                    'price' => $item->unit_price,
-                    'total' => $item->unit_price * $item->quantity,
-                ];
+            if ($item->product_type === 'food') {
+                $product = Food::find($item->product_id);
+                $productName = $product?->name ?? 'Không rõ';
+                $image = $product?->image;
+                $restaurantId = $product?->restaurant_id;
+            } else {
+                $product = Beverage::find($item->product_id);
+                $productName = $product ? $product->name . ' (Size ' . $item->size . ')' : 'Không rõ';
+                $image = $product?->image;
+                $restaurantId = $product?->restaurant_id;
+            }
+
+            if (!$product || !$restaurantId) continue;
+
+            $groupedItems[$restaurantId][] = [
+                'product_id' => $item->product_id,
+                'product_type' => $item->product_type,
+                'size' => $item->size,
+                'name' => $productName,
+                'image' => $image,
+                'quantity' => $item->quantity,
+                'price' => $item->unit_price,
+                'total' => $item->unit_price * $item->quantity,
+            ];
+
+            $restaurantNames[$restaurantId] = $product->restaurant->name ?? 'Không rõ';
+
+            if (!isset($restaurantShippingFees[$restaurantId])) {
+                $restaurant = $product->restaurant;
+
+                if (
+                    $restaurant && $customer &&
+                    $restaurant->latitude && $restaurant->longitude &&
+                    $customer->latitude && $customer->longitude
+                ) {
+                    $distance = $this->haversineDistance(
+                        $restaurant->latitude,
+                        $restaurant->longitude,
+                        $customer->latitude,
+                        $customer->longitude
+                    );
+
+                    $restaurantDistances[$restaurantId] = $distance;
+
+                    $shippingFee = (
+                        abs($restaurant->latitude - $customer->latitude) < 0.01 &&
+                        abs($restaurant->longitude - $customer->longitude) < 0.01
+                    ) ? 30000 : min(100000, max(15000, round($distance * 1000)));
+
+                    $restaurantShippingFees[$restaurantId] = $shippingFee;
+                } else {
+                    $restaurantDistances[$restaurantId] = null;
+                    $restaurantShippingFees[$restaurantId] = 0;
+                }
             }
         }
 
-        if (empty($cartItems)) {
+        if (empty($groupedItems)) {
             return back()->with('error', 'Không có sản phẩm hợp lệ để thanh toán.');
         }
 
-        $totalAmount = collect($cartItems)->sum('total');
+        // Tính tổng tiền sản phẩm và tổng cộng của từng nhà hàng
+        foreach ($groupedItems as $restaurantId => $items) {
+            $totalItems = collect($items)->sum('total');
+            $shipping = $restaurantShippingFees[$restaurantId] ?? 0;
+
+            $restaurantTotalAmounts[$restaurantId] = $totalItems;
+            $restaurantTotalSums[$restaurantId] = $totalItems + $shipping;
+        }
+
+        // Tổng toàn bộ đơn hàng (gồm tất cả nhà hàng)
+        $totalAmount = array_sum($restaurantTotalAmounts);
+        $totalShippingFee = array_sum($restaurantShippingFees);
+        $finalTotal = array_sum($restaurantTotalSums); // Tổng cộng toàn bộ (sản phẩm + ship)
 
         return view('web.checkout', [
-            'items' => $cartItems,
+            'groupedItems' => $groupedItems,
+            'restaurantDistances' => $restaurantDistances,
+            'restaurantShippingFees' => $restaurantShippingFees,
+            'restaurantTotalAmounts' => $restaurantTotalAmounts,
+            'restaurantTotalSums' => $restaurantTotalSums,
+            'restaurantNames' => $restaurantNames,
             'totalAmount' => $totalAmount,
+            'totalShippingFee' => $totalShippingFee,
+            'finalTotal' => $finalTotal,
+            'customer' => $customer,
         ]);
     }
+
+
+
 
     public function removeItem(Request $request)
     {

@@ -114,7 +114,7 @@
                                     <!-- Nếu là customer -->
                                     @if (Auth::user()->role === 'customer')
                                         <a href="{{ route('cart.show') }}">Giỏ hàng của tôi</a>
-                                        
+                                        <a href="{{ route('orders.items') }}">📦 Sản phẩm đã đặt</a>
                                     @endif
 
                                     <form method="POST" action="{{ route('logout') }}">
