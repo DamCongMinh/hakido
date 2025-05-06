@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="{{ asset('css/order_success.css') }}">
 </head>
 <body>
+    @include('layout.header')
+
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
@@ -18,7 +20,7 @@
         {{-- <pre>{{ print_r($orders, true) }}</pre> --}}
         @foreach ($orders as $order)
             <section class="restaurant-order">
-                <h4>Đơn hàng #{{ $order->id }} từ nhà hàng {{ $order->restaurant->name ?? 'Không rõ' }}</h4>
+                <h4>Đơn hàng #{{ $order->id }} từ nhà hàng {{ $order->restaurantProfile->name ?? 'Không rõ' }}</h4>
 
                 </h3>
                 <p><strong>Đơn hàng:</strong> #{{ $order->id }}</p>

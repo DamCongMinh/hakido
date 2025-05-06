@@ -5,17 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Đơn hàng đang giao</title>
+
+    <link rel="stylesheet" href="{{ asset('css/Shipper/current_delivery.css') }}">
+
 </head>
 <body>
+    @include('layout.header')
+
     <h1>🚚 Đơn hàng đang giao</h1>
 
     @if($orders->isEmpty())
         <p>Bạn chưa nhận đơn hàng nào.</p>
     @else
         @foreach($orders as $order)
+
             <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
                 <p><strong>Đơn #{{ $order->id }}</strong></p>
                 <p>Khách: {{ $order->receiver_name }} - {{ $order->receiver_phone }}</p>
+                <p>Phí ship: {{ $order->shipping_fee }}₫</p>
                 <p>Địa chỉ giao: {{ $order->receiver_address }}</p>
                 <p>Tổng tiền: {{ number_format($order->total) }}₫</p>
                 <p>Thanh toán: {{ strtoupper($order->payment_method) }}</p>
@@ -28,7 +35,7 @@
                         <option value="failed">❌ Giao thất bại</option>
                     </select><br>
                     <label>Ghi chú:</label>
-                    <input type="text" name="note" placeholder="Nhập ghi chú (nếu có)">
+                    <input class="note" type="text" name="note" placeholder="Nhập ghi chú (nếu có)">
                     <br>
                     <button type="submit">Cập nhật</button>
                 </form>

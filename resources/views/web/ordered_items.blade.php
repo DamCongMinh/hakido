@@ -6,41 +6,62 @@
     <link rel="stylesheet" href="{{ asset('css/order_items.css') }}">
 </head>
 <body>
-<div class="container mt-5">
-    <h2 class="mb-4">Sản phẩm đã đặt</h2>
+    @include('layout.header')
 
-    @if ($items->isEmpty())
-        <p>Bạn chưa đặt sản phẩm nào.</p>
-    @else
+    <div class="container mt-5">
+        <h2 class="mb-4">Sản phẩm đã đặt</h2>
+
+        @if ($orders->isEmpty())
+            <p>Bạn chưa đặt sản phẩm nào.</p>
+        @else
         <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>#Đơn hàng</th>
-                    <th>Sản phẩm</th>
-                    <th>Loại</th>
-                    <th>Số lượng</th>
-                    <th>Giá</th>
-                    <th>Thành tiền</th>
                     <th>Nhà hàng</th>
+                    <th>Sản phẩm</th>
+                    <th>Trạng thái</th>
+                    <th>Hành động</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($items as $item)
+                @foreach ($orders as $order)
                     <tr>
-                        <td>{{ $item->order->id }}</td>
-                        <td>{{ $item->product_name }}</td>
-                        <td>{{ $item->product_type }}</td>
-                        <td>{{ $item->quantity }}</td>
-                        <td>{{ number_format($item->price) }}₫</td>
-                        <td>{{ number_format($item->total_price) }}₫</td>
-                        <td>{{ $item->order->restaurant->name ?? 'Không rõ' }}</td>
+                        <td>{{ $order->id }}</td>
+                        <td>{{ $order->restaurantProfile->name ?? 'Không rõ' }}</td>
+                        <td>
+                            <ul>
+                                @foreach ($order->orderItems as $item)
+                                    <li>
+                                        {{ $item->product_name }} ({{ $item->product_type }}) -
+                                        SL: {{ $item->quantity }} -
+                                        Giá: {{ number_format($item->price) }}₫ -
+                                        Thành tiền: {{ number_format($item->total_price) }}₫
+                                    </li>
+                                @endforeach
+                            </ul>
+                            <strong>Tổng: {{ number_format($order->total) }}₫ (Phí ship: {{ number_format($order->shipping_fee) }}₫)</strong>
+                        </td>
+                        <td>{{ \App\Models\Order::statusMapping()[$order->status] ?? ucfirst($order->status) }}</td>
+                        <td>
+                            @if ($order->status === 'pending')
+                                <form action="{{ route('orders.cancel', $order->id) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn này không?');">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="btn btn-danger btn-sm">Hủy đơn</button>
+                                </form>
+                            @else
+                                
+                            @endif
+                        </td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
-    @endif
+        
+        @endif
 
-    <a href="{{ route('home') }}" class="btn btn-primary mt-3">Quay về trang chủ</a>
-</div>
+        <a href="{{ route('home') }}" class="btn btn-primary mt-3">Quay về trang chủ</a>
+    </div>
 </body>
 </html>

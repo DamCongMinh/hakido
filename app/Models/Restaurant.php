@@ -28,4 +28,6 @@ class Restaurant extends Model
     {
         return $this->hasMany(Beverage::class);
     }
+
+    
 }

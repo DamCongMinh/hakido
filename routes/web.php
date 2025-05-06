@@ -125,6 +125,9 @@ Route::middleware(['auth', 'role:customer'])->group(function () {
     // danh sách order
     Route::get('/ordered-items', [OrderController::class, 'orderedItems'])->name('orders.items');
 
+    //hủy đơn hàng
+    Route::patch('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+
 });
 
 
@@ -240,5 +243,8 @@ Route::prefix('shipper/orders')->name('shipper.orders.')->middleware(['auth'])->
     Route::get('/current', [ShipperOrderController::class, 'currentDelivery'])->name('current');
     Route::post('/update-status/{id}', [ShipperOrderController::class, 'updateStatus'])->name('updateStatus');
     Route::get('/history', [ShipperOrderController::class, 'deliveryHistory'])->name('history');
+    Route::get('/income-stats', [ShipperOrderController::class, 'incomeStats'])->name('incomeStats');
+
+
 });
 

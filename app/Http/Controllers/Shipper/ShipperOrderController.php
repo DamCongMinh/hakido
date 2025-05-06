@@ -9,14 +9,19 @@ use Illuminate\Support\Facades\Auth;
 
 class ShipperOrderController extends Controller
 {
-    // 1. Hiển thị các đơn hàng đang chờ shipper nhận
+    
     public function availableOrders()
     {
-        $orders = Order::where('status', 'processing')->whereNull('shipper_id')->get();
+        $orders = Order::with('orderItems')
+            ->where('status', 'processing')
+            ->whereNull('shipper_id')
+            ->latest()
+            ->get();
         return view('shipper.available_orders', compact('orders'));
     }
 
-    // 2. Shipper nhận đơn hàng
+
+    
     public function acceptOrder($id)
     {
         $order = Order::findOrFail($id);
@@ -58,11 +63,43 @@ class ShipperOrderController extends Controller
     // 5. Hiển thị lịch sử đơn hàng của shipper
     public function deliveryHistory()
     {
-        $orders = Order::where('shipper_id', Auth::id())
-                       ->whereIn('status', ['completed', 'canceled'])
-                       ->latest()
-                       ->get();
+        $successfulOrders = Order::where('shipper_id', Auth::id())
+                                ->where('status', 'completed')
+                                ->latest()
+                                ->get();
 
-        return view('shipper.delivery_history', compact('orders'));
+        $failedOrders = Order::where('shipper_id', Auth::id())
+                            ->where('status', 'canceled')
+                            ->latest()
+                            ->get();
+
+        return view('shipper.delivery_history', compact('successfulOrders', 'failedOrders'));
     }
+
+    public function incomeStats()
+    {
+        $shipperId = Auth::id();
+
+        // Lấy tất cả đơn hàng giao thành công
+        $successfulOrders = Order::where('shipper_id', $shipperId)
+            ->where('status', 'completed')
+            ->get();
+
+        // Tổng đơn và tổng thu nhập
+        $totalOrders = $successfulOrders->count();
+        $totalIncome = $successfulOrders->sum('shipping_fee');
+
+        // Doanh thu theo tháng (năm hiện tại)
+        $monthlyIncome = Order::where('shipper_id', $shipperId)
+            ->where('status', 'completed')
+            ->whereYear('updated_at', now()->year)
+            ->selectRaw('MONTH(updated_at) as month, SUM(shipping_fee) as total_fee, COUNT(*) as order_count')
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+
+        return view('shipper.income_stats', compact('totalOrders', 'totalIncome', 'monthlyIncome'));
+    }
+
+
 }

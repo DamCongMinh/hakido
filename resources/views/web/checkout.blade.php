@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="{{ asset('css/checkout.css') }}">
 </head>
 <body>
+    @include('layout.header')
+
     @if (!isset($restaurantTotalAmounts))
         <div class="alert alert-warning">
             Dữ liệu thanh toán chưa sẵn sàng. Vui lòng chọn sản phẩm từ giỏ hàng để tiến hành thanh toán.
@@ -101,6 +103,7 @@
         <input type="hidden" name="shipping_fees" id="shipping-fees-input">
         <input type="hidden" name="distances" id="distances-input">
         <input type="hidden" name="restaurantTotalAmounts" id="restaurant-total-amounts-input">
+        <input type="hidden" name="restaurantTotalSums" id="restaurant-total-sums-input">
 
 
 
@@ -112,7 +115,7 @@
         <button type="submit">Xác nhận & Thanh toán</button>
     </form>
 
-    <<script>
+    <script>
         document.addEventListener('DOMContentLoaded', function () {
             const form = document.querySelector('form');
             const submitButton = form.querySelector('button[type="submit"]');
@@ -130,14 +133,16 @@
             const shippingFees = @json($restaurantShippingFees, JSON_PRETTY_PRINT);
             const distances = @json($restaurantDistances, JSON_PRETTY_PRINT);
             const totalAmounts = @json($restaurantTotalAmounts, JSON_PRETTY_PRINT);
+            const restaurantTotalSums = @json($restaurantTotalSums, JSON_PRETTY_PRINT);
     
-            // 🛠 Gán dữ liệu JSON có key đầy đủ vào các input hidden
+            // Gán dữ liệu JSON có key đầy đủ vào các input hidden
             document.getElementById('items-input').value = JSON.stringify(groupedItems);
             document.getElementById('shipping-fees-input').value = JSON.stringify(shippingFees);
             document.getElementById('distances-input').value = JSON.stringify(distances);
             document.getElementById('restaurant-total-amounts-input').value = JSON.stringify(totalAmounts);
-    
-            // ✅ Tự động điền thông tin khi checkbox thay đổi
+            document.getElementById('restaurant-total-sums-input').value = JSON.stringify(restaurantTotalSums);
+
+            
             checkbox.addEventListener('change', function () {
                 if (this.checked) {
                     nameInput.value = defaultName;

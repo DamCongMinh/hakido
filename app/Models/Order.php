@@ -45,6 +45,13 @@ class Order extends Model
         return $this->belongsTo(User::class, 'restaurant_id');
     }
 
+    public function restaurantProfile()
+    {
+        return $this->belongsTo(\App\Models\Restaurant::class, 'restaurant_id', 'id');
+    }
+
+
+
     // Mối quan hệ với shipper
     public function shipper()
     {

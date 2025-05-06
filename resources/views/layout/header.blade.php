@@ -108,6 +108,7 @@
                                         <a href="{{ route('shipper.orders.available') }}">🛒 Đơn hàng đang chờ</a>
                                         <a href="{{ route('shipper.orders.current') }}">🚚 Đơn đang giao</a>
                                         <a href="{{ route('shipper.orders.history') }}">📜 Lịch sử giao hàng</a>
+                                        <a href="{{ route('shipper.orders.incomeStats') }}">💰 Thống kê thu nhập</a>
                                     @endif
 
 

@@ -41,6 +41,7 @@ class OrderController extends Controller
         $shippingFees = json_decode($request->input('shipping_fees'), true);
         $distances = json_decode($request->input('distances'), true);
         $restaurantTotalAmounts = json_decode($request->input('restaurantTotalAmounts'), true);
+        $restaurantTotalSums = json_decode($request->input('restaurantTotalSums'), true);
         $orders = []; 
         $createdOrders = [];
         // dd($groupedItems);
@@ -61,7 +62,7 @@ class OrderController extends Controller
                     'receiver_address' => $request->receiver_address,
                     // 'distance' => $distances[$restaurantId] ?? 0,
                     'shipping_fee' => $shippingFees[$restaurantId] ?? 0,
-                    'total' => $restaurantTotalAmounts[$restaurantId] ?? 0,
+                    'total' => $restaurantTotalSums[$restaurantId] ?? 0,
                     'status' => 'pending',
                     'payment_method' => $request->payment_method,
                 ]);
@@ -85,13 +86,33 @@ class OrderController extends Controller
                 }
                 
                 // ✅ Load các quan hệ để dùng ở view
-                $order->load('orderItems', 'restaurant');
+                $order->load('orderItems', 'restaurantProfile');
                 
 
                 // ✅ Thêm vào danh sách để hiển thị
                 $createdOrders[] = $order;
                 
             }
+            // ✅ Xoá giỏ hàng sau khi tạo đơn xong
+            $cart = $user->cart;
+                if ($cart) {
+                    foreach ($groupedItems as $restaurantId => $items) {
+                        foreach ($items as $item) {
+                            $query = $cart->items()
+                                ->where('product_id', $item['product_id'])
+                                ->where('product_type', $item['product_type']);
+
+                            if (!empty($item['size'])) {
+                                $query->where('size', $item['size']);
+                            } else {
+                                $query->whereNull('size');
+                            }
+
+                            $query->delete();
+                        }
+                    }
+                }
+
 
             
             DB::commit();
@@ -124,12 +145,37 @@ class OrderController extends Controller
             return redirect()->route('home')->with('error', 'Không tìm thấy khách hàng.');
         }
 
-        $items = \App\Models\OrderItem::whereHas('order', function ($q) use ($customer) {
-            $q->where('customer_id', $customer->id);
-        })->with('order.restaurant')->latest()->get();
+        // Lấy danh sách đơn hàng kèm items và nhà hàng
+        $orders = \App\Models\Order::with(['orderItems', 'restaurantProfile'])
+            ->where('customer_id', $customer->id)
+            ->latest()
+            ->get();
 
-        return view('web.ordered_items', compact('items'));
+        return view('web.ordered_items', compact('orders'));
     }
+
+
+    public function cancel(Order $order)
+    {
+        $customer = auth()->user()->customer;
+
+        // Kiểm tra quyền hủy đơn (đảm bảo đơn thuộc về khách hàng hiện tại)
+        if ($order->customer_id !== $customer->id) {
+            return back()->with('error', 'Bạn không có quyền hủy đơn hàng này.');
+        }
+
+        // Chỉ cho phép hủy nếu đang ở trạng thái pending
+        if ($order->status !== 'pending') {
+            return back()->with('error', 'Chỉ có thể hủy đơn hàng đang chờ xác nhận.');
+        }
+
+        // Cập nhật trạng thái
+        $order->status = 'canceled';
+        $order->save();
+
+        return back()->with('success', 'Đơn hàng đã được hủy thành công.');
+    }
+
 
 
 }
