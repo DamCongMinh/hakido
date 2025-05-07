@@ -165,56 +165,54 @@ Route::post('/reset-password', [NewPasswordController::class, 'store'])
     ->name('password.update');
 
 // Quản lý tài khoản
-Route::middleware(['auth', 'admin'])->prefix('admin/accounts')->name('admin.accounts.')->group(function () {
-    Route::get('/', [AdminAccountController::class, 'account'])->name('index');
-    Route::post('/toggle/{id}', [AdminAccountController::class, 'toggleActive'])->name('toggle');
-    Route::delete('/delete/{id}', [AdminAccountController::class, 'destroy'])->name('delete');
-    Route::post('/{id}/approve', [AdminAccountController::class, 'approveUser'])->name('approve');
-
-});
-
-// Quản lý Đồ Ăn
-Route::middleware(['auth', 'admin'])->prefix('admin/foods')->name('foods.')->group(function () {
-    Route::get('/', [FoodController::class, 'index'])->name('index');
-    Route::get('/edit/{id}', [FoodController::class, 'edit'])->name('edit');
-    Route::put('/update/{id}', [FoodController::class, 'update'])->name('update');
-    Route::post('/approve/{id}', [FoodController::class, 'approve'])->name('approve');
-    Route::delete('/destroy/{id}', [FoodController::class, 'destroy'])->name('destroy');
-});
-
-// Quản lý Đồ Uống
-Route::middleware(['auth', 'admin'])->prefix('admin/beverages')->name('beverages.')->group(function () {
-    Route::get('/', [BeverageController::class, 'index'])->name('index');
-    Route::get('/edit/{id}', [BeverageController::class, 'edit'])->name('edit');
-    Route::put('/update/{id}', [BeverageController::class, 'update'])->name('update');
-    Route::post('/approve/{id}', [BeverageController::class, 'approve'])->name('approve');
-    Route::delete('/destroy/{id}', [BeverageController::class, 'destroy'])->name('destroy');
-});
-
-// Quản lý Đặt Hàng
-Route::middleware(['auth', 'admin'])->prefix('admin/orders')->name('admin.orders.')->group(function () {
-    Route::get('/', [AdminOrderController::class, 'index'])->name('index');
-    Route::get('/{order}', [AdminOrderController::class, 'show'])->name('show');
-    Route::post('/{order}/update-status', [AdminOrderController::class, 'updateStatus'])->name('updateStatus');
-    Route::post('/{order}/assign-shipper', [AdminOrderController::class, 'assignShipper'])->name('assignShipper');
-    Route::post('/{order}/cancel', [AdminOrderController::class, 'cancel'])->name('cancel');
-    
-});
-
-// Quản trị nội dung
-Route::get('/admin/content', [ContentManagementController::class, 'index'])
-    ->middleware(['auth', 'admin'])
-    ->name('admin.content');
-Route::get('/category/{id}', [CategoryController::class, 'show'])->name('category.show');
+// Admin routes
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+
+    // Quản lý tài khoản
+    Route::prefix('accounts')->name('accounts.')->group(function () {
+        Route::get('/', [AdminAccountController::class, 'account'])->name('index');
+        Route::post('/toggle/{id}', [AdminAccountController::class, 'toggleActive'])->name('toggle');
+        Route::delete('/delete/{id}', [AdminAccountController::class, 'destroy'])->name('delete');
+        Route::post('/{id}/approve', [AdminAccountController::class, 'approveUser'])->name('approve');
+    });
+
+    // Quản lý Đồ Ăn
+    Route::prefix('foods')->name('foods.')->group(function () {
+        Route::get('/', [FoodController::class, 'index'])->name('index');
+        Route::get('/edit/{id}', [FoodController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [FoodController::class, 'update'])->name('update');
+        Route::post('/approve/{id}', [FoodController::class, 'approve'])->name('approve');
+        Route::delete('/destroy/{id}', [FoodController::class, 'destroy'])->name('destroy');
+    });
+
+    // Quản lý Đồ Uống
+    Route::prefix('beverages')->name('beverages.')->group(function () {
+        Route::get('/', [BeverageController::class, 'index'])->name('index');
+        Route::get('/edit/{id}', [BeverageController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [BeverageController::class, 'update'])->name('update');
+        Route::post('/approve/{id}', [BeverageController::class, 'approve'])->name('approve');
+        Route::delete('/destroy/{id}', [BeverageController::class, 'destroy'])->name('destroy');
+    });
+
+    // Quản lý Đặt Hàng
+    Route::prefix('orders')->name('orders.')->group(function () {
+        Route::get('/', [AdminOrderController::class, 'index'])->name('index');
+        Route::get('/{order}', [AdminOrderController::class, 'show'])->name('show');
+        Route::post('/{order}/update-status', [AdminOrderController::class, 'updateStatus'])->name('updateStatus');
+        Route::post('/{order}/assign-shipper', [AdminOrderController::class, 'assignShipper'])->name('assignShipper');
+        Route::post('/{order}/cancel', [AdminOrderController::class, 'cancel'])->name('cancel');
+    });
+
+    // Quản trị nội dung
+    Route::get('/content', [ContentManagementController::class, 'index'])->name('content');
+
+    // Slides & Categories
     Route::resource('slides', SlideController::class);
     Route::resource('categories', CategoryController::class);
+
+    // Thống kê
+    Route::get('/statistics', [AdminStatisticController::class, 'index'])->name('statistics');
 });
-    
-//Thống kê doanh thu và số lượng đơn hàng Admin
-Route::get('/admin/statistics', [AdminStatisticController::class, 'index'])
-    ->middleware(['auth', 'admin'])
-    ->name('admin.statistics');
 
 
 
@@ -244,6 +242,7 @@ Route::prefix('shipper/orders')->name('shipper.orders.')->middleware(['auth'])->
     Route::post('/update-status/{id}', [ShipperOrderController::class, 'updateStatus'])->name('updateStatus');
     Route::get('/history', [ShipperOrderController::class, 'deliveryHistory'])->name('history');
     Route::get('/income-stats', [ShipperOrderController::class, 'incomeStats'])->name('incomeStats');
+    Route::get('/shipper/income-stats', [ShipperOrderController::class, 'incomeStats'])->name('shipper.income.stats');
 
 
 });

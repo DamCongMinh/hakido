@@ -8,34 +8,93 @@ class AdminAccountController extends Controller
 {
     public function account()
     {
-        $customers = User::where('role', 'customer')->get();
-        $restaurants = User::where('role', 'restaurant')->get();
-        $shippers = User::where('role', 'shipper')->get();
+        $customers = User::with('customer')
+            ->where('role', 'customer')
+            ->get()
+            ->filter(fn($user) => $user->customer) // Bỏ user không có bản ghi phụ
+            ->map(function ($user) {
+                $profile = $user->customer;
+                $profile->user_id = $user->id;
+                $profile->is_active = $user->is_active;
+                $profile->is_approved = $user->is_approved;
+                $profile->email = $user->email;
+                $profile->name = $user->name;
+                return $profile;
+            });
+
+        $restaurants = User::with('restaurant')
+            ->where('role', 'restaurant')
+            ->get()
+            ->filter(fn($user) => $user->restaurant)
+            ->map(function ($user) {
+                $profile = $user->restaurant;
+                $profile->user_id = $user->id;
+                $profile->is_active = $user->is_active;
+                $profile->is_approved = $user->is_approved;
+                $profile->email = $user->email;
+                $profile->name = $user->name;
+                return $profile;
+            });
+
+        $shippers = User::with('shipper')
+            ->where('role', 'shipper')
+            ->get()
+            ->filter(fn($user) => $user->shipper)
+            ->map(function ($user) {
+                $profile = $user->shipper;
+                $profile->user_id = $user->id;
+                $profile->is_active = $user->is_active;
+                $profile->is_approved = $user->is_approved;
+                $profile->email = $user->email;
+                $profile->name = $user->name;
+                return $profile;
+            });
 
         return view('admin.accounts.index', compact('customers', 'restaurants', 'shippers'));
     }
 
+
+
+    public function getProfileInfo()
+    {
+        $profile = match ($this->role) {
+            'customer' => $this->customer,
+            'restaurant' => $this->restaurant,
+            'shipper' => $this->shipper,
+            default => null,
+        };
+
+        if ($profile) {
+            // Gộp thêm các thông tin từ bảng users
+            foreach (['email', 'name', 'password', 'is_active', 'is_approved', 'id'] as $field) {
+                $profile->$field = $this->$field;
+            }
+
+            // Alias user_id cho tiện trong view
+            $profile->user_id = $this->id;
+        }
+
+        return $profile;
+    }
+
+
+
+
+
     public function approveUser($id)
     {
         $user = User::findOrFail($id);
-        $user->is_approved = 1;
-        $user->save();
-
-        // Nếu là restaurant, customer hoặc shipper thì update thêm bảng liên quan
-        switch ($user->role) {
-            case 'restaurant':
-                \DB::table('restaurants')->where('user_id', $user->id)->update(['is_approved' => 1]);
-                break;
-            case 'shipper':
-                \DB::table('shippers')->where('user_id', $user->id)->update(['is_approved' => 1]);
-                break;
-            case 'customer':
-                \DB::table('customers')->where('user_id', $user->id)->update(['is_approved' => 1]);
-                break;
+        
+        // Chỉ cập nhật cột is_approved trong bảng users
+        if (!$user->is_approved) {
+            $user->is_approved = 1;
+            $user->save();
+            
         }
 
         return back()->with('success', 'Duyệt tài khoản thành công!');
     }
+
 
 
     public function toggleActive($id)

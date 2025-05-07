@@ -18,19 +18,25 @@
     <section id="home_body">
         <div class="body_container">
             <div class="home-slide">
-                <div class="content-slide">
-                    <div class="slide-show">
-                        <div class="show-left">
-                            <h1 id="title">Phở ngon cung đình, tâm tình với bạn</h1>
-                            <p id="description1">Nước dùng đậm đà , sợi phở tươi ngon</p>
-                            <p id="description2">chất lượng tốt</p>
-                            <a href="{{ route('detail') }}" class="btn" id="button">Order now</a>
+                @foreach ($slidesData as $slide)
+                @if ($slide->is_active)
+                    <div class="content-slide">
+                        <div class="slide-show">
+                            <div class="show-left">
+                                <h1>{{ $slide->title }}</h1>
+                                <p>{{ $slide->description1 }}</p>
+                                <p>{{ $slide->description2 }}</p>
+                                <a href="{{ route('detail') }}" class="btn">Order now</a>
+                            </div>
+                            <div class="show-right">
+                                <img src="{{ $slide->image }}" alt="">
+                            </div>
                         </div>
-                        <div class="show-right">
-                            <img id="image" src="{{ asset('img/slide.png') }}" alt="">
-                        </div>                                             
                     </div>
-                </div>
+                @endif
+            @endforeach
+            
+            
 
                 <div class="nav-slide">
                     <button class="prev-btn"><i class="fa-solid fa-arrow-left"></i></button>

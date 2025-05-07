@@ -61,31 +61,51 @@ class ShipperOrderController extends Controller
     }
 
     // 5. Hiển thị lịch sử đơn hàng của shipper
-    public function deliveryHistory()
+    public function deliveryHistory(Request $request)
     {
+        $filter = $request->query('filter', 'all');
+        $day = $request->query('day');
+        $month = $request->query('month');
+        $year = $request->query('year');
+
         $successfulOrders = Order::where('shipper_id', Auth::id())
-                                ->where('status', 'completed')
-                                ->latest()
-                                ->get();
+            ->where('status', 'completed');
 
         $failedOrders = Order::where('shipper_id', Auth::id())
-                            ->where('status', 'canceled')
-                            ->latest()
-                            ->get();
+            ->where('status', 'canceled');
+
+        // Áp dụng filter
+        if ($filter === 'day' && $day) {
+            $successfulOrders->whereDate('updated_at', $day);
+            $failedOrders->whereDate('updated_at', $day);
+        } elseif ($filter === 'month' && $month) {
+            // $month format YYYY-MM
+            $parts = explode('-', $month);
+            if (count($parts) === 2) {
+                $successfulOrders->whereYear('updated_at', $parts[0])->whereMonth('updated_at', $parts[1]);
+                $failedOrders->whereYear('updated_at', $parts[0])->whereMonth('updated_at', $parts[1]);
+            }
+        } elseif ($filter === 'year' && $year) {
+            $successfulOrders->whereYear('updated_at', $year);
+            $failedOrders->whereYear('updated_at', $year);
+        }
+
+        $successfulOrders = $successfulOrders->latest()->get();
+        $failedOrders = $failedOrders->latest()->get();
 
         return view('shipper.delivery_history', compact('successfulOrders', 'failedOrders'));
     }
 
-    public function incomeStats()
+
+    public function incomeStats(Request $request)
     {
         $shipperId = Auth::id();
 
-        // Lấy tất cả đơn hàng giao thành công
+        // Tổng đơn và tổng thu nhập
         $successfulOrders = Order::where('shipper_id', $shipperId)
             ->where('status', 'completed')
             ->get();
 
-        // Tổng đơn và tổng thu nhập
         $totalOrders = $successfulOrders->count();
         $totalIncome = $successfulOrders->sum('shipping_fee');
 
@@ -98,8 +118,33 @@ class ShipperOrderController extends Controller
             ->orderBy('month')
             ->get();
 
-        return view('shipper.income_stats', compact('totalOrders', 'totalIncome', 'monthlyIncome'));
+        // Xử lý thống kê theo ngày nếu có chọn
+        $dailyIncome = [];
+        $selectedMonth = $request->query('month');
+        $selectedYear = $request->query('year');
+
+        if ($selectedMonth && $selectedYear) {
+            $dailyIncome = Order::where('shipper_id', $shipperId)
+                ->where('status', 'completed')
+                ->whereYear('updated_at', $selectedYear)
+                ->whereMonth('updated_at', $selectedMonth)
+                ->selectRaw('DAY(updated_at) as day, SUM(shipping_fee) as total_fee, COUNT(*) as order_count')
+                ->groupBy('day')
+                ->orderBy('day')
+                ->get();
+        }
+
+        return view('shipper.income_stats', compact(
+            'totalOrders',
+            'totalIncome',
+            'monthlyIncome',
+            'dailyIncome',
+            'selectedMonth',
+            'selectedYear'
+        ));
     }
+
+
 
 
 }

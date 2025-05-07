@@ -1,65 +1,72 @@
+/* create.css */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f5f6fa;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
     padding: 40px;
 }
 
 h2 {
     text-align: center;
-    color: #1573d1;
-    margin-bottom: 20px;
+    color: #2c3e50;
+    margin-bottom: 30px;
 }
 
 form {
-    background-color: #fff;
-    padding: 30px;
-    border-radius: 10px;
     max-width: 600px;
     margin: 0 auto;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 label {
     display: block;
-    margin-top: 15px;
-    font-size: 16px;
+    margin-top: 20px;
     font-weight: 600;
-    color: #34495e;
 }
 
-input[type="text"], select, input[type="file"] {
+input[type="text"],
+input[type="file"],
+select,
+textarea {
     width: 100%;
-    padding: 12px;
-    margin-top: 8px;
+    padding: 10px 12px;
     border: 1px solid #ccc;
     border-radius: 6px;
-    font-size: 14px;
-    background-color: #ecf0f1;
+    margin-top: 8px;
+    transition: border-color 0.3s;
 }
 
-button {
-    margin-top: 20px;
-    background-color: #3498db;
-    color: white;
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+button[type="submit"] {
+    background-color: #28a745;
+    color: #fff;
     padding: 12px 20px;
     border: none;
     border-radius: 6px;
-    font-size: 16px;
+    margin-top: 30px;
     cursor: pointer;
-    width: 100%;
+    font-weight: bold;
 }
 
-button:hover {
-    background-color: #2980b9;
+button[type="submit"]:hover {
+    background-color: #218838;
 }
 
 a {
-    display: inline-block;
-    margin-top: 20px;
-    color: #8e44ad;
-    text-decoration: none;
-    font-size: 16px;
+    display: block;
     text-align: center;
+    margin-top: 20px;
+    color: #007bff;
+    text-decoration: none;
 }
 
 a:hover {
@@ -68,20 +75,12 @@ a:hover {
 
 .image-preview-wrapper {
     margin-top: 10px;
-    text-align: center;
 }
 
 .image-preview {
-    display: none;
-    width: 150px;
+    width: 120px;
     height: auto;
+    display: none;
     border-radius: 8px;
-    border: 2px solid #ccc;
-    padding: 4px;
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
-}
-
-.image-preview img {
-    max-width: 100%;
-    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }

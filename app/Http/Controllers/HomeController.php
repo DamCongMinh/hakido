@@ -9,20 +9,12 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $slides = Slide::where('is_active', true)->get();
+        $slidesData = Slide::where('is_active', 1)->get()->map(function ($slide) {
+            // Thêm thuộc tính image chứa đường dẫn đầy đủ
+            $slide->image = asset($slide->image_path);
+            return $slide;
+        });
 
-        // Convert collection thành mảng slide sạch sẽ
-        $slidesData = $slides->map(function ($slide) {
-            return [
-                'title' => $slide->title,
-                'description1' => $slide->description1,
-                'description2' => $slide->description2,
-                'image' => asset($slide->image_path),
-            ];
-        })->toArray(); // rất quan trọng!
-
-        return view('web.home', compact('slides', 'slidesData'));
+        return view('web.home', compact('slidesData'));
     }
-
 }
-

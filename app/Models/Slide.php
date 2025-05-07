@@ -11,5 +11,6 @@ class Slide extends Model
         'description1',
         'description2',
         'image_path',
+        'is_active',
     ];
 }

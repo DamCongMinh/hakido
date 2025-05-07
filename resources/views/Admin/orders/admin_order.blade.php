@@ -14,7 +14,29 @@
         </div>
     @endif
 
+    @php
+        $statusMapping = \App\Models\Order::statusMapping();
+    @endphp
+
+
     <h2>Danh sách Đơn hàng</h2>
+    <form method="GET" action="{{ route('admin.orders.index') }}" class="order-filter-form">
+        <label for="filter_type">Lọc theo:</label>
+        <select name="filter_type" id="filter_type">
+            <option value="">-- Chọn --</option>
+            <option value="day" {{ request('filter_type') == 'day' ? 'selected' : '' }}>Hôm nay</option>
+            <option value="month" {{ request('filter_type') == 'month' ? 'selected' : '' }}>Tháng này</option>
+            <option value="year" {{ request('filter_type') == 'year' ? 'selected' : '' }}>Năm nay</option>
+        </select>
+    
+        <label for="date">Hoặc chọn ngày:</label>
+        <input type="date" name="date" id="date" value="{{ request('date') }}">
+    
+        <button type="submit">Lọc</button>
+        <a href="{{ route('admin.orders.index') }}">Xóa lọc</a>
+    </form>
+    
+
     <table border="1">
         <thead>
             <tr>
@@ -31,35 +53,27 @@
             @foreach($orders as $order)
                 <tr>
                     <td>{{ $order->id }}</td>
-                    <td>{{ $order->customer->name }}</td>
-                    <td>{{ $order->restaurant->name }}</td>
+                    <td>
+                        {{ $order->receiver_name ?? ($order->customer->name ?? 'Không có tên khách') }}
+                    </td>                    
+                    <td>
+                        {{ $order->restaurantProfile->name ?? ($order->restaurant->name ?? 'Không có tên nhà hàng') }}
+                    </td>                    
                     <td>{{ number_format($order->total, 0, ',', '.') }}đ</td>
-                    <td>{{ $order->status }}</td>
+                    <td>{{ $statusMapping[$order->status] ?? $order->status }}</td>
                     <td>
                         {{ $order->shipper ? $order->shipper->name : 'Chưa có' }}
                     </td>
                     <td>
-                        {{-- Gán shipper --}}
-                        @if(!$order->shipper)
-                            <form action="{{ route('admin.orders.assignShipper', $order->id) }}" method="POST" style="display:inline;">
-                                @csrf
-                                <select name="shipper_id" required>
-                                    @foreach($shippers as $shipper)
-                                        <option value="{{ $shipper->id }}">{{ $shipper->name }}</option>
-                                    @endforeach
-                                </select>
-                                <button type="submit">Gán shipper</button>
-                            </form>
-                        @endif
 
                         {{-- Cập nhật trạng thái --}}
                         @if(in_array($order->status, ['chờ xác nhận', 'đang xử lý']))
                             <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST" style="display:inline;">
                                 @csrf
                                 <select name="status" required>
-                                    <option value="đang giao">Đang giao</option>
-                                    <option value="hoàn thành">Hoàn thành</option>
-                                </select>
+                                    <option value="delivering">Đang giao</option>
+                                    <option value="completed">Hoàn thành</option>
+                                </select>                                
                                 <button type="submit">Cập nhật</button>
                             </form>
                         @endif

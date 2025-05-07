@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Thêm Danh mục mới</title>
+
+    <link rel="stylesheet" href="{{ asset('css/Admin/content/slides/create.css') }}">
 </head>
 <body>
+    @include('layout.header')
+    
     <h2>➕ Thêm Danh mục mới</h2>
 
     <form action="{{ route('admin.categories.store') }}" method="POST">

@@ -7,13 +7,13 @@
     <link rel="stylesheet" href="{{ asset('css/Admin/products/product_control_management.css') }}">
 </head>
 <body>
-    @include('layout.header') {{-- Sử dụng header dùng chung --}}
-    @if(session('success'))
-    <div style="color: green; font-weight: bold;">
-        {{ session('success') }}
-    </div>
-    @endif
+    @include('layout.header') {{-- Header dùng chung --}}
 
+    @if(session('success'))
+        <div style="color: green; font-weight: bold;">
+            {{ session('success') }}
+        </div>
+    @endif
 
     <!-- Đồ Ăn - Đã Duyệt -->
     <h2>Đồ Ăn - Đã Duyệt</h2>
@@ -34,11 +34,11 @@
                     <td>{{ $food->id }}</td>
                     <td><img src="{{ asset('storage/' . $food->image) }}" alt="Hình" width="70"></td>
                     <td>{{ $food->name }}</td>
-                    <td>{{ $food->restaurant->restaurant_name ?? 'Không có' }}</td>
+                    <td>{{ $food->restaurant->name ?? 'Không có' }}</td>
                     <td>{{ number_format($food->price) }}đ</td>
                     <td>
-                        <a href="{{ route('foods.edit', $food->id) }}">Sửa</a> | 
-                        <form action="{{ route('foods.destroy', $food->id) }}" method="POST" style="display:inline">
+                        <a href="{{ route('admin.foods.edit', $food->id) }}">Sửa</a> |
+                        <form action="{{ route('admin.foods.destroy', $food->id) }}" method="POST" style="display:inline">
                             @csrf
                             @method('DELETE')
                             <button type="submit" onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</button>
@@ -49,6 +49,7 @@
         </tbody>
     </table>
 
+    <!-- Đồ Ăn - Chờ Duyệt -->
     <h2>Đồ Ăn - Chờ Duyệt</h2>
     <table border="1" cellpadding="10" cellspacing="0">
         <thead>
@@ -67,16 +68,18 @@
                     <td>{{ $food->id }}</td>
                     <td><img src="{{ asset('storage/' . $food->image) }}" alt="Hình" width="70"></td>
                     <td>{{ $food->name }}</td>
-                    <td>{{ $food->restaurant->restaurant_name ?? 'Không có' }}</td>
+                    <td>
+                        {{ $food->restaurant->name ?? 'Không có' }}
+                    </td>
                     <td>{{ number_format($food->price) }}đ</td>
                     <td>
-                        <form action="{{ route('foods.approve', $food->id) }}" method="POST" style="display:inline">
+                        <form action="{{ route('admin.foods.approve', $food->id) }}" method="POST" style="display:inline">
                             @csrf
                             <button type="submit">Duyệt</button>
                         </form>
                         |
-                        <a href="{{ route('foods.edit', $food->id) }}">Sửa</a> | 
-                        <form action="{{ route('foods.destroy', $food->id) }}" method="POST" style="display:inline">
+                        <a href="{{ route('admin.foods.edit', $food->id) }}">Sửa</a> |
+                        <form action="{{ route('admin.foods.destroy', $food->id) }}" method="POST" style="display:inline">
                             @csrf
                             @method('DELETE')
                             <button type="submit" onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</button>
@@ -106,11 +109,11 @@
                     <td>{{ $beverage->id }}</td>
                     <td><img src="{{ asset('storage/' . $beverage->image) }}" alt="Hình" width="70"></td>
                     <td>{{ $beverage->name }}</td>
-                    <td>{{ $beverage->restaurant->restaurant_name ?? 'Không có' }}</td>
+                    <td>{{ $beverage->restaurant->name ?? 'Không có' }}</td>
                     <td>{{ number_format($beverage->price) }}đ</td>
                     <td>
-                        <a href="{{ route('beverages.edit', $beverage->id) }}">Sửa</a> | 
-                        <form action="{{ route('beverages.destroy', $beverage->id) }}" method="POST" style="display:inline">
+                        <a href="{{ route('admin.beverages.edit', $beverage->id) }}">Sửa</a> |
+                        <form action="{{ route('admin.beverages.destroy', $beverage->id) }}" method="POST" style="display:inline">
                             @csrf
                             @method('DELETE')
                             <button type="submit" onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</button>
@@ -121,6 +124,7 @@
         </tbody>
     </table>
 
+    <!-- Đồ Uống - Chờ Duyệt -->
     <h2>Đồ Uống - Chờ Duyệt</h2>
     <table border="1" cellpadding="10" cellspacing="0">
         <thead>
@@ -139,16 +143,18 @@
                     <td>{{ $beverage->id }}</td>
                     <td><img src="{{ asset('storage/' . $beverage->image) }}" alt="Hình" width="70"></td>
                     <td>{{ $beverage->name }}</td>
-                    <td>{{ $beverage->restaurant->restaurant_name ?? 'Không có' }}</td>
+                    <td>
+                        {{ $beverage->restaurant->name ?? 'Không có' }}
+                    </td>                    
                     <td>{{ number_format($beverage->price) }}đ</td>
                     <td>
-                        <form action="{{ route('beverages.approve', $beverage->id) }}" method="POST" style="display:inline">
+                        <form action="{{ route('admin.beverages.approve', $beverage->id) }}" method="POST" style="display:inline">
                             @csrf
                             <button type="submit">Duyệt</button>
                         </form>
                         |
-                        <a href="{{ route('beverages.edit', $beverage->id) }}">Sửa</a> | 
-                        <form action="{{ route('beverages.destroy', $beverage->id) }}" method="POST" style="display:inline">
+                        <a href="{{ route('admin.beverages.edit', $beverage->id) }}">Sửa</a> |
+                        <form action="{{ route('admin.beverages.destroy', $beverage->id) }}" method="POST" style="display:inline">
                             @csrf
                             @method('DELETE')
                             <button type="submit" onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</button>

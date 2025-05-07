@@ -23,13 +23,16 @@
             <div class="header_center">
                 <div class="header_center--directory">
                     @foreach ($categories as $category)
-                        <div class="directory--title">
-                            <a href="{{ route('products.byCategory', ['category_id' => $category->id]) }}">
-                                <p>{{ $category->name }}</p>
-                            </a>
-                        </div>
+                        @if ($category->is_active)
+                            <div class="directory--title">
+                                <a href="{{ route('products.byCategory', ['category_id' => $category->id]) }}">
+                                    <p>{{ $category->name }}</p>
+                                </a>
+                            </div>
+                        @endif
                     @endforeach
                 </div>
+                
 
                 <div class="header_center--classify">
                     <div class="classify-title">
@@ -89,33 +92,37 @@
                                     <h3>{{ Auth::user()->name }}</h3>
 
                                     <!-- Link cho tất cả user -->
-                                    <a href="{{ route('profile.home_info') }}">Tài khoản của tôi</a>
+                                    <li><a href="{{ route('profile.home_info') }}">Tài khoản của tôi</a></li>
 
                                     <!-- Nếu là admin -->
                                     @if (Auth::user()->role === 'admin')
-                                        <a href="{{ route('admin.dashboard') }}">Quản lý của admin</a>
+                                        <li><a href="{{ route('admin.accounts.index') }}">Quản lý người dùng</a></li>
+                                        <li><a href="{{ route('admin.orders.index') }}">Quản lý đơn hàng</a></li>
+                                        <li><a href="{{ route('control_product') }}">Quản lý sản phẩm</a></li>
+                                        <li><a href="{{ route('admin.content') }}">Quản lý nội dung</a></li>
+                                        <li><a href="{{ route('admin.statistics') }}">Thống kê doanh thu và số lượng đơn hàng</a></li>
                                     @endif
 
                                     <!-- Nếu là restaurant -->
                                     @if (Auth::user()->role === 'restaurant')
-                                        <a href="{{ route('restaurant.products.home') }}">Quản lý sản phẩm</a>
-                                        <a href="{{ route('restaurant.statistics.index') }}">Quản lý đơn hàng</a>
-                                        <a href="{{ route('restaurant.statistics.home') }}">Thống kê</a>
+                                        <li><a href="{{ route('restaurant.products.home') }}">Quản lý sản phẩm</a></li>
+                                        <li><a href="{{ route('restaurant.statistics.index') }}">Quản lý đơn hàng</a></li>
+                                        <li><a href="{{ route('restaurant.statistics.home') }}">Thống kê</a></li>
                                     @endif
 
                                     <!-- Nếu là shipper -->
                                     @if (Auth::user()->role === 'shipper')
-                                        <a href="{{ route('shipper.orders.available') }}">🛒 Đơn hàng đang chờ</a>
-                                        <a href="{{ route('shipper.orders.current') }}">🚚 Đơn đang giao</a>
-                                        <a href="{{ route('shipper.orders.history') }}">📜 Lịch sử giao hàng</a>
-                                        <a href="{{ route('shipper.orders.incomeStats') }}">💰 Thống kê thu nhập</a>
+                                        <li><a href="{{ route('shipper.orders.available') }}">🛒 Đơn hàng đang chờ</a></li>
+                                        <li><a href="{{ route('shipper.orders.current') }}">🚚 Đơn đang giao</a></li>
+                                        <li><a href="{{ route('shipper.orders.history') }}">📜 Lịch sử giao hàng</a></li>
+                                        <li><a href="{{ route('shipper.orders.incomeStats') }}">💰 Thống kê thu nhập</a></li>
                                     @endif
 
 
                                     <!-- Nếu là customer -->
                                     @if (Auth::user()->role === 'customer')
-                                        <a href="{{ route('cart.show') }}">Giỏ hàng của tôi</a>
-                                        <a href="{{ route('orders.items') }}">📦 Sản phẩm đã đặt</a>
+                                        <li><a href="{{ route('cart.show') }}">Giỏ hàng của tôi</a></li>
+                                        <li><a href="{{ route('orders.items') }}">📦 Sản phẩm đã đặt</a></li>
                                     @endif
 
                                     <form method="POST" action="{{ route('logout') }}">

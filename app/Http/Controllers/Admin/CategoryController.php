@@ -50,15 +50,19 @@ class CategoryController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'is_active' => 'required|in:0,1',
         ]);
 
         $category->update([
             'name' => $request->name,
             'description' => $request->description,
+            'is_active' => $request->is_active,
         ]);
 
         return redirect()->route('admin.categories.index')->with('success', 'Cập nhật danh mục thành công!');
     }
+
+
 
     public function destroy($id)
     {

@@ -1,59 +1,82 @@
+/* public/css/Admin/content/slides/edit.css */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f4f6f9;
+    padding: 50px;
+    color: #333;
+    margin-top: 120px;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #2c3e50;
+}
+
 .form-container {
-    width: 500px;
-    margin: 50px auto;
-    padding: 20px;
-    border: 1px solid #ccc;
+    max-width: 700px;
+    margin: 0 auto;
+    background: #ffffff;
+    padding: 30px;
     border-radius: 10px;
-    background-color: #f9f9f9;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
 }
 
-.form-container h2 {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
+label {
     display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-.form-group input,
-.form-group select {
-    width: 100%;
-    padding: 8px;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-.form-actions {
-    display: flex;
-    justify-content: space-between;
     margin-top: 20px;
+    font-weight: 600;
 }
 
-.btn-save,
-.btn-cancel {
-    padding: 10px 20px;
-    font-size: 1rem;
+.form-container input[type="text"],
+.form-container input[type="file"],
+select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 15px;
+    transition: border 0.3s ease-in-out;
+}
+
+.form-container input:focus,
+select:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+img#preview-image {
+    margin-top: 12px;
+    border-radius: 8px;
+    width: 150px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+button[type="submit"] {
+    background-color: #007bff;
+    color: white;
+    padding: 12px 20px;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
+    margin-top: 30px;
     cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
 }
 
-.btn-save {
-    background-color: #28a745;
-    color: white;
+button[type="submit"]:hover {
+    background-color: #0056b3;
 }
 
-.btn-cancel {
-    background-color: #dc3545;
-    color: white;
+ .form-container a {
+    display: inline-block;
+    margin-top: 20px;
+    color: #007bff;
     text-decoration: none;
-    text-align: center;
+}
+
+.form-container a:hover {
+    text-decoration: underline;
 }

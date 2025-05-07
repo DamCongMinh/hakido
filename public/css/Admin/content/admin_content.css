@@ -1,55 +1,154 @@
+/* Reset & font */
 body {
-    margin-top: 140px;
-    font-family: Arial, sans-serif;
-    padding: 20px;
-    background-color: #f8f9fa;
-}
-
-h2 {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f4f6f8;
     color: #333;
-    margin-bottom: 20px;
+    margin-top: 120px;
 }
 
-table {
+.admin-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.content-section {
+    margin-bottom: 40px;
+}
+
+.content-section h2 {
+    font-size: 24px;
+    color: #007BFF;
+    margin-bottom: 20px;
+    border-left: 4px solid #007BFF;
+    padding-left: 12px;
+}
+
+.btn-add {
+    display: inline-block;
+    background-color: #28a745;
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    margin-bottom: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-add:hover {
+    background-color: #218838;
+}
+
+/* Table styling */
+.content-table {
     width: 100%;
     border-collapse: collapse;
-    background-color: #fff;
-    margin-bottom: 60px;
-    max-height: 600px;
+    background-color: #ffffff;
 }
 
-table th, table td {
-    border: 1px solid #ccc;
-    padding: 12px;
+.content-table thead {
+    background-color: #007BFF;
+    color: white;
+}
+
+.content-table thead tr:hover {
+    background-color: #007BFF;  
+    color: #fff;                
+    cursor: default;          
+}
+
+.content-table th, .content-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #ddd;
     text-align: left;
 }
 
-table th {
-    background-color: #f0f0f0;
-    color: #333;
+.content-table tr:hover {
+    background-color: #f1f1f1;
+    cursor: pointer;
 }
 
 img {
-    max-width: 100px;
-    height: auto;
-    border-radius: 6px;
-    box-shadow: 0 0 4px rgba(0,0,0,0.2);
+    max-height: 80px;
+    border-radius: 8px;
 }
 
+/* Action buttons */
+button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-right: 6px;
+    transition: background-color 0.3s ease;
+}
+
+button[type="button"] {
+    background-color: #ffc107;
+    color: #fff;
+}
+
+button[type="button"]:hover {
+    background-color: #e0a800;
+}
+
+button[type="submit"] {
+    background-color: #dc3545;
+    color: white;
+}
+
+button[type="submit"]:hover {
+    background-color: #c82333;
+}
+
+.btn-edit {
+    background-color: #17a2b8;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 5px;
+    text-decoration: none;
+    margin-right: 5px;
+}
+
+.btn-edit:hover {
+    background-color: #138496;
+}
+
+.btn-delete {
+    background-color: #dc3545;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 5px;
+    border: none;
+}
+
+.btn-delete:hover {
+    background-color: #c82333;
+}
+
+/* Success alert */
 .alert-success {
     background-color: #d4edda;
-    padding: 10px 15px;
-    border: 1px solid #c3e6cb;
     color: #155724;
-    border-radius: 5px;
-    margin-bottom: 20px;
+    padding: 10px 20px;
+    border: 1px solid #c3e6cb;
+    border-radius: 8px;
+    margin: 20px;
 }
 
+/* Back link */
 .back {
     display: inline-block;
     margin-top: 20px;
     text-decoration: none;
-    color: #007bff;
+    color: #007BFF;
     font-weight: bold;
 }
 

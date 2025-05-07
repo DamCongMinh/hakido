@@ -4,11 +4,14 @@
     <meta charset="UTF-8">
     <title>Sửa Slide</title>
 
-    <link rel="stylesheet" href="{{ asset('css/Admin/content/slides/create.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/Admin/content/categories/edit.css') }}">
 </head>
 <body>
+
+    @include('layout.header')
+    
     <h2>Sửa Slide</h2>
-    <form action="{{ route('admin.slides.update', $slide->id) }}" method="POST" enctype="multipart/form-data">
+    <form class="form-container" action="{{ route('admin.slides.update', $slide->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 

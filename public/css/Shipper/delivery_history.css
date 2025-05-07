@@ -1,8 +1,8 @@
 body {
     font-family: Arial, sans-serif;
-    background: #f4f4f4;
-    margin-top: 120px;
+    background: #f8f9fc;
     padding: 20px;
+    margin-top: 120px;
 }
 
 h1, h2 {
@@ -10,34 +10,56 @@ h1, h2 {
     color: #333;
 }
 
+.filter-form {
+    text-align: center;
+    margin: 20px 0;
+    background: #fff;
+    padding: 20px;
+    display: inline-block;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.filter-form select, .filter-form input, .filter-form button {
+    padding: 8px 12px;
+    margin: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.filter-form button {
+    background-color: #3490dc;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.filter-form button:hover {
+    background-color: #2779bd;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 15px;
+    margin: 20px 0;
     background: #fff;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-th, td {
+table th, table td {
     padding: 12px;
     border: 1px solid #ddd;
     text-align: center;
 }
 
-th {
-    background: #007bff;
+table th {
+    background-color: #3490dc;
     color: white;
-}
-
-tr:nth-child(even) {
-    background: #f9f9f9;
 }
 
 .text {
     text-align: center;
-    color: #666;
-}
-
-.section {
-    margin-bottom: 50px;
+    color: #888;
+    font-style: italic;
 }

@@ -23,6 +23,7 @@
             <table class="content-table">
                 <thead>
                     <tr>
+                        <th>STT</th>
                         <th>Tiêu đề</th>
                         <th>Mô tả 1</th>
                         <th>Mô tả 2</th>
@@ -34,6 +35,7 @@
                 <tbody>
                     @foreach ($slides as $slide)
                         <tr>
+                            <td></td>
                             <td>{{ $slide->title }}</td>
                             <td>{{ $slide->description1 }}</td>
                             <td>{{ $slide->description2 }}</td>
@@ -66,6 +68,7 @@
             <table class="content-table">
                 <thead>
                     <tr>
+                        <th>STT</th>
                         <th>Tên danh mục</th>
                         <th>Trạng thái</th>
                         <th>Hành động</th>
@@ -74,6 +77,7 @@
                 <tbody>
                     @foreach($categories as $category)
                         <tr>
+                            <td></td>
                             <td>{{ $category->name }}</td>
                             <td>{{ $category->is_active ? 'Hiển thị' : 'Ẩn' }}</td>
                             <td>
@@ -98,6 +102,21 @@
         {{-- hiển thị danh mục --}}
     @endforeach
     @endif
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".content-table").forEach(function (table) {
+                const rows = table.querySelectorAll("tbody tr");
+                rows.forEach((row, index) => {
+                    const sttCell = row.querySelector("td:first-child");
+                    if (sttCell) {
+                        sttCell.textContent = index + 1;
+                    }
+                });
+            });
+        });
+    </script>
+    
 
 </body>
 </html>

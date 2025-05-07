@@ -10,13 +10,33 @@ use Illuminate\Http\Request;
 class AdminOrderController extends Controller
 {
     // Hiển thị danh sách đơn hàng
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::with(['customer', 'restaurant', 'shipper'])->orderBy('created_at', 'desc')->get();
+        $query = Order::with(['customer', 'restaurant', 'shipper']);
+
+        // Lọc theo filter_type
+        if ($request->filled('filter_type')) {
+            if ($request->filter_type == 'day') {
+                $query->whereDate('created_at', today());
+            } elseif ($request->filter_type == 'month') {
+                $query->whereMonth('created_at', now()->month)
+                    ->whereYear('created_at', now()->year);
+            } elseif ($request->filter_type == 'year') {
+                $query->whereYear('created_at', now()->year);
+            }
+        }
+
+        // Lọc theo ngày cụ thể nếu có
+        if ($request->filled('date')) {
+            $query->whereDate('created_at', $request->date);
+        }
+
+        $orders = $query->orderBy('created_at', 'desc')->get();
         $shippers = User::where('role', 'shipper')->where('is_active', true)->get();
 
         return view('Admin.orders.admin_order', compact('orders', 'shippers'));
     }
+
 
     // Hiển thị chi tiết 1 đơn hàng
     public function show(Order $order)
@@ -31,20 +51,20 @@ class AdminOrderController extends Controller
     public function updateStatus(Request $request, Order $order)
     {
         $request->validate([
-            'status' => 'required|in:chờ xác nhận,đang xử lý,đang giao,hoàn thành,đã hủy'
+            'status' => 'required|in:pending,processing,delivering,completed,canceled',
         ]);
+
         $order->status = $request->status;
         $order->save();
 
         return redirect()->back()->with('success', 'Cập nhật trạng thái thành công.');
     }
 
-
     // Gán shipper cho đơn hàng
     public function assignShipper(Request $request, Order $order)
     {
         $request->validate([
-            'shipper_id' => 'required|exists:users,id'
+            'shipper_id' => 'required|exists:users,id',
         ]);
 
         $order->shipper_id = $request->shipper_id;
@@ -56,11 +76,9 @@ class AdminOrderController extends Controller
     // Hủy đơn hàng
     public function cancel(Order $order)
     {
-        $order->status = 'cancelled';
+        $order->status = 'canceled';
         $order->save();
 
         return redirect()->back()->with('success', 'Đơn hàng đã được hủy.');
     }
 }
-
- 

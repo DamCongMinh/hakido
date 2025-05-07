@@ -14,101 +14,66 @@
         </div>
     @endif
 
-    {{-- Danh sách Khách hàng --}}
-    <h2>Danh sách Khách hàng</h2>
-    <table border="1">
-        @foreach($customers as $user)
-            <tr>
-                <td>{{ $user->name }}</td>
-                <td>{{ $user->email }}</td>
-                <td>
-                    @if(!$user->is_approved)
-                        <form action="{{ route('admin.accounts.approve', $user->id) }}" method="POST" style="display:inline;">
-                            @csrf
-                            <button type="submit">Duyệt</button>
-                        </form>
-                    @endif
+    @php
+        $accountTypes = [
+            'customers' => 'Danh sách Khách hàng',
+            'restaurants' => 'Danh sách Nhà hàng',
+            'shippers' => 'Danh sách Shipper',
+        ];
+    @endphp
 
-                    <form action="{{ route('admin.accounts.toggle', $user->id) }}" method="POST" style="display:inline;">
-                        @csrf
-                        <button type="submit">
-                            {{ $user->is_active ? 'Khóa' : 'Mở khóa' }}
-                        </button>
-                    </form>
+    @foreach ($accountTypes as $type => $title)
+        <h2>{{ $title }}</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Tên</th>
+                    <th>Email</th>
+                    <th>Số điện thoại</th>
+                    <th>Trạng thái</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($$type as $user)
+                    <tr>
+                        <td>{{ $user->name }}</td>
+                        <td>{{ $user->email }}</td>
+                        <td>{{ $user->phone }}</td>
+                        <td>
+                            <div><strong>Trạng thái:</strong> {{ $user->is_active ? 'Đang hoạt động' : 'Bị khóa' }}</div>
+                            <div><strong>Duyệt:</strong> {{ $user->is_approved ? 'Đã duyệt' : 'Chưa duyệt' }}</div>
+                        </td>
+                        <td>
+                            {{-- Duyệt tài khoản nếu chưa duyệt --}}
+                            @if (!$user->is_approved)
+                                <form action="{{ route('admin.accounts.approve', $user->user_id) }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    <button type="submit">✔️ Duyệt</button>
+                                </form>
+                            @endif
 
-                    <form action="{{ route('admin.accounts.delete', $user->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn xóa tài khoản này?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit">Xóa</button>
-                    </form>
-                </td>
-            </tr>
-        @endforeach
-    </table>
+                            {{-- Khóa / Mở khóa --}}
+                            <form action="{{ route('admin.accounts.toggle', $user->user_id) }}" method="POST" style="display:inline;">
+                                @csrf
+                                <button type="submit">
+                                    {{ $user->is_active ? '🔒 Khóa' : '🔓 Mở khóa' }}
+                                </button>
+                            </form>
 
-    {{-- Danh sách Nhà hàng --}}
-    <h2>Danh sách Nhà hàng</h2>
-    <table border="1">
-        @foreach($restaurants as $user)
-            <tr>
-                <td>{{ $user->name }}</td>
-                <td>{{ $user->email }}</td>
-                <td>
-                    @if(!$user->is_approved)
-                        <form action="{{ route('admin.accounts.approve', $user->id) }}" method="POST" style="display:inline;">
-                            @csrf
-                            <button type="submit">Duyệt</button>
-                        </form>
-                    @endif
+                            {{-- Xóa --}}
+                            <form action="{{ route('admin.accounts.delete', $user->user_id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn xóa tài khoản này?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit">🗑️ Xóa</button>
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endforeach
 
-                    <form action="{{ route('admin.accounts.toggle', $user->id) }}" method="POST" style="display:inline;">
-                        @csrf
-                        <button type="submit">
-                            {{ $user->is_active ? 'Khóa' : 'Kích hoạt' }}
-                        </button>
-                    </form>
-
-                    <form action="{{ route('admin.accounts.delete', $user->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn xóa tài khoản này?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit">Xóa</button>
-                    </form>
-                </td>
-            </tr>
-        @endforeach
-    </table>
-
-    {{-- Danh sách Shipper --}}
-    <h2>Danh sách Shipper</h2>
-    <table border="1">
-        @foreach($shippers as $user)
-            <tr>
-                <td>{{ $user->name }}</td>
-                <td>{{ $user->email }}</td>
-                <td>
-                    @if(!$user->is_approved)
-                        <form action="{{ route('admin.accounts.approve', $user->id) }}" method="POST" style="display:inline;">
-                            @csrf
-                            <button type="submit">Duyệt</button>
-                        </form>
-                    @endif
-
-                    <form action="{{ route('admin.accounts.toggle', $user->id) }}" method="POST" style="display:inline;">
-                        @csrf
-                        <button type="submit">
-                            {{ $user->is_active ? 'Khóa' : 'Kích hoạt' }}
-                        </button>
-                    </form>
-
-                    <form action="{{ route('admin.accounts.delete', $user->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn xóa tài khoản này?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit">Xóa</button>
-                    </form>
-                </td>
-            </tr>
-        @endforeach
-    </table>
 
     <a href="{{ route('admin.dashboard') }}">← Quay lại trang Admin</a>
 </body>
