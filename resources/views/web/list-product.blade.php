@@ -56,6 +56,7 @@
                         <option value="all">Tất cả phường xã</option>
                         <!-- Khi load phường xã thì cũng cần check selected -->
                     </select>
+
                     
                     <input type="range" name="price" id="price-filter" min="0" max="500000" step="1000"
                         value="{{ request('price', 500000) }}">
@@ -73,8 +74,32 @@
                             <div class="list-show">
                                 <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}">
                                 <div class="show-cart">
-                                    <p><i class="fa-solid fa-cart-shopping"></i></p>
+                                    @if ($product->type == 'food')
+                                        <form action="{{ route('cart.add') }}" method="POST">
+                                            @csrf
+                                            <input type="hidden" name="type" value="food">
+                                            <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                            <input type="hidden" name="quantity" value="1">
+                                            <button type="submit" class="show-cart" style="background: none; border: none; cursor: pointer; padding: 0;">
+                                                <p><i class="fa-solid fa-cart-shopping"></i></p>
+                                            </button>
+                                        </form>
+                                    @elseif ($product->type == 'beverage')
+                                        @foreach ($product->beverageSizes as $size)
+                                            <form action="{{ route('cart.add') }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="type" value="beverage">
+                                                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                                <input type="hidden" name="quantity" value="1">
+                                                <input type="hidden" name="size" value="{{ $size->size }}">
+                                                <button type="submit" class="show-cart" style="background: none; border: none; cursor: pointer; padding: 0;">
+                                                    <p><i class="fa-solid fa-cart-shopping"></i></p>
+                                                </button>
+                                            </form>
+                                        @endforeach
+                                    @endif
                                 </div>
+
                                 <div class="show-title">
                                     <h1>{{ $product->name }}</h1>
                                     <div class="title-detail">

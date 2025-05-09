@@ -23,9 +23,7 @@ class ProfileController extends Controller
     public function update(Request $request)
     {
         $user = auth()->user();
-        // $user->address = $request->address;
 
-        // Validate dữ liệu
         $commonRules = [
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
@@ -33,33 +31,11 @@ class ProfileController extends Controller
             'address' => 'required|string|max:255',
             'extra' => 'nullable|string|max:255',
             'avatar' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
-        ];
-
-        $request->validate([
-            'province' => 'required',
-            'district' => 'required',
-            'ward' => 'required',
-            'address' => 'required|string|max:255',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
-        ]);
+        ];
 
-        // Gọi API để lấy dữ liệu
-        $province = Http::get("https://provinces.open-api.vn/api/p/{$request->province}")->json();
-        $district = Http::get("https://provinces.open-api.vn/api/d/{$request->district}")->json();
-        $ward = Http::get("https://provinces.open-api.vn/api/w/{$request->ward}")->json();
-
-        // Check nếu không có name thì để trống
-        $provinceName = $province['name'] ?? '';
-        $districtName = $district['name'] ?? '';
-        $wardName = $ward['name'] ?? '';
-        
-        //  địa chỉ
-        $fullAddress = $request->address;
-
-
-       
-
+        // Các rule riêng theo vai trò
         switch ($user->role) {
             case 'customer':
                 $rules = array_merge($commonRules, [
@@ -80,18 +56,18 @@ class ProfileController extends Controller
                 break;
             default:
                 $rules = $commonRules;
-                break;
         }
 
+        // Validate input chung + riêng
         $validated = $request->validate($rules);
 
-        // Upload avatar nếu có
+        // Xử lý avatar (nếu có)
+        $avatarPath = null;
         if ($request->hasFile('avatar')) {
-            $path = $request->file('avatar')->store('avatars', 'public');
-            $validated['avatar'] = $path;
+            $avatarPath = $request->file('avatar')->store('avatars', 'public');
         }
 
-        // Cập nhật bảng phụ
+        // Cập nhật theo role
         switch ($user->role) {
             case 'customer':
                 $customer = $user->customer;
@@ -100,10 +76,10 @@ class ProfileController extends Controller
                         'name' => $validated['name'],
                         'phone' => $validated['phone'],
                         'email' => $validated['email'],
-                        'address' => $fullAddress,
-                        'latitude' => $request->latitude,
-                        'longitude' => $request->longitude,
-                        'avatar' => $validated['avatar'] ?? $customer->avatar,
+                        'address' => $validated['address'],
+                        'latitude' => $validated['latitude'] ?? $customer->latitude,
+                        'longitude' => $validated['longitude'] ?? $customer->longitude,
+                        'avatar' => $avatarPath ?? $customer->avatar,
                         'date_of_birth' => $validated['date_of_birth'] ?? $customer->date_of_birth,
                         'extra' => $validated['extra'] ?? $customer->extra,
                     ]);
@@ -117,10 +93,10 @@ class ProfileController extends Controller
                         'name' => $validated['name'],
                         'phone' => $validated['phone'],
                         'email' => $validated['email'],
-                        'address' => $fullAddress,
-                        'latitude' => $request->latitude,
-                        'longitude' => $request->longitude,
-                        'avatar' => $validated['avatar'] ?? $restaurant->avatar,
+                        'address' => $validated['address'],
+                        'latitude' => $validated['latitude'] ?? $restaurant->latitude,
+                        'longitude' => $validated['longitude'] ?? $restaurant->longitude,
+                        'avatar' => $avatarPath ?? $restaurant->avatar,
                         'time_open' => $validated['time_open'] ?? $restaurant->time_open,
                         'time_close' => $validated['time_close'] ?? $restaurant->time_close,
                         'is_active' => $validated['is_active'] ?? $restaurant->is_active,
@@ -136,8 +112,8 @@ class ProfileController extends Controller
                         'name' => $validated['name'],
                         'phone' => $validated['phone'],
                         'email' => $validated['email'],
-                        'address' => $fullAddress,
-                        'avatar' => $validated['avatar'] ?? $shipper->avatar,
+                        'address' => $validated['address'],
+                        'avatar' => $avatarPath ?? $shipper->avatar,
                         'area' => $validated['area'] ?? $shipper->area,
                         'extra' => $validated['extra'] ?? $shipper->extra,
                     ]);
@@ -145,7 +121,7 @@ class ProfileController extends Controller
                 break;
         }
 
-        // Cập nhật bảng users
+        // Cập nhật bảng cha users
         $user->update([
             'name' => $validated['name'],
             'email' => $validated['email'],
@@ -153,6 +129,10 @@ class ProfileController extends Controller
 
         return redirect()->route('profile.home_info')->with('success', 'Cập nhật thành công!');
     }
+
+
+
+
 
 
     public function changePassword(Request $request)

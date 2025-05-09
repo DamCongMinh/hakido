@@ -33,8 +33,8 @@ class FoodController extends Controller
         return view('products.edit', [
             'item' => $food,
             'type' => 'food',
-            'updateRoute' => route('foods.update', $food->id),
-            'indexRoute' => route('foods.index'),
+            'updateRoute' => route('admin.foods.update', $food->id),
+            'indexRoute' => route('admin.foods.index'),
         ]);
     }
 
@@ -63,6 +63,17 @@ class FoodController extends Controller
 
         return redirect()->back()->with('success', 'Món ăn đã được duyệt!');
     }
+
+    public function reject($id)
+    {
+        $food = Food::findOrFail($id);
+        $food->status = 'rejected';
+        $food->is_approved = false;
+        $food->save();
+
+        return redirect()->back()->with('success', 'Món ăn đã bị từ chối.');
+    }
+
 
 
 

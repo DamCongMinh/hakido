@@ -10,7 +10,23 @@
     
     <h2>Sửa {{ $type === 'food' ? 'Đồ Ăn' : 'Đồ Uống' }}: {{ $item->name }}</h2>
 
-    <form action="{{ $updateRoute }}" method="POST" enctype="multipart/form-data">
+    @if ($errors->any())
+        <div style="color: red;">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    @if (session('success'))
+        <div style="color: green; font-weight: bold;">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    <form action="{{ route($type === 'food' ? 'admin.foods.update' : 'admin.beverages.update', $item->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
@@ -18,7 +34,7 @@
         <input type="text" name="name" value="{{ old('name', $item->name) }}" required>
 
         <label for="price">Giá:</label>
-        <input type="number" name="price" value="{{ old('price', $item->price) }}" required>
+        <input type="number" name="price" value="{{ old('price', $item->price ?? ($item->beverageSizes[0]->new_price ?? '')) }}" required>
 
         <label for="description">Mô tả:</label>
         <input type="text" name="description" value="{{ old('description', $item->description) }}">
@@ -48,26 +64,8 @@
                 document.getElementById('preview-image').src = reader.result;
             };
             reader.readAsDataURL(event.target.files[0]);
-
-            const formData = new FormData();
-            formData.append('image', event.target.files[0]);
-
-            fetch("{{ route($type === 'food' ? 'foods.update' : 'beverages.update', $item->id) }}", {
-                method: 'POST', // Dùng POST vì Laravel đang expect PUT spoofing
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                },
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    console.log("Upload thành công");
-                } else {
-                    console.log("Lỗi upload ảnh");
-                }
-            });
         }
+
     </script>
 </body>
 </html>

@@ -8,11 +8,9 @@ class Beverage extends Model
 {
     protected $table = 'beverages';
 
-    protected $fillable = ['name', 'image', 'category_id', 'description', 'status', 'restaurant_id', 'is_active'];
+    protected $fillable = ['name', 'image', 'category_id', 'description', 'status', 'restaurant_id', 'is_active', 'is_rejected',
+    'rejection_reason',];
 
-    // protected $casts = [
-    //     'is_active' => 'boolean',
-    // ];
 
     public function restaurant()
     {
@@ -40,4 +38,13 @@ class Beverage extends Model
         }
         return null;
     }
+
+
+    protected $appends = ['type'];
+
+    public function getTypeAttribute()
+    {
+        return 'beverage';
+    }
+
 }

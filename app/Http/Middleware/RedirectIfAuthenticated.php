@@ -30,7 +30,7 @@ class RedirectIfAuthenticated
             // Chuyển hướng theo role
             switch ($user->role) {
                 case 'admin':
-                    return redirect()->route('admin.dashboard');
+                    return redirect()->route('home');
                 case 'shiper':
                     return redirect()->route('shiper');
                 case 'restaurant':

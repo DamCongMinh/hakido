@@ -33,13 +33,13 @@
         @endif
 
         <label for="current_password">Mật khẩu hiện tại:</label>
-        <input type="password" name="current_password" id="current_password" required>
+        <input class="input_change" type="password" name="current_password" id="current_password" required>
 
         <label for="new_password">Mật khẩu mới:</label>
-        <input type="password" name="new_password" id="new_password" required>
+        <input class="input_change" type="password" name="new_password" id="new_password" required>
 
         <label for="new_password_confirmation">Xác nhận mật khẩu mới:</label>
-        <input type="password" name="new_password_confirmation" id="new_password_confirmation" required>
+        <input class="input_change" type="password" name="new_password_confirmation" id="new_password_confirmation" required>
 
         <button type="submit">Đổi mật khẩu</button>
     </form>    

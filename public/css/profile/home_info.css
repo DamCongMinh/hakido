@@ -1,41 +1,96 @@
-body {
-    font-family: Arial, sans-serif;
-    background: #f2f2f2;
-    margin-top: 120px;
-    padding: 0;
-}
-
 .container {
     max-width: 600px;
-    background: #fff;
-    margin: 50px auto;
+    margin: 120px auto;
     padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
+    font-family: 'Poppins', sans-serif;
 }
 
-h1 {
+.container h1 {
     text-align: center;
+    margin-bottom: 30px;
+    font-size: 28px;
     color: #333;
 }
 
-form div {
+.avatar-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 25px;
+    position: relative;
+}
+
+.avatar-container {
+    position: relative;
+    width: 130px;
+    height: 130px;
+}
+
+.profile-pic {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #ddd;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+.upload-button {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: #fff;
+    border-radius: 50%;
+    padding: 5px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.15);
+}
+
+.user-name {
+    margin-top: 10px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #444;
+}
+
+form > div {
     margin-bottom: 15px;
 }
 
 label {
     display: block;
-    font-weight: bold;
     margin-bottom: 5px;
-    color: #555;
+    font-weight: 600;
+    color: #444;
 }
 
-input[type="text"] {
+.container input[type="text"],
+.contrainer input[type="email"],
+select {
     width: 100%;
-    padding: 10px;
+    margin-top: 10px;
+    padding: 10px 12px;
     border: 1px solid #ccc;
-    border-radius: 6px;
-    box-sizing: border-box;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: 0.3s ease;
+}
+
+.input_change[type="text"]:focus,
+.input_change[type="email"]:focus,
+select:focus {
+    outline: none;
+    border-color: #6c63ff;
+    box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.2);
+}
+
+strong {
+    display: block;
+    margin-top: 5px;
+    font-weight: 600;
+    color: #222;
 }
 
 button[type="submit"] {
@@ -51,85 +106,4 @@ button[type="submit"] {
 
 button[type="submit"]:hover {
     background: #45a049;
-}
-
-hr {
-    margin: 30px 0;
-    border: none;
-    border-top: 1px solid #ccc;
-}
-
-.delete-button {
-    background: #e53935;
-    margin-top: 10px;
-}
-
-.delete-button:hover {
-    background: #d32f2f;
-}
-
-.success-message {
-    background: #d4edda;
-    color: #155724;
-    padding: 10px;
-    border-radius: 6px;
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.avatar-wrapper {
-    position: relative;
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.avatar-container {
-    width: 130px;
-    height: 130px;
-    margin: 0 auto;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 4px solid #fff;
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
-}
-
-.profile-pic {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
-}
-
-.upload-button {
-    position: absolute;
-    bottom: 10px;
-    right: calc(50% - 65px + 10px); /* canh phải icon dựa trên avatar nằm giữa */
-    background-color: rgba(0, 0, 0, 0.6);
-    color: #fff;
-    border-radius: 50%;
-    padding: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2;
-}
-
-.upload-button:hover {
-    background-color: rgba(0, 0, 0, 0.8);
-}
-
-.upload-button i {
-    pointer-events: none;
-}
-
-.file-upload {
-    display: none;
-}
-
-.user-name {
-    margin-top: 10px;
-    font-weight: bold;
-    font-size: 18px;
 }

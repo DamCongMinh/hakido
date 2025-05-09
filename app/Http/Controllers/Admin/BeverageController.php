@@ -59,11 +59,22 @@ class BeverageController extends Controller
     {
         $beverage = Beverage::findOrFail($id);
         $beverage->is_approved = true;
-        $beverage->status = 'approved'; // <--- thêm dòng này
+        $beverage->status = 'approved';
         $beverage->save();
 
         return redirect()->back()->with('success', 'Đồ uống đã được duyệt!');
     }
+
+    public function reject($id)
+    {
+        $beverage = Beverage::findOrFail($id);
+        $beverage->status = 'rejected';
+        $beverage->is_approved = false;
+        $beverage->save();
+
+        return redirect()->back()->with('success', 'Đồ uống đã bị từ chối.');
+    }
+
 
 
 

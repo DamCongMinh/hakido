@@ -150,6 +150,24 @@
         localStorage.setItem('token', '{{ session('token') }}');
         localStorage.setItem('user', JSON.stringify({!! session('user') !!}));
     </script>
+
+    {{-- <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('searchForm');
+            const keywordInput = document.getElementById('searchInput');
+            const typeInput = document.getElementById('searchType');
+
+            form.addEventListener('submit', function (e) {
+                const keyword = keywordInput.value.toLowerCase().trim();
+
+                if (keyword.includes('nhà hàng')) {
+                    typeInput.value = 'restaurant';
+                } else {
+                    typeInput.value = 'product';
+                }
+            });
+        });
+    </script> --}}
     @endif
 </body>
 </html>

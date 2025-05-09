@@ -47,10 +47,13 @@ Route::get('/search-restaurant', [SearchRestaurantController::class, 'search'])-
 //show detail product
 Route::get('/product/{type}/{id}', [ShowDetailController::class, 'show'])->name('product.show');
 
+// listrestaurant
+Route::get('/search', [SearchAndFilterController::class, 'search'])->name('search');
+
+
 // Route::get('/list-product', fn () => view('web.list-product'))->name('list-product');
 Route::get('/detail', fn () => view('web.detail_product'))->name('detail');
 
-// Trang theo role
 // Route trang Restaurant (đúng Controller, đúng dữ liệu)
 Route::middleware(['auth'])->group(function () {
     Route::get('/restaurant', [RestaurantStatisticsController::class, 'index'])->name('restaurant');
@@ -183,6 +186,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::put('/update/{id}', [FoodController::class, 'update'])->name('update');
         Route::post('/approve/{id}', [FoodController::class, 'approve'])->name('approve');
         Route::delete('/destroy/{id}', [FoodController::class, 'destroy'])->name('destroy');
+        Route::post('/reject/{id}', [FoodController::class, 'reject'])->name('reject');
     });
 
     // Quản lý Đồ Uống
@@ -192,6 +196,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::put('/update/{id}', [BeverageController::class, 'update'])->name('update');
         Route::post('/approve/{id}', [BeverageController::class, 'approve'])->name('approve');
         Route::delete('/destroy/{id}', [BeverageController::class, 'destroy'])->name('destroy');
+        Route::post('/reject/{id}', [BeverageController::class, 'reject'])->name('reject');
     });
 
     // Quản lý Đặt Hàng

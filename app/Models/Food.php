@@ -18,6 +18,8 @@ class Food extends Model
         'image',
         'status',
         'is_active',
+        'is_rejected',
+        'rejection_reason',
     ];
 
     // protected $casts = [
@@ -39,5 +41,12 @@ class Food extends Model
     {
         $discount = $this->discount_percent ?? 0;
         return round($this->old_price * (1 - $discount / 100), 2);
+    }
+
+    protected $appends = ['type'];
+
+    public function getTypeAttribute()
+    {
+        return 'food';
     }
 }
