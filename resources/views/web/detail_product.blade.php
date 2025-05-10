@@ -44,7 +44,12 @@
                     <p class="name-restaurant">{{ $product->restaurant->name ?? 'Không rõ' }}</p>
                 </div>
                 <div class="descripttion">Mô tả :
-                    <p class="description">{{ $product->description }}</p>
+                    <div class="descripttion_title">
+                        <p class="description">{{ $product->description }}</p>
+                    </div>
+                    <button class="toggle-btn" id="toggleBtn">
+                        <i class="fa fa-chevron-down"></i>
+                    </button>
                 </div>
                 <div class="title">
                     <div class="title-left">

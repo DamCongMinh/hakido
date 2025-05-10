@@ -2,7 +2,7 @@
     max-width: 600px;
     margin: 120px auto;
     padding: 30px;
-    background: #fff;
+    background: #efe8e8;
     border-radius: 12px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
     font-family: 'Poppins', sans-serif;
@@ -78,6 +78,15 @@ select {
     transition: 0.3s ease;
 }
 
+#email {
+    font-size: 1.0rem;
+    width: 100%;
+}
+
+.header_right--search {
+    margin: 0;
+}
+
 .input_change[type="text"]:focus,
 .input_change[type="email"]:focus,
 select:focus {
@@ -88,7 +97,7 @@ select:focus {
 
 strong {
     display: block;
-    margin-top: 5px;
+    margin: 18px 0 12px 0;
     font-weight: 600;
     color: #222;
 }
@@ -102,6 +111,7 @@ button[type="submit"] {
     border-radius: 6px;
     cursor: pointer;
     font-size: 16px;
+    margin-top: 24px;
 }
 
 button[type="submit"]:hover {

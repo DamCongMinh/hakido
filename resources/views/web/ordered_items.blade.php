@@ -32,15 +32,16 @@
                         <td>
                             <ul>
                                 @foreach ($order->orderItems as $item)
-                                    <li>
-                                        {{ $item->product_name }} ({{ $item->product_type }}) -
-                                        SL: {{ $item->quantity }} -
-                                        Giá: {{ number_format($item->price) }}₫ -
-                                        Thành tiền: {{ number_format($item->total_price) }}₫
-                                    </li>
+                                <li>
+                                    <span><strong>+ Tên:</strong> {{ $item->product_name }} ({{ $item->product_type }})</span>&nbsp;
+                                    <span><strong>+ SL:</strong> {{ $item->quantity }}</span>&nbsp;
+                                    <span><strong>+ Giá:</strong> {{ number_format($item->price) }}₫</span>&nbsp;
+                                    <span><strong>+ Thành tiền:</strong> {{ number_format($item->total_price) }}₫</span>
+                                </li>                                
+                                
                                 @endforeach
                             </ul>
-                            <strong>Tổng: {{ number_format($order->total) }}₫ (Phí ship: {{ number_format($order->shipping_fee) }}₫)</strong>
+                            <strong id="sum">Tổng: {{ number_format($order->total) }}₫ (Phí ship: {{ number_format($order->shipping_fee) }}₫)</strong>
                         </td>
                         <td>{{ \App\Models\Order::statusMapping()[$order->status] ?? ucfirst($order->status) }}</td>
                         <td>

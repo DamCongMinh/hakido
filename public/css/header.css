@@ -1,396 +1,249 @@
-html {
+/* Reset cơ bản */
+* {
     margin: 0;
     padding: 0;
-    height: 1000px;
+    box-sizing: border-box;
 }
 
-/* body {
-    width: 100%;
-} */
+body {
+    font-family: 'Quicksand', sans-serif;
+}
+
 
 #header {
+    background-color: #b86c72;
     width: 100%;
+    padding: 10px 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: sticky;
     top: 0;
-    left: 0;
-    background-color: rgb(179, 103, 111);
-    position: fixed;
     z-index: 999;
+    height: 82px;
 }
 
 .header_container {
-    width: calc(100% - 64px);
-    height: 90px;
     display: flex;
-    justify-content: center;
-    margin: auto;
-    text-align: center;
     align-items: center;
-    position: relative;
-    
-    
-
+    justify-content: space-between;
+    max-width: 1400px;
+    margin: 0 auto;
+    height: 100%;
 }
 
-.header_left {
-    width: 20%;
-}
-
-.header_left--logo {
-    width: 60%;
-}
-
+/* Left - Logo */
 .header_left--logo img {
-    width: 100%;
+    height: 60px;
+    transition: transform 0.3s;
 }
-
 .header_left--logo img:hover {
-    cursor: pointer;
+    transform: scale(1.1);
 }
 
+/* Center - Categories */
 .header_center {
-    width: 40%;
-    display: flex;
-    overflow: visible;
-
+    flex: 1;
+    margin: 0 30px;
 }
 
 .header_center--directory {
-    width: 100%;
     display: flex;
-    flex-direction: row;
-    gap: 6px;
+    gap: 25px;
+    justify-content: center;
+    align-items: center;
 }
 
-.directory--title {
-    width: calc((100% / 3) - 40px);
-    height: 100%;
-}
-
-/* .directory--title p{
-    width: 100%;
-    height: 100%;
-    font-size: 1.6rem;
-} */
-
-.directory--title p {
-    font-size: 1.4rem;
-    position: relative;
-    display: inline-block;
-    padding-bottom: 5px; /* Tạo khoảng cách giữa chữ và gạch chân */
-    text-transform: uppercase;
-}
-
-.directory--title p::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 0;
-    height: 4px;
-    background-color: #ff6600; /* Màu của gạch chân */
-    transition: width 0.3s ease-in-out;
-}
-
-.directory--title:hover p::after {
-    width: 100%;
-}
-
-
-.directory--title p:hover {
+.directory--title a {
+    text-decoration: none;
     color: #fff;
-    cursor: pointer;
+    font-weight: 600;
+    text-transform: uppercase;
+    transition: color 0.3s;
+    position: relative;
 }
-
-.header_center--classify {
-    width: 100%;
-    height: auto;
-    background-color: rgb(100, 162, 162);
-    justify-content: space-between;
-    top: 65px;
-    left: 0;
-    border: 1px solid rgb(156, 32, 32);
+.directory--title a::after {
+    content: '';
     position: absolute;
-
-    /* Đổ bóng */
-    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
-    
-   /* Ẩn ban đầu */
-   opacity: 0;
-   visibility: hidden;
-   transform: translateY(25px);
-   transition: opacity 0.5s ease, transform 0.5s ease;
+    width: 0%;
+    height: 2px;
+    bottom: -5px;
+    left: 0;
+    background-color: #fff;
+    transition: width 0.3s;
+}
+.directory--title a:hover {
+    color: #fdd9d6;
+}
+.directory--title a:hover::after {
+    width: 100%;
 }
 
-.header_center--directory:hover ~ .header_center--classify,
-.directory--title:hover ~ .header_center--classify,
-.header_center--classify:hover {
-    display: flex;
-    opacity: 1;
-    visibility: visible;
-}
-
-.classify-title {
-    width: 40%;
+/* Classify */
+.header_center--classify {
+    margin-top: 10px;
+    display: none; /* Có thể bật nếu bạn muốn nó luôn hiển thị */
 }
 
 .classify-title ul {
+    display: flex;
+    gap: 15px;
     list-style: none;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: left;
+    justify-content: center;
+    margin-top: 10px;
 }
-
 .classify-title li {
-    width: 100%;
-    font-size: 1.4rem;
-    text-align: left;
-    padding-bottom: 14px;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    transition: color 0.3s;
 }
-.classify-img {
-    width: 40%;
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    margin-bottom: 24px;
+.classify-title li:hover {
+    color: #fdd9d6;
 }
 
-.classify-img div {
-    width: calc((100% / 2) - 24px);
-    margin: 24px 24px 0 0;
-    
-
-}
-
-.classify-img img {
-    width: 100%;
-    height: 100%;
-    border-radius: 15px;
-}
-
+/* Right - Search + Icons */
 .header_right {
-    width: 40%;
-    height: 100%;
-    display: flex;
-    position: relative;
-}
-
-
-
-
-#searchContainer {
-    position: relative;
-    width: 100%;
-    max-width: 450px;
-    margin: 0 auto;
-}
-
-.header_right--search {
-    width: 450px;
-    margin-top: 26px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    background: white;
-    padding: 8px 12px;
-    border-radius: 25px;
-    border: 2px solid #ccc;
-    background-color: #fff;
+    gap: 20px;
+    height: 100%;
 }
 
-.header_right--search .search-icon {
-    font-size: 18px;
-    color: #999;
-    margin-right: 8px;
+/* Search */
+.header_right--search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-radius: 30px;
+    overflow: hidden;
+    padding: 5px 15px;
+    transition: box-shadow 0.3s;
 }
-
+.header_right--search:hover {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+.search-icon {
+    color: #b86c72;
+    font-size: 16px;
+}
 #searchInput {
     border: none;
     outline: none;
-    flex: 1;
-    font-size: 16px;
-    background: transparent;
+    padding: 5px 10px;
+    font-size: 14px;
+    width: 180px;
 }
 
-.search-suggestions {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: #fff;
-    border: 1px solid #ccc;
-    border-top: none;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 0 0 8px 8px;
-    z-index: 10;
-    overflow: hidden;
-}
-
-.search-suggestions ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-.search-suggestions li {
-    padding: 12px 16px;
+/* Icons */
+.header_right--email,
+.header_right--cart,
+.header_right--account .account-icon {
+    color: #fff;
+    font-size: 20px;
     cursor: pointer;
-    text-align: center;
-    font-size: 16px;
-    transition: background 0.2s;
+    position: relative;
+    transition: transform 0.2s;
+}
+.header_right--email:hover,
+.header_right--cart:hover,
+.header_right--account .account-icon:hover {
+    transform: scale(1.2);
 }
 
-.search-suggestions li:hover {
-    background-color: #f5f5f5;
+.fa-solid {
+    color: white;
 }
 
-
-
-.header_right--email {
-    width: 10%;
-    display: flex;
-    justify-content: right;
-    align-items: center;
-    text-align: center;
-}
-
-.header_right--email i {
-    font-size: 1.4rem;
-    font-weight:600;
-}
-
-.header_right--cart {
-    width: 10%;
-    display: flex;
-    justify-content: right;
-    align-items: center;
-    text-align: center;
-}
-
-.header_right--cart i {
-    font-size: 1.4rem;
-    font-weight:600;
-}
-
+/* Account Dropdown */
 .header_right--account {
-    width: 10%;
+    position: relative;
     height: 100%;
-    display: flex;
-    justify-content: right;
-    align-items: center;
-    text-align: center;
-}
-
-.header_right--account i {
-    font-size: 1.4rem;
-    font-weight:600;
+   
 }
 
 .account-nav {
-    width: 250px;
-    height: auto;
-    min-height: 300px;
-    visibility: hidden;
-    top: 61px;
-    border-radius: 15px;
     position: absolute;
-    background-color: #dbd4d4;
-    border: 1px solid #726868;
-
-    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
-    
-   /* Ẩn ban đầu */
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(0);
-    transition: opacity 0.5s ease, transform 0.5s ease;
+    top: 100%;
+    right: -105px;
+    display: none;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    min-width: 220px; /* Ví dụ tăng thêm ~20px so với ban đầu */
+    border-radius: 8px;
+    z-index: 10;
+    transition: all 0.2s ease;
 }
 
-.header_right--account:hover .account-nav,
-.account-nav:hover,
-.header_right--cart:hover ~ .header_right--account .account-nav{
-    top: 90px;
-    right: 0;
-    display: flex;
-    opacity: 1;
-    visibility: visible;
+.header_right--account:hover .account-nav {
+    display: block;
+}
+
+.account-icon {
+    margin-top: 20px;
 }
 
 .account-nav ul {
-    width: 100%;
     list-style: none;
-    padding: 0;
-    line-height: 46px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
 }
 
-.account-nav ul li {
-    width: calc(100% - 24px);
-    font-size: 1.4rem;
-    border-bottom: 2px solid #000;
-    cursor: pointer;
-}
-
-.auth {
-    width: 100%;
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 25px 20px;
-    width: 240px;
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    text-align: center;
-}
-
-.auth img {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 15px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.auth h3 {
-    margin: 0 0 15px;
-    font-size: 20px;
-    font-weight: bold;
+.account-nav .fa-solid {
     color: #333;
 }
 
-.auth a {
+.account-nav li {
+    border-bottom: 1px solid #eee;
+}
+.account-nav li a, 
+.account-nav form button {
+    display: block;
     text-decoration: none;
-    color: #007bff;
-    font-size: 16px;
-    margin-bottom: 10px;
-    transition: all 0.3s;
-}
-
-.auth a:hover {
-    color: #0056b3;
-    text-decoration: underline;
-}
-
-#logout-btn {
+    padding: 12px 20px;
+    color: #333;
+    font-size: 14px;
+    width: 100%;
+    text-align: left;
     background: none;
     border: none;
-    color: #007bff;
     cursor: pointer;
+    transition: background 0.3s;
+}
+.account-nav li a:hover,
+.account-nav form button:hover {
+    background: #f2f2f2;
+}
+.account-nav h3 {
     font-size: 16px;
-    transition: all 0.3s;
+    text-align: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+.account-nav .avatar {
+    display: block;
+    margin: 10px auto;
 }
 
-#logout-btn:hover {
-    color: #dc3545;
+/* Suggestions Box */
+.search-suggestions {
+    position: absolute;
+    top: 40px;
+    left: 0;
+    background: #fff;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    border-radius: 5px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: none;
 }
-
-
-
+.search-suggestions ul {
+    list-style: none;
+}
+.search-suggestions li {
+    padding: 10px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.search-suggestions li:hover {
+    background: #f7f7f7;
+}

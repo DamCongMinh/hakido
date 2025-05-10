@@ -120,7 +120,7 @@
                                                 @endif
                                             </p>
                                             <p>{{ $product->rating ?? '4.5' }}/5</p>
-                                            <p>Category ID: {{ $product->category_id }}</p>
+                                            {{-- <p>Category ID: {{ $product->category_id }}</p> --}}
 
                                         </div>
                                     </div>

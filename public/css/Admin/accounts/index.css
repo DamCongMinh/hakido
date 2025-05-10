@@ -1,9 +1,8 @@
 body {
     font-family: Arial, sans-serif;
-    margin: 20px;
+    margin: 0 20px;
     background-color: #f9f9f9;
     color: #333;
-    margin-top: 120px;
 }
 
 h2 {
@@ -36,14 +35,3 @@ table tbody tr:hover {
     background-color: #f1f1f1;
 }
 
-/* a {
-    display: inline-block;
-    margin-top: 20px;
-    color: #3498db;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-a:hover {
-    text-decoration: underline;
-} */

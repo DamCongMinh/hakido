@@ -73,7 +73,7 @@
     {{-- FORM THANH TOÁN --}}
     <form action="{{ route('cart.processCheckout') }}" method="POST" id="checkout-form">
         @csrf
-        <button type="submit">Thanh toán</button>
+        <button type="submit" class="btn-payment">Thanh toán</button>
     </form>
 
     <script>

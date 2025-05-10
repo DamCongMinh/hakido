@@ -34,7 +34,7 @@
                 </div>
                 
 
-                <div class="header_center--classify">
+                {{-- <div class="header_center--classify">
                     <div class="classify-title">
                         <ul>
                             <li>đồ chay</li>
@@ -49,7 +49,7 @@
                         <div><img src="{{ asset('img/home_img2.jpg') }}" alt=""></div>
                         <div><img src="{{ asset('img/home_img2.jpg') }}" alt=""></div>
                     </div>
-                </div>
+                </div> --}}
                 
             </div>
             <div class="header_right">
@@ -72,7 +72,7 @@
                 </div>
 
                 <div class="header_right--cart">
-                    <i class="fa-solid fa-cart-shopping"></i>
+                    <a href="{{ route('cart.show') }}"><i class="fa-solid fa-cart-shopping"></i></a>
                 </div>
                 <div class="header_right--account">
                     <div class="account-icon"><i class="fa-solid fa-user"></i></div>
@@ -81,8 +81,8 @@
                             
                             <!-- Nếu chưa đăng nhập -->
                             @guest
-                                <li><a href="{{ route('register') }}">Đăng ký</a></li>
-                                <li><a href="{{ route('login') }}">Đăng nhập</a></li>
+                                <li><a href="{{ route('login') }}"><i class="fa-solid fa-user-plus"></i> Đăng ký</a></li>
+                                <li><a href="{{ route('login') }}"><i class="fa-solid fa-sign-in-alt"></i> Đăng nhập</a></li>
                             @endguest
 
                             <!-- Nếu đã đăng nhập -->
@@ -92,45 +92,45 @@
                                     <h3>{{ Auth::user()->name }}</h3>
 
                                     <!-- Link cho tất cả user -->
-                                    <li><a href="{{ route('profile.home_info') }}">Tài khoản của tôi</a></li>
+                                    <li><a href="{{ route('profile.home_info') }}"><i class="fa-solid fa-user"></i> Tài khoản của tôi</a></li>
 
                                     <!-- Nếu là admin -->
                                     @if (Auth::user()->role === 'admin')
-                                        <li><a href="{{ route('admin.accounts.index') }}">Quản lý người dùng</a></li>
-                                        <li><a href="{{ route('admin.orders.index') }}">Quản lý đơn hàng</a></li>
-                                        <li><a href="{{ route('control_product') }}">Quản lý sản phẩm</a></li>
-                                        <li><a href="{{ route('admin.content') }}">Quản lý nội dung</a></li>
-                                        <li><a href="{{ route('admin.statistics') }}">Thống kê doanh thu và số lượng đơn hàng</a></li>
+                                        <li><a href="{{ route('admin.accounts.index') }}"><i class="fa-solid fa-users-gear"></i> Quản lý người dùng</a></li>
+                                        <li><a href="{{ route('admin.orders.index') }}"><i class="fa-solid fa-clipboard-list"></i> Quản lý đơn hàng</a></li>
+                                        <li><a href="{{ route('control_product') }}"><i class="fa-solid fa-box-open"></i> Quản lý sản phẩm</a></li>
+                                        <li><a href="{{ route('admin.content') }}"><i class="fa-solid fa-images"></i> Quản lý nội dung</a></li>
+                                        <li><a href="{{ route('admin.statistics') }}"><i class="fa-solid fa-chart-line"></i> Thống kê doanh thu & đơn hàng</a></li>
                                     @endif
 
                                     <!-- Nếu là restaurant -->
                                     @if (Auth::user()->role === 'restaurant')
-                                        <li><a href="{{ route('restaurant.products.home') }}">Quản lý sản phẩm</a></li>
-                                        <li><a href="{{ route('restaurant.statistics.index') }}">Quản lý đơn hàng</a></li>
-                                        <li><a href="{{ route('restaurant.statistics.home') }}">Thống kê</a></li>
+                                        <li><a href="{{ route('restaurant.products.home') }}"><i class="fa-solid fa-utensils"></i> Quản lý sản phẩm</a></li>
+                                        <li><a href="{{ route('restaurant.statistics.index') }}"><i class="fa-solid fa-receipt"></i> Quản lý đơn hàng</a></li>
+                                        <li><a href="{{ route('restaurant.statistics.home') }}"><i class="fa-solid fa-chart-pie"></i> Thống kê</a></li>
                                     @endif
 
                                     <!-- Nếu là shipper -->
                                     @if (Auth::user()->role === 'shipper')
-                                        <li><a href="{{ route('shipper.orders.available') }}">🛒 Đơn hàng đang chờ</a></li>
-                                        <li><a href="{{ route('shipper.orders.current') }}">🚚 Đơn đang giao</a></li>
-                                        <li><a href="{{ route('shipper.orders.history') }}">📜 Lịch sử giao hàng</a></li>
-                                        <li><a href="{{ route('shipper.orders.incomeStats') }}">💰 Thống kê thu nhập</a></li>
+                                        <li><a href="{{ route('shipper.orders.available') }}"><i class="fa-solid fa-cart-arrow-down"></i> Đơn hàng đang chờ</a></li>
+                                        <li><a href="{{ route('shipper.orders.current') }}"><i class="fa-solid fa-truck"></i> Đơn đang giao</a></li>
+                                        <li><a href="{{ route('shipper.orders.history') }}"><i class="fa-solid fa-file-invoice"></i> Lịch sử giao hàng</a></li>
+                                        <li><a href="{{ route('shipper.orders.incomeStats') }}"><i class="fa-solid fa-sack-dollar"></i> Thống kê thu nhập</a></li>
                                     @endif
-
 
                                     <!-- Nếu là customer -->
                                     @if (Auth::user()->role === 'customer')
-                                        <li><a href="{{ route('cart.show') }}">Giỏ hàng của tôi</a></li>
-                                        <li><a href="{{ route('orders.items') }}">📦 Sản phẩm đã đặt</a></li>
+                                        <li><a href="{{ route('cart.show') }}"><i class="fa-solid fa-shopping-cart"></i> Giỏ hàng của tôi</a></li>
+                                        <li><a href="{{ route('orders.items') }}"><i class="fa-solid fa-box"></i> Sản phẩm đã đặt</a></li>
                                     @endif
 
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf
-                                        <button type="submit">Đăng xuất</button>
+                                        <button type="submit"><i class="fa-solid fa-sign-out-alt"></i> Đăng xuất</button>
                                     </form>
                                 </li>
                             @endauth
+
 
 
 

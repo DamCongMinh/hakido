@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 selectedSizeInput.value = button.value;
             }
     
-            // 👉 Hiển thị phần tổng tiền nếu đang ẩn
+            // Hiển thị phần tổng tiền nếu đang ẩn
             const totalBox = document.querySelector('.total-payouts');
             if (totalBox.style.display === 'none') {
                 totalBox.style.display = 'block';
@@ -148,4 +148,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Đồng bộ initial form quantity
     syncFormQuantity();
+
+    updateTotalPayouts();
+
+    // js của nút mở rộng mô tả
+    const toggleBtn = document.getElementById('toggleBtn');
+    const description = document.querySelector('.description');
+
+    toggleBtn.addEventListener('click', function() {
+        description.classList.toggle('expanded');
+        toggleBtn.classList.toggle('expanded');
+
+        // Đổi icon nếu cần (nếu không thích xoay)
+        const icon = toggleBtn.querySelector('i');
+        if (description.classList.contains('expanded')) {
+            icon.classList.remove('fa-chevron-down');
+            icon.classList.add('fa-chevron-up');
+        } else {
+            icon.classList.remove('fa-chevron-up');
+            icon.classList.add('fa-chevron-down');
+        }
+    });
 });

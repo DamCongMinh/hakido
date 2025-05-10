@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/home.css') }}">
     <link rel="stylesheet" href="{{ asset('css/base.css') }}">    
@@ -82,14 +83,12 @@
                     <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum qui voluptatem quae quos error atque officiis!</p>
                 </div>
                 <div class="products-content">
-                    <div>
                         <img src="{{ asset('img/slide5.jpg') }}" alt="">
                         <img src="{{ asset('img/slide5.jpg') }}" alt="">
                         <img src="{{ asset('img/slide5.jpg') }}" alt="">
                         <img src="{{ asset('img/slide5.jpg') }}" alt="">
                         <img src="{{ asset('img/slide5.jpg') }}" alt="">
                         <img src="{{ asset('img/slide5.jpg') }}" alt="">
-                    </div>
                 </div>
             </div>
 

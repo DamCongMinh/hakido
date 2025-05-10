@@ -5,7 +5,6 @@ body {
     font-family: 'Segoe UI', sans-serif;
     background-color: #f4f6f8;
     color: #333;
-    margin-top: 120px;
 }
 
 .admin-container {
@@ -93,6 +92,7 @@ button {
 button[type="button"] {
     background-color: #ffc107;
     color: #fff;
+    width: 100%;
 }
 
 button[type="button"]:hover {
@@ -102,6 +102,8 @@ button[type="button"]:hover {
 button[type="submit"] {
     background-color: #dc3545;
     color: white;
+    width: 100%;
+    margin-top: 12px;
 }
 
 button[type="submit"]:hover {
@@ -111,7 +113,7 @@ button[type="submit"]:hover {
 .btn-edit {
     background-color: #17a2b8;
     color: #fff;
-    padding: 6px 12px;
+    padding: 10px 16px;
     border-radius: 5px;
     text-decoration: none;
     margin-right: 5px;
@@ -124,9 +126,10 @@ button[type="submit"]:hover {
 .btn-delete {
     background-color: #dc3545;
     color: white;
-    padding: 6px 12px;
+    padding: 10px 16px;
     border-radius: 5px;
     border: none;
+    margin: 0 !important;
 }
 
 .btn-delete:hover {

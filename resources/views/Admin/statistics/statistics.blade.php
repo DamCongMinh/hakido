@@ -10,10 +10,12 @@
 <body>
     @include('layout.header')
 
-    <h1>Thống kê Doanh thu & Đơn hàng</h1>
-
-    <p><strong>Tổng doanh thu:</strong> {{ number_format($totalRevenue, 0, ',', '.') }} VND</p>
-    <p><strong>Tổng số đơn hàng:</strong> {{ $totalOrders }}</p>
+    <div class="stat-container">
+        <h1>Thống kê Doanh thu & Đơn hàng</h1>
+        <p><strong>Tổng doanh thu:</strong> {{ number_format($totalRevenue, 0, ',', '.') }} VND</p>
+        <p><strong>Tổng số đơn hàng:</strong> {{ $totalOrders }}</p>
+    </div>
+      
 
 
     <h2>Biểu đồ thống kê theo năm</h2>
