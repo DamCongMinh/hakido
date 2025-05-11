@@ -23,5 +23,6 @@
         </form>
     </x-guest-layout>
     
+    @include('layout.footer')
 </body>
 </html>

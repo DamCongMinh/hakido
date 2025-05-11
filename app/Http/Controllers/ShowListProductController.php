@@ -30,8 +30,12 @@ class ShowListProductController extends Controller
 
     private function loadProducts($category_id = null)
     {
-        $foodQuery = Food::with('category')->where('is_active', 1);
-        $beverageQuery = Beverage::with(['category', 'beverageSizes'])->where('is_active', 1);
+        $foodQuery = Food::with('category')
+            ->where('is_active', 1)
+            ->where('is_approved', 1);
+        $beverageQuery = Beverage::with(['category', 'beverageSizes'])
+            ->where('is_active', 1)
+            ->where('is_approved', 1);
 
         if ($category_id) {
             $foodQuery->where('category_id', $category_id);
@@ -60,25 +64,62 @@ class ShowListProductController extends Controller
         return $foods->concat($beverages)->sortByDesc('id')->values();
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $products = $this->loadProducts();
+        $type = $request->get('type', 'food'); // default là food
+        $perPage = 10;
         
-        $paginatedProducts = $this->paginateCollection($products, 10);
+        if ($type === 'food') {
+            $products = Food::with('category')
+                ->where('is_active', 1)
+                ->where('is_approved', 1)
+                ->select('id', 'name', 'image', 'old_price', 'discount_percent', 'category_id')
+                ->orderByDesc('id')
+                ->paginate($perPage)
+                ->through(function ($item) {
+                    $item->rating = rand(35, 50) / 10;
+                    $item->type = 'food';
+                    $item->new_price = $item->old_price * (1 - ($item->discount_percent ?? 0) / 100);
+                    return $item;
+                });
+
+        } elseif ($type === 'beverage') {
+            $products = Beverage::with(['category', 'beverageSizes'])
+                ->where('is_active', 1)
+                ->where('is_approved', 1)
+                ->select('id', 'name', 'image', 'category_id')
+                ->orderByDesc('id')
+                ->paginate($perPage)
+                ->through(function ($item) {
+                    $item->rating = rand(35, 50) / 10;
+                    $item->type = 'beverage';
+                    $size = $item->beverageSizes->sortBy('old_price')->first();
+                    $item->old_price = $size?->old_price ?? 0;
+                    $item->discount_percent = $size?->discount_percent ?? 0;
+                    $item->new_price = $size ? ($size->old_price * (1 - ($size->discount_percent ?? 0) / 100)) : 0;
+                    return $item;
+                });
+        } else {
+            // fallback hoặc redirect nếu cần
+            $products = collect();
+        }
+
         $provinces = $this->getProvinces();
 
         return view('web.list-product', [
-            'products' => $paginatedProducts,
+            'products' => $products,
             'provinces' => $provinces,
         ]);
     }
+
 
     public function byCategory($category_id)
     {
         $foods = Food::with('category')
             ->where('is_active', 1)
+            ->where('is_approved', 1)
             ->where('category_id', $category_id)
-            ->select('id', 'name', 'image', 'old_price', 'discount_percent', 'category_id') // <- thêm category_id vào đây
+            ->select('id', 'name', 'image', 'old_price', 'discount_percent', 'category_id')
             ->get()
             ->map(function ($item) {
                 $item->rating = rand(35, 50) / 10;
@@ -89,6 +130,7 @@ class ShowListProductController extends Controller
     
         $beverages = Beverage::with(['category', 'beverageSizes'])
             ->where('is_active', 1)
+            ->where('is_approved', 1)
             ->where('category_id', $category_id)
             ->select('id', 'name', 'image', 'category_id')
             ->get()

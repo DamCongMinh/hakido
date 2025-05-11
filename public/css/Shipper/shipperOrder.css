@@ -1,14 +1,13 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 20px;
+    margin:0 20px;
     background: #f4f6f8;
     color: #333;
-    margin-top: 120px;
 }
 h1 {
     text-align: center;
     color: #34495e;
-    margin-bottom: 40px;
+    margin: 40px 0;
 }
 .order-box {
     background: #fff;

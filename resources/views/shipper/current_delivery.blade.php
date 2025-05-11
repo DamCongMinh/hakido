@@ -19,15 +19,15 @@
     @else
         @foreach($orders as $order)
 
-            <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+            <div class="container" style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
                 <p><strong>Đơn #{{ $order->id }}</strong></p>
                 <p>Khách: {{ $order->receiver_name }} - {{ $order->receiver_phone }}</p>
                 <p>Phí ship: {{ $order->shipping_fee }}₫</p>
                 <p>Địa chỉ giao: {{ $order->receiver_address }}</p>
-                <p>Tổng tiền: {{ number_format($order->total) }}₫</p>
+                <p>Tổng tiền: {{ number_format($order->actual_income) }}₫</p>
                 <p>Thanh toán: {{ strtoupper($order->payment_method) }}</p>
 
-                <form method="POST" action="{{ route('shipper.orders.updateStatus', $order->id) }}">
+                <form method="POST" id="current_delivery-form" action="{{ route('shipper.orders.updateStatus', $order->id) }}">
                     @csrf
                     <label>Trạng thái:</label>
                     <select name="status" required>
@@ -42,5 +42,7 @@
             </div>
         @endforeach
     @endif
+
+    @include('layout.footer')
 </body>
 </html>

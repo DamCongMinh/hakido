@@ -103,5 +103,7 @@
         @endforeach
 
     </table>
+
+    @include('layout.footer')
 </body>
 </html>

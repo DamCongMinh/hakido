@@ -12,7 +12,7 @@
 
     <h2>Thêm Sản Phẩm Mới</h2>
 
-    <form action="{{ route('restaurant.products.store') }}" method="POST" enctype="multipart/form-data">
+    <form id="product_create-form" action="{{ route('restaurant.products.store') }}" method="POST" enctype="multipart/form-data">
         @csrf   
 
         <label>Loại:</label>
@@ -70,12 +70,18 @@
             </div>
         </div>
 
+        <!-- Ảnh preview -->
+        <img id="imagePreview" src="#" alt="Ảnh xem trước" style="display:none; max-height: 200px;"><br><br>
 
         <label>Hình ảnh:</label>
-        <input type="file" name="image" required><br><br>
+        <input type="file" name="image" id="imageInput" required><br><br>
+
 
         <button type="submit">Thêm</button>
     </form>
+
+
+    @include('layout.footer')
 
     <script>
         const typeSelect = document.getElementById('typeSelect');
@@ -99,6 +105,25 @@
     
         // Khi thay đổi select
         typeSelect.addEventListener('change', toggleSizeOptions);
+
+        document.getElementById('imageInput').addEventListener('change', function (event) {
+            const preview = document.getElementById('imagePreview');
+            const file = event.target.files[0];
+
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = '#';
+                preview.style.display = 'none';
+            }
+        });
     </script>
     
 </body>

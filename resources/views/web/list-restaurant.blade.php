@@ -27,6 +27,8 @@
             <p>Không tìm thấy nhà hàng nào phù hợp.</p>
         @endif
     </div>
+
+    @include('layout.footer')
     
 </body>
 </html>

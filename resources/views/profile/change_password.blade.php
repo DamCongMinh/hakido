@@ -42,9 +42,8 @@
         <input class="input_change" type="password" name="new_password_confirmation" id="new_password_confirmation" required>
 
         <button type="submit">Đổi mật khẩu</button>
-    </form>    
-</body>
+    </form> 
     
-    
+    @include('layout.footer')
 </body>
 </html>

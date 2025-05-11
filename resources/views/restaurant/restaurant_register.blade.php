@@ -59,5 +59,7 @@
             </div>
         @endif
     </div>
+
+    @include('layout.footer')
 </body>
 </html>

@@ -22,7 +22,7 @@
                 <p>Người nhận: {{ $order->receiver_name }} ({{ $order->receiver_phone }})</p>
                 <p>Địa chỉ: {{ $order->receiver_address }}</p>
                 <p>Phí ship: {{ $order->shipping_fee }}₫</p>
-                <p>Tổng tiền: {{ number_format($order->total) }}₫</p>
+                <p>Tổng tiền: {{ number_format($order->actual_income) }}₫</p>
 
                 <h4>Sản phẩm trong đơn:</h4>
                 <table border="1" cellpadding="5">
@@ -57,6 +57,7 @@
         @endforeach
     @endif
 
+    @include('layout.footer')
 
 </body>
 </html>

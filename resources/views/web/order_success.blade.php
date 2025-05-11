@@ -61,5 +61,7 @@
         <br>
         <a href="{{ route('home') }}">Trở về trang chủ</a>
     </div>
+
+    @include('layout.footer')
 </body>
 </html>

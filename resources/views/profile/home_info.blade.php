@@ -115,11 +115,10 @@
         <form method="POST" action="{{ route('profile.destroy') }}" onsubmit="return confirm('Bạn chắc chắn muốn xóa tài khoản?');">
             @csrf
             <button type="submit" style="color:red;">Xóa tài khoản</button>
-        </form>
-
-
-        
+        </form>       
     </div>
+
+    @include('layout.footer')
     
     <script>
         document.addEventListener('DOMContentLoaded', function () {

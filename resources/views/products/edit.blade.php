@@ -57,6 +57,8 @@
     <br>
     <a href="{{ $indexRoute }}">← Quay lại danh sách</a>
 
+    @include('layout.footer')
+
     <script>
         function previewImage(event) {
             const reader = new FileReader();

@@ -181,5 +181,7 @@
             </div>
         </section>
     </form>
+
+    @include('layout.footer')
 </body>
 </html>

@@ -6,14 +6,14 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Sửa sản phẩm</title>
 
-    <link rel="stylesheet" href="{{ asset('css/product/create.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/Restaurant/products/edit_product.css') }}">
 </head>
 <body>
     @include('layout.header')
 
     <h2>Sửa {{ $type === 'food' ? 'Đồ ăn' : 'Đồ uống' }}</h2>
 
-    <form action="{{ route('restaurant.products.update', $item->id) }}" method="POST" enctype="multipart/form-data">
+    <form id="edit_product-form" action="{{ route('restaurant.products.update', $item->id) }}" method="POST" enctype="multipart/form-data">
         @csrf 
         @method('PUT')
 
@@ -85,5 +85,7 @@
 
         <button type="submit">Cập nhật</button>
     </form>
+
+    @include('layout.footer')
 </body>
 </html>

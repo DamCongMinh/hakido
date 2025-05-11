@@ -86,6 +86,8 @@
         </table>
     @endif
 
+    @include('layout.footer')
+
     <script>
         function handleFilterChange() {
             var filter = document.getElementById('filter').value;

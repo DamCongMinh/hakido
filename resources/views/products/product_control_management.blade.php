@@ -16,7 +16,7 @@
     @endif
 
     <!-- Đồ Ăn - Đã Duyệt -->
-    <h2>Đồ Ăn - Đã Duyệt</h2>
+    <h2 class="h2">Đồ Ăn - Đã Duyệt</h2>
     <table border="1" cellpadding="10" cellspacing="0">
         <thead>
             <tr>
@@ -52,8 +52,10 @@
         </tbody>
     </table>
 
+    <hr style="margin: 40px 0;">
+
     <!-- Đồ Ăn - Chờ Duyệt -->
-    <h2>Đồ Ăn - Chờ Duyệt</h2>
+    <h2 class="h2">Đồ Ăn - Chờ Duyệt</h2>
     <table border="1" cellpadding="10" cellspacing="0">
         <thead>
             <tr>
@@ -100,8 +102,10 @@
         </tbody>
     </table>
 
+    <hr style="margin: 40px 0;">
+
     <!-- Đồ Uống - Đã Duyệt -->
-    <h2>Đồ Uống - Đã Duyệt</h2>
+    <h2 class="h2">Đồ Uống - Đã Duyệt</h2>
     <table border="1" cellpadding="10" cellspacing="0">
         <thead>
             <tr>
@@ -142,8 +146,10 @@
         </tbody>
     </table>
 
+    <hr style="margin: 40px 0;">
+
     <!-- Đồ Uống - Chờ Duyệt -->
-    <h2>Đồ Uống - Chờ Duyệt</h2>
+    <h2 class="h2">Đồ Uống - Chờ Duyệt</h2>
     <table border="1" cellpadding="10" cellspacing="0">
         <thead>
             <tr>
@@ -196,6 +202,8 @@
     </table>
 
     <a href="{{ route('admin.dashboard') }}">← Quay lại trang Admin</a>
+
+    @include('layout.footer')
 
 </body>
 </html>

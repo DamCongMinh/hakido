@@ -123,7 +123,8 @@
             </table>
         </section>
     </main>
-
+    
+    @include('layout.footer')
 </body>
 </html>
 

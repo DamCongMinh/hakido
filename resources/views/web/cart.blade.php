@@ -76,6 +76,8 @@
         <button type="submit" class="btn-payment">Thanh toán</button>
     </form>
 
+    @include('layout.footer')
+
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         const selectAll = document.getElementById('select-all');

@@ -40,7 +40,7 @@
         <p style="text-align: center; color: #666;">Chưa có dữ liệu thu nhập trong năm nay.</p>
     @else
         <!-- Bảng dữ liệu -->
-        <h2>Bảng thống kê thu nhập</h2>
+        <h3>Bảng thống kê thu nhập</h3>
         <table>
             <thead>
                 <tr>
@@ -61,7 +61,7 @@
         </table>
 
         <!-- Biểu đồ -->
-        <h2>Biểu đồ thống kê theo tháng</h2>
+        <h3>Biểu đồ thống kê theo tháng</h3>
         <canvas id="incomeChart" style="max-width: 100%; margin-top: 30px;"></canvas>
 
         <script>
@@ -129,7 +129,7 @@
 
     @if(!empty($dailyIncome) && $dailyIncome->isNotEmpty())
         <!-- Bảng dữ liệu theo ngày -->
-        <h2>Bảng thống kê thu nhập theo ngày (Tháng {{ $selectedMonth }}/{{ $selectedYear }})</h2>
+        <h3>Bảng thống kê thu nhập theo ngày (Tháng {{ $selectedMonth }}/{{ $selectedYear }})</h3>
         <table>
             <thead>
                 <tr>
@@ -150,7 +150,7 @@
         </table>
 
         <!-- Biểu đồ -->
-        <h2>Biểu đồ thống kê theo ngày</h2>
+        <h3>Biểu đồ thống kê theo ngày</h3>
         <canvas id="dailyIncomeChart" style="max-width: 100%; margin-top: 30px;"></canvas>
 
         <script>
@@ -198,5 +198,6 @@
         <p style="text-align: center; color: #666;">Chưa có dữ liệu thu nhập cho Tháng {{ $selectedMonth }}/{{ $selectedYear }}.</p>
     @endif
 
+    @include('layout.footer')
 </body>
 </html>

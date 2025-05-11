@@ -41,6 +41,8 @@
     </form>
     <a href="{{ route('admin.slides.index') }}">← Quay lại danh sách slide</a>
 
+    @include('layout.footer')
+
     <script>
         function previewImage(event) {
             const reader = new FileReader();

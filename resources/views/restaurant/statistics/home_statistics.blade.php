@@ -63,6 +63,8 @@
 
     <a href="{{ route('restaurant') }}">← Quay lại trang Nhà hàng</a>
 
+    @include('layout.footer')
+
     <script>
         const monthlyLabels = {!! json_encode($monthlyStats->map(fn($s) => 'Tháng ' . $s->month)) !!};
         const revenueData = {!! json_encode($monthlyStats->map(fn($s) => $s->revenue)) !!};

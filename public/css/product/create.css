@@ -1,16 +1,15 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f9fafb;
-    padding: 20px;
 }
 
 h2 {
     text-align: center;
     color: #333;
-    margin-bottom: 30px;
+    margin: 30px 0;
 }
 
-form {
+#product_create-form {
     max-width: 600px;
     margin: 0 auto;
     background-color: white;
@@ -26,9 +25,9 @@ label {
     color: #555;
 }
 
-input[type="text"],
-input[type="number"],
-input[type="file"],
+#product_create-form input[type="text"],
+#product_create-form input[type="number"],
+#product_create-form input[type="file"],
 select,
 textarea {
     width: 100%;
@@ -68,7 +67,7 @@ button[type="submit"] {
 }
 
 button[type="submit"]:hover {
-    background-color: #4338ca; /* Indigo-700 */
+    background-color: #4338ca; 
 }
 
 #sizeOptions > div {
@@ -84,6 +83,19 @@ button[type="submit"]:hover {
 #foodFields {
     margin-bottom: 20px;
 }
+
+#imagePreview {
+    display: block;
+    max-height: 300px;
+    max-width: 100%;
+    object-fit: contain;
+    margin-top: 10px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ccc;
+    margin: auto;
+}
+
 
 @media (max-width: 640px) {
     form {

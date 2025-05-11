@@ -18,8 +18,8 @@
       
 
 
-    <h2>Biểu đồ thống kê theo năm</h2>
-    <form method="GET" action="{{ route('admin.statistics') }}">
+    <h2 class="h2">Biểu đồ thống kê theo năm</h2>
+    <form id="statistic_form" method="GET" action="{{ route('admin.statistics') }}">
         <label for="year"><strong>Chọn năm:</strong></label>
         <select name="year" id="year" onchange="this.form.submit()">
             @for ($y = now()->year - 5; $y <= now()->year + 1; $y++)
@@ -50,7 +50,8 @@
             <canvas id="monthlyChart"></canvas>
         </div>
         
-
+        @include('layout.footer')
+        
         <script>
             const ctx = document.getElementById('monthlyChart').getContext('2d');
 
@@ -77,7 +78,7 @@
                             beginAtZero: true
                         },
                         x: {
-                            categoryPercentage: 0.5,
+                            categoryPercentage: 0.3,
                             barPercentage: 0.5,  
                             title: {
                                 display: true,

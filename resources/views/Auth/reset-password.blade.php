@@ -27,6 +27,8 @@
             <button type="submit">Đặt lại mật khẩu</button>
         </form>
     </x-guest-layout>
+
+    @include('layout.footer')
     
 </body>
 </html>

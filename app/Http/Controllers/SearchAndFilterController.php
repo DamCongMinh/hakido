@@ -68,6 +68,7 @@ class SearchAndFilterController extends Controller
 
         $foods = Food::select('id', 'name')
             ->where('is_active', 1)
+            ->where('is_approved', 1)
             ->where(function ($q) use ($words) {
                 foreach ($words as $word) {
                     $q->orWhere('name', 'like', '%' . $word . '%');
@@ -85,6 +86,7 @@ class SearchAndFilterController extends Controller
 
         $beverages = Beverage::select('id', 'name')
             ->where('is_active', 1)
+            ->where('is_approved', 1)
             ->where(function ($q) use ($words) {
                 foreach ($words as $word) {
                     $q->orWhere('name', 'like', '%' . $word . '%');
@@ -123,8 +125,12 @@ class SearchAndFilterController extends Controller
 
     public function index()
     {
-        $foods = Food::where('is_active', 1)->get();
-        $beverages = Beverage::where('is_active', 1)->get();
+        $foods = Food::where('is_active', 1)
+            ->where('is_approved', 1)
+            ->get();
+        $beverages = Beverage::where('is_active', 1)
+            ->where('is_approved', 1)
+            ->get();
 
         $provinces = $this->getProvinces();
         $products = $foods->concat($beverages);
@@ -140,6 +146,7 @@ class SearchAndFilterController extends Controller
 
         $foodsQuery = Food::with('restaurant')
             ->where('is_active', 1)
+            ->where('is_approved', 1)
             ->whereHas('restaurant', function ($q) use ($provinceName, $districtName, $wardName) {
                 $q->where(function ($subQuery) use ($provinceName, $districtName, $wardName) {
                     if ($provinceName) $subQuery->where('address', 'like', "%{$provinceName}%");
@@ -169,6 +176,7 @@ class SearchAndFilterController extends Controller
             }
         }])
             ->where('is_active', 1)
+            ->where('is_approved', 1)
             ->whereHas('restaurant', function ($q) use ($provinceName, $districtName, $wardName) {
                 $q->where(function ($subQuery) use ($provinceName, $districtName, $wardName) {
                     if ($provinceName) $subQuery->where('address', 'like', "%{$provinceName}%");

@@ -24,5 +24,7 @@
 
     <br>
     <a href="{{ route('admin.categories.index') }}">← Quay lại danh sách danh mục</a>
+
+    @include('layout.footer')
 </body>
 </html>

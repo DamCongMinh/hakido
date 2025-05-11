@@ -37,5 +37,6 @@
         @endif
     @endsection
 
+    @include('layout.footer')
 </body>
 </html>

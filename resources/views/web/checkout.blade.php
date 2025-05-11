@@ -115,6 +115,8 @@
         <button type="submit">Xác nhận & Thanh toán</button>
     </form>
 
+    @include('layout.footer')
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const form = document.querySelector('form');

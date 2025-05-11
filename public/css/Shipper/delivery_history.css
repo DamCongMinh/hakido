@@ -1,13 +1,12 @@
 body {
     font-family: Arial, sans-serif;
     background: #f8f9fc;
-    padding: 20px;
-    margin-top: 120px;
 }
 
 h1, h2 {
     text-align: center;
     color: #333;
+    margin: 30px 0;
 }
 
 .filter-form {

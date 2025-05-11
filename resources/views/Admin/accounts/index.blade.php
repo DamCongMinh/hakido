@@ -76,5 +76,7 @@
 
 
     <a href="{{ route('admin.dashboard') }}">← Quay lại trang Admin</a>
+
+    @include('layout.footer')
 </body>
 </html>

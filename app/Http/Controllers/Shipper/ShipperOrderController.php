@@ -16,7 +16,11 @@ class ShipperOrderController extends Controller
             ->where('status', 'processing')
             ->whereNull('shipper_id')
             ->latest()
-            ->get();
+            ->get()
+            ->map(function ($order) {
+                $order->actual_income = $order->total + $order->shipping_fee;
+                return $order;
+            });
         return view('shipper.available_orders', compact('orders'));
     }
 
@@ -40,7 +44,14 @@ class ShipperOrderController extends Controller
     // 3. Hiển thị các đơn đang giao của shipper hiện tại
     public function currentDelivery()
     {
-        $orders = Order::where('shipper_id', Auth::id())->where('status', 'delivering')->get();
+        $orders = Order::where('shipper_id', Auth::id())
+            ->where('status', 'delivering')
+            ->get()
+            ->map(function ($order) {
+                $order->actual_income = $order->total + $order->shipping_fee;
+                return $order;
+            });
+
         return view('shipper.current_delivery', compact('orders'));
     }
 

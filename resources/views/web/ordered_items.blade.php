@@ -64,5 +64,7 @@
 
         <a href="{{ route('home') }}" class="btn btn-primary mt-3">Quay về trang chủ</a>
     </div>
+
+    @include('layout.footer')
 </body>
 </html>

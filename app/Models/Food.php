@@ -17,6 +17,7 @@ class Food extends Model
         'quantity',
         'image',
         'status',
+        'is_approved',
         'is_active',
         'is_rejected',
         'rejection_reason',

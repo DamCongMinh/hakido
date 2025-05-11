@@ -61,6 +61,8 @@
             </table>
         </section>
 
+        <hr style="margin: 80px 0;">
+
         {{-- Quản lý Danh mục --}}
         <section class="content-section">
             <h2>Danh mục trong Header</h2>
@@ -102,6 +104,8 @@
         {{-- hiển thị danh mục --}}
     @endforeach
     @endif
+
+    @include('layout.footer')
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
