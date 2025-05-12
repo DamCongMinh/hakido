@@ -20,7 +20,7 @@ html, body {
 
 .container {
     width: 100%;
-    max-width: 1200px;
+    /* max-width: 1200px; */
     margin: 0 auto;
     padding: 20px;
 }
@@ -151,127 +151,133 @@ html, body {
     margin-top: 5px;
 }
 
+.products-title {
+    width: 80%;
+    margin: 20px auto;
+}
+
 
 /* --- title and products grid --- */
-.products-title {
-    margin-left: 0;
-    margin-top: 40px;
-}
-
-.products-title h1 {
-    font-size: 28px;
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-/* grid list */
-.title-list {
+/* Bố cục cơ bản */
+.grid-container {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    
-    gap: 20px;
+    justify-content: end;
+    gap: 40px;
+    margin-top: 42px;
+    /* justify-content: center; */
 }
 
-/* --- single product card --- */
-.list-show {
-    width: 350px;
-    height: 400px;
+.product-card {
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     background: #fff;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     position: relative;
-    transition: 0.3s;
-    display: flex;
-    flex-direction: column;
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
 }
 
-.list-show:hover {
-    transform: translateY(-5px);
+/* Đổ bóng và hiệu ứng hover */
+.product-card:hover {
+    box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+    transform: translateY(-4px);
 }
 
-.list-show img {
+/* Ẩn nút ban đầu */
+.product-image .overlay-button,
+.product-info form {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+/* Khi hover thì hiện */
+.product-card:hover .overlay-button,
+.product-card:hover form {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Overlay button trong ảnh */
+.product-image {
     width: 100%;
-    height: 200px;
+    position: relative;
+    overflow: hidden;
+}
+
+.product-image img {
+    width: 100%;
+    height: 250px;
+    display: block;
     object-fit: cover;
 }
 
-/* cart icon */
-.show-cart {
-    position: absolute;
-    font-size: 1.3rem;
-    top: 10px;
-    right: 10px;
-    background: #007bff;
-    padding: 8px;
-    border-radius: 50%;
-    color: white;
-    cursor: pointer;
+.product-image:hover img {
+    opacity: 0.6;
 }
 
-.show-title {
-    padding: 15px;
-    flex-grow: 1;
+.overlay-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    z-index: 2;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+/* Info section */
+.product-info {
+    width: calc(100% - 12px);
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    padding: 24px 16px;
+    text-align: center;
+    gap: 4px;
 }
 
-.show-title h1 {
-    font-size: 18px;
-    margin-bottom: 10px;
-}
-
-.title-detail {
-    font-size: 14px;
-    margin-bottom: 10px;
-}
-
-.detail-cost .old-cost {
-    text-decoration: line-through;
-    color: gray;
-    font-size: 13px;
-}
-
-.detail-cost .new-cost {
+.product-name {
+    font-size: 16px;
     font-weight: bold;
-    color: #e74c3c;
-    margin-top: 5px;
+    margin-bottom: 6px;
 }
 
-.title-access {
-    margin-top: 10px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
+.product-price {
+    font-weight: bold;
+    color: #e67e22;
 }
 
-.title-access p {
-    display: inline;
-    font-size: 14px;
+.old-price {
+    font-size: 13px;
+    color: #aaa;
+    text-decoration: line-through;
 }
 
-.title-access i {
-    color: #f1c40f;
-}
-
-/* button mua ngay */
-.btn.btn-primary {
-    background: #007bff;
-    border: none;
-    padding: 10px;
+.btn-cart {
+    background: #e67e22;
     color: white;
+    border: none;
+    padding: 10px 10px;
+    margin-top: 10px;
     border-radius: 6px;
-    width: 100%;
-    margin-top: auto;
     cursor: pointer;
-    transition: 0.3s;
+    transition: background 0.2s ease;
 }
 
-.btn.btn-primary:hover {
-    background: #0056b3;
+.btn-cart:hover {
+    background: #cf711f;
 }
+
+
+
 
 
 .my-pagination {

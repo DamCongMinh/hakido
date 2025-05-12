@@ -28,47 +28,11 @@ class ShowListProductController extends Controller
         );
     }
 
-    private function loadProducts($category_id = null)
-    {
-        $foodQuery = Food::with('category')
-            ->where('is_active', 1)
-            ->where('is_approved', 1);
-        $beverageQuery = Beverage::with(['category', 'beverageSizes'])
-            ->where('is_active', 1)
-            ->where('is_approved', 1);
-
-        if ($category_id) {
-            $foodQuery->where('category_id', $category_id);
-            $beverageQuery->where('category_id', $category_id);
-        }
-
-        $foods = $foodQuery->select('id', 'name', 'image', 'old_price', 'discount_percent', 'category_id')->get()
-            ->map(function ($item) {
-                $item->rating = rand(35, 50) / 10;
-                $item->type = 'food';
-                $item->new_price = $item->old_price * (1 - ($item->discount_percent ?? 0) / 100);
-                return $item;
-            });
-
-        $beverages = $beverageQuery->select('id', 'name', 'image', 'category_id')->get()
-            ->map(function ($item) {
-                $item->rating = rand(35, 50) / 10;
-                $item->type = 'beverage';
-                $size = $item->beverageSizes->sortBy('old_price')->first();
-                $item->old_price = $size?->old_price ?? 0;
-                $item->discount_percent = $size?->discount_percent ?? 0;
-                $item->new_price = $size ? ($size->old_price * (1 - ($size->discount_percent ?? 0) / 100)) : 0;
-                return $item;
-            });
-
-        return $foods->concat($beverages)->sortByDesc('id')->values();
-    }
-
     public function index(Request $request)
     {
-        $type = $request->get('type', 'food'); // default là food
+        $type = $request->get('type', 'food');
         $perPage = 10;
-        
+
         if ($type === 'food') {
             $products = Food::with('category')
                 ->where('is_active', 1)
@@ -93,14 +57,39 @@ class ShowListProductController extends Controller
                 ->through(function ($item) {
                     $item->rating = rand(35, 50) / 10;
                     $item->type = 'beverage';
-                    $size = $item->beverageSizes->sortBy('old_price')->first();
-                    $item->old_price = $size?->old_price ?? 0;
-                    $item->discount_percent = $size?->discount_percent ?? 0;
-                    $item->new_price = $size ? ($size->old_price * (1 - ($size->discount_percent ?? 0) / 100)) : 0;
+
+                    $prices = $item->beverageSizes->map(function ($size) {
+                        $discount = $size->discount_percent ?? 0;
+                        $new_price = $size->old_price * (1 - $discount / 100);
+                        return (object)[
+                            'size' => $size->size,
+                            'id' => $size->id,
+                            'old_price' => $size->old_price,
+                            'discount_percent' => $discount,
+                            'new_price' => $new_price,
+                        ];
+                    });
+
+                    if ($prices->isNotEmpty()) {
+                        $item->min_old_price = $prices->min('old_price');
+                        $item->max_old_price = $prices->max('old_price');
+                        $item->min_new_price = $prices->min('new_price');
+                        $item->max_new_price = $prices->max('new_price');
+
+                        $bestSize = $prices->sortBy('new_price')->first();
+                        $item->best_size = $bestSize->size;
+                        $item->best_size_id = $bestSize->id;
+                    } else {
+                        $item->min_old_price = $item->max_old_price = 0;
+                        $item->min_new_price = $item->max_new_price = 0;
+                        $item->best_size = null;
+                        $item->best_size_id = null;
+                    }
+
                     return $item;
                 });
+
         } else {
-            // fallback hoặc redirect nếu cần
             $products = collect();
         }
 
@@ -111,7 +100,6 @@ class ShowListProductController extends Controller
             'provinces' => $provinces,
         ]);
     }
-
 
     public function byCategory($category_id)
     {
@@ -127,7 +115,7 @@ class ShowListProductController extends Controller
                 $item->new_price = $item->old_price * (1 - ($item->discount_percent ?? 0) / 100);
                 return $item;
             });
-    
+
         $beverages = Beverage::with(['category', 'beverageSizes'])
             ->where('is_active', 1)
             ->where('is_approved', 1)
@@ -137,23 +125,45 @@ class ShowListProductController extends Controller
             ->map(function ($item) {
                 $item->rating = rand(35, 50) / 10;
                 $item->type = 'beverage';
-                $size = $item->beverageSizes->sortBy('old_price')->first();
-                $item->old_price = $size?->old_price ?? 0;
-                $item->discount_percent = $size?->discount_percent ?? 0;
-                $item->new_price = $size ? ($size->old_price * (1 - ($size->discount_percent ?? 0) / 100)) : 0;
+
+                $prices = $item->beverageSizes->map(function ($size) {
+                    $discount = $size->discount_percent ?? 0;
+                    $new_price = $size->old_price * (1 - $discount / 100);
+                    return (object)[
+                        'size' => $size->size,
+                        'id' => $size->id,
+                        'old_price' => $size->old_price,
+                        'discount_percent' => $discount,
+                        'new_price' => $new_price,
+                    ];
+                });
+
+                if ($prices->isNotEmpty()) {
+                    $item->min_old_price = $prices->min('old_price');
+                    $item->max_old_price = $prices->max('old_price');
+                    $item->min_new_price = $prices->min('new_price');
+                    $item->max_new_price = $prices->max('new_price');
+
+                    $bestSize = $prices->sortBy('new_price')->first();
+                    $item->best_size = $bestSize->size;
+                    $item->best_size_id = $bestSize->id;
+                } else {
+                    $item->min_old_price = $item->max_old_price = 0;
+                    $item->min_new_price = $item->max_new_price = 0;
+                    $item->best_size = null;
+                    $item->best_size_id = null;
+                }
+
                 return $item;
             });
-    
+
         $products = $foods->concat($beverages)->sortByDesc('id')->values();
-        $paginatedProducts = $this->paginateCollection($products, 10);
-    
+        $paginatedProducts = $this->paginateCollection($products, 8);
         $provinces = $this->getProvinces();
-    
+
         return view('web.list-product', [
             'products' => $paginatedProducts,
             'provinces' => $provinces,
         ]);
     }
-    
-    
 }

@@ -8,8 +8,8 @@ class Beverage extends Model
 {
     protected $table = 'beverages';
 
-    protected $fillable = ['name', 'image', 'category_id', 'description', 'status', 'restaurant_id', 'is_approved', 'is_active', 'is_rejected',
-    'rejection_reason',];
+    protected $fillable = ['name', 'image', 'category_id', 'description', 'status', 'restaurant_id', 'is_approved',
+     'is_active', 'is_rejected', 'min_price', 'max_price', 'rejection_reason',];
 
 
     public function restaurant()

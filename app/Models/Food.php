@@ -20,6 +20,8 @@ class Food extends Model
         'is_approved',
         'is_active',
         'is_rejected',
+        'min_price', 
+        'max_price',
         'rejection_reason',
     ];
 

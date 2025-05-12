@@ -13,7 +13,7 @@ class RestaurantProductController extends Controller
 {
     public function home()
     {
-        $restaurantId = Auth::user()->restaurant->id; // Lấy đúng restaurant_id
+        $restaurantId = Auth::user()->restaurant->id;
         $foods = Food::where('restaurant_id', $restaurantId)->get();
         $beverages = Beverage::where('restaurant_id', $restaurantId)->get();
 
@@ -38,7 +38,7 @@ class RestaurantProductController extends Controller
             'image' => 'required|image',
         ]);
 
-        $restaurantId = Auth::user()->restaurant->id; // Đảm bảo đúng restaurant id
+        $restaurantId = Auth::user()->restaurant->id;
 
         $data = [
             'restaurant_id' => $restaurantId,
@@ -54,22 +54,37 @@ class RestaurantProductController extends Controller
             $data['old_price'] = $request->old_price ?? 0;
             $data['discount_percent'] = $request->discount_percent ?? 0;
             $data['quantity'] = $request->quantity ?? 0;
+
+            $discounted = $data['old_price'] * (1 - $data['discount_percent'] / 100);
+            $data['min_price'] = $discounted;
+            $data['max_price'] = $discounted;
+
             Food::create($data);
         } else {
             $beverage = Beverage::create($data);
-        
+
+            $prices = [];
+
             if ($request->has('sizes')) {
                 foreach ($request->sizes as $size => $info) {
                     if (!empty($info['old_price'])) {
+                        $discount = $info['discount_percent'] ?? 0;
+                        $new_price = $info['old_price'] * (1 - $discount / 100);
+                        $prices[] = $new_price;
+
                         $beverage->beverageSizes()->create([
                             'size' => $size,
                             'old_price' => $info['old_price'],
-                            'discount_percent' => $info['discount_percent'] ?? 0,
+                            'discount_percent' => $discount,
                             'quantity' => $info['quantity'] ?? 0,
                         ]);
                     }
                 }
             }
+
+            $beverage->min_price = collect($prices)->min() ?? 0;
+            $beverage->max_price = collect($prices)->max() ?? 0;
+            $beverage->save();
         }
 
         return redirect()->route('restaurant.products.home')->with('success', 'Thêm sản phẩm thành công, chờ admin duyệt!');
@@ -100,7 +115,6 @@ class RestaurantProductController extends Controller
             }
             $item->sizes = $sizes;
         }
-        
 
         $categories = Category::all();
 
@@ -146,26 +160,38 @@ class RestaurantProductController extends Controller
             $item->old_price = $request->old_price ?? 0;
             $item->discount_percent = $request->discount_percent ?? 0;
             $item->quantity = $request->quantity ?? 0;
+
+            $discounted = $item->old_price * (1 - $item->discount_percent / 100);
+            $item->min_price = $discounted;
+            $item->max_price = $discounted;
         }
-        
 
         $item->save();
 
         if ($type === 'beverage' && $request->has('sizes')) {
             $item->beverageSizes()->delete();
-        
+
+            $prices = [];
+
             foreach ($request->sizes as $size => $info) {
                 if (!empty($info['old_price'])) {
+                    $discount = $info['discount_percent'] ?? 0;
+                    $new_price = $info['old_price'] * (1 - $discount / 100);
+                    $prices[] = $new_price;
+
                     $item->beverageSizes()->create([
                         'size' => $size,
                         'old_price' => $info['old_price'],
-                        'discount_percent' => $info['discount_percent'] ?? 0,
+                        'discount_percent' => $discount,
                         'quantity' => $info['quantity'] ?? 0,
                     ]);
                 }
             }
+
+            $item->min_price = collect($prices)->min() ?? 0;
+            $item->max_price = collect($prices)->max() ?? 0;
+            $item->save();
         }
-        
 
         return redirect()->route('restaurant.products.home')->with('success', 'Đã cập nhật sản phẩm, vui lòng chờ admin duyệt!');
     }

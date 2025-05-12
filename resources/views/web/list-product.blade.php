@@ -31,6 +31,15 @@
                         </button>
                     </div>
 
+                    <select id="category-filter" name="category">
+                        <option value="all">Tất cả danh mục</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
+                                {{ $category->name }}
+                            </option>
+                        @endforeach
+                    </select>                    
+
                     <select id="type-filter" name="type">
                         <option value="all">Tất cả loại</option>
                         <option value="food" {{ request('type') == 'food' ? 'selected' : '' }}>Đồ ăn</option>
@@ -68,70 +77,71 @@
                 
                 <!-- Danh sách sản phẩm -->
                 <div class="products-title active list-products">
-                    <h1>Đồ ăn ngon</h1>
-                    <div class="title-list">
+                    <h1>| Đồ ăn ngon</h1>
+                    <div class="title-list grid-container">
                         @foreach ($products as $product)
-                            <div class="list-show">
-                                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}">
-                                <div class="show-cart">
+                            <div class="product-card">
+                                <div class="product-image">
+                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}">
+                                    <a href="{{ route('product.show', ['type' => $product->type, 'id' => $product->id]) }}" class="overlay-button">
+                                        <i class="fa-solid fa-magnifying-glass"></i> Xem ngay
+                                    </a>
+                                </div>
+                
+                                <div class="product-info">
+                                    <h2 class="product-name">{{ $product->name }}</h2>
+                                
+                                    @if ($product->type === 'food')
+                                        <p class="product-price">Giá mới: {{ number_format($product->new_price) }}đ</p>
+                                        @if ($product->discount_percent > 0)
+                                            <p class="old-price">Giá cũ: {{ number_format($product->old_price) }}đ</p>
+                                        @endif
+                                
+                                    @elseif ($product->type === 'beverage')
+                                        <p class="product-price">
+                                            Giá mới: 
+                                            {{ number_format($product->min_new_price) }}đ 
+                                            @if ($product->min_new_price != $product->max_new_price)
+                                                - {{ number_format($product->max_new_price) }}đ
+                                            @endif
+                                        </p>
+                                        @if ($product->min_old_price != $product->max_old_price || $product->min_old_price > $product->min_new_price)
+                                            <p class="old-price">
+                                                Giá cũ: 
+                                                {{ number_format($product->min_old_price) }}đ 
+                                                @if ($product->min_old_price != $product->max_old_price)
+                                                    - {{ number_format($product->max_old_price) }}đ
+                                                @endif
+                                            </p>
+                                        @endif
+                                    @endif
+                                
+                                    {{-- Thêm vào giỏ hàng --}}
                                     @if ($product->type == 'food')
                                         <form action="{{ route('cart.add') }}" method="POST">
                                             @csrf
                                             <input type="hidden" name="type" value="food">
                                             <input type="hidden" name="product_id" value="{{ $product->id }}">
                                             <input type="hidden" name="quantity" value="1">
-                                            <button type="submit" class="show-cart" style="background: none; border: none; cursor: pointer; padding: 0;">
-                                                <p><i class="fa-solid fa-cart-shopping"></i></p>
-                                            </button>
+                                            <button type="submit" class="btn-cart">Thêm vào giỏ hàng</button>
                                         </form>
-                                    @elseif ($product->type == 'beverage')
-                                        @foreach ($product->beverageSizes as $size)
-                                            <form action="{{ route('cart.add') }}" method="POST">
-                                                @csrf
-                                                <input type="hidden" name="type" value="beverage">
-                                                <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                                <input type="hidden" name="quantity" value="1">
-                                                <input type="hidden" name="size" value="{{ $size->size }}">
-                                                <button type="submit" class="show-cart" style="background: none; border: none; cursor: pointer; padding: 0;">
-                                                    <p><i class="fa-solid fa-cart-shopping"></i></p>
-                                                </button>
-                                            </form>
-                                        @endforeach
+                                    @elseif ($product->type == 'beverage' && isset($product->best_size))
+                                        <form action="{{ route('cart.add') }}" method="POST">
+                                            @csrf
+                                            <input type="hidden" name="type" value="beverage">
+                                            <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                            <input type="hidden" name="quantity" value="1">
+                                            <input type="hidden" name="size" value="{{ $product->best_size }}">
+                                            <button type="submit" class="btn-cart">Thêm vào giỏ hàng</button>
+                                        </form>
                                     @endif
                                 </div>
-
-                                <div class="show-title">
-                                    <h1>{{ $product->name }}</h1>
-                                    <div class="title-detail">
-                                        <div class="detail-cost">
-                                            @if ($product->discount_percent > 0)
-                                                <p class="old-cost">Giá cũ: {{ number_format($product->old_price) }}đ</p>
-                                            @endif
-                                            <p class="new-cost">Giá mới: {{ number_format($product->new_price) }}đ</p>
-                                        </div>
-                                        <div class="title-access">
-                                            Đánh giá:
-                                            <p>
-                                                @for ($i = 0; $i < floor($product->rating ?? 4.5); $i++)
-                                                    <i class="fa-solid fa-star"></i>
-                                                @endfor
-                                                @if (fmod($product->rating ?? 4.5, 1) > 0)
-                                                    <i class="fa-solid fa-star-half-stroke"></i>
-                                                @endif
-                                            </p>
-                                            <p>{{ $product->rating ?? '4.5' }}/5</p>
-
-                                        </div>
-                                    </div>
-                                    <a href="{{ route('product.show', ['type' => $product->type, 'id' => $product->id]) }}">
-                                        <button class="btn btn-primary">Mua ngay</button>
-                                    </a>
-                                    
-                                </div>
+                                
                             </div>
                         @endforeach
                     </div>
-                </div>    
+                </div>
+                 
                 <div class="my-pagination">
                     @if ($products->onFirstPage())
                         <span class="disabled">&laquo; Trang Trước</span>

@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function moveImagesToCenter(clickedIndex) {
-        const currentOrder = images.map(img => parseInt(img.dataset.index, 10));
+        const currentOrder = images.map(img => parseInt(img.dataset.index, 8));
         const shift = currentOrder.indexOf(clickedIndex) - centerIndex;
 
         if (shift > 0) {
@@ -41,8 +41,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     images.forEach(img => {
         img.addEventListener("click", function () {
-            const clickedIndex = parseInt(this.dataset.index, 10);
-            if (clickedIndex !== parseInt(images[centerIndex].dataset.index, 10)) {
+            const clickedIndex = parseInt(this.dataset.index, 8);
+            if (clickedIndex !== parseInt(images[centerIndex].dataset.index, 8)) {
                 moveImagesToCenter(clickedIndex);
             }
         });
