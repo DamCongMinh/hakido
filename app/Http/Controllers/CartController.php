@@ -31,6 +31,7 @@ class CartController extends Controller
         if ($validated['type'] === 'beverage') {
             $query->where('size', $validated['size']);
         }
+        
 
         $existingItem = $query->first();
 
@@ -55,8 +56,15 @@ class CartController extends Controller
                 'quantity' => $validated['quantity'],
             ]);
         }
-
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Đã thêm vào giỏ hàng!'
+            ]);
+        }
+        
         return back()->with('success', 'Đã thêm vào giỏ hàng!');
+
     }
 
     public function show()
@@ -305,6 +313,18 @@ class CartController extends Controller
         $totalAmount = array_sum($restaurantTotalAmounts);
         $totalShippingFee = array_sum($restaurantShippingFees);
         $finalTotal = array_sum($restaurantTotalSums); // Tổng cộng toàn bộ (sản phẩm + ship)
+        session([
+            'checkout_data' => [
+                'groupedItems' => $groupedItems,
+                'restaurantShippingFees' => $restaurantShippingFees,
+                'restaurantTotalAmounts' => $restaurantTotalAmounts,
+                'restaurantTotalSums' => $restaurantTotalSums,
+                'totalAmount' => $totalAmount,
+                'totalShippingFee' => $totalShippingFee,
+                'finalTotal' => $finalTotal,
+            ]
+        ]);
+        
 
         return view('web.checkout', [
             'groupedItems' => $groupedItems,

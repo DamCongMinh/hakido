@@ -18,7 +18,7 @@
                     @csrf
                     <h1>Đăng ký tài khoản</h1>
 
-                    <select name="role" required>
+                    <select class="select_role" name="role" required>
                         <option value="">--Chọn vai trò--</option>
                         <option value="customer">Khách hàng</option>
                         <option value="restaurant">Nhà hàng</option>

@@ -118,22 +118,33 @@
                                 
                                     {{-- Thêm vào giỏ hàng --}}
                                     @if ($product->type == 'food')
-                                        <form action="{{ route('cart.add') }}" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="type" value="food">
-                                            <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                            <input type="hidden" name="quantity" value="1">
-                                            <button type="submit" class="btn-cart">Thêm vào giỏ hàng</button>
-                                        </form>
+                                    <form class="add-to-cart-form" 
+                                            data-product-id="{{ $product->id }}" 
+                                            data-product-type="food" 
+                                            method="POST" 
+                                            action="{{ route('cart.add') }}">
+                                        @csrf
+                                        <input type="hidden" name="type" value="food">
+                                        <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                        <input type="hidden" name="quantity" value="1">
+                                        <button type="submit" class="btn-cart">Thêm vào giỏ hàng</button>
+                                    </form>
+                              
                                     @elseif ($product->type == 'beverage' && isset($product->best_size))
-                                        <form action="{{ route('cart.add') }}" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="type" value="beverage">
-                                            <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                            <input type="hidden" name="quantity" value="1">
-                                            <input type="hidden" name="size" value="{{ $product->best_size }}">
-                                            <button type="submit" class="btn-cart">Thêm vào giỏ hàng</button>
-                                        </form>
+                                    <form class="add-to-cart-form" 
+                                            data-product-id="{{ $product->id }}" 
+                                            data-product-type="beverage" 
+                                            data-size="{{ $product->best_size }}" 
+                                            method="POST" 
+                                            action="{{ route('cart.add') }}">
+                                        @csrf
+                                        <input type="hidden" name="type" value="beverage">
+                                        <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                        <input type="hidden" name="quantity" value="1">
+                                        <input type="hidden" name="size" value="{{ $product->best_size }}">
+                                        <button type="submit" class="btn-cart">Thêm vào giỏ hàng</button>
+                                    </form>
+                              
                                     @endif
                                 </div>
                                 
@@ -185,6 +196,52 @@
     </section>
 
     <script src="{{ url('js/list-products.js') }}"></script>
+
+    <script>
+        // thêm giỏ
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.add-to-cart-form').forEach(form => {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault(); // Ngăn reload
+        
+                    const productId = this.dataset.productId;
+                    const productType = this.dataset.productType;
+                    const size = this.dataset.size;
+                    const quantity = this.querySelector('input[name="quantity"]').value;
+                    const token = this.querySelector('input[name="_token"]').value;
+        
+                    fetch("{{ route('cart.add') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': token,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({
+                            product_id: productId,
+                            type: productType,
+                            quantity: quantity,
+                            size: size
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message);
+                        } else {
+                            alert("Lỗi: " + data.message);
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert("Đã xảy ra lỗi khi thêm vào giỏ hàng.");
+                    });
+                });
+            });
+        });
+    </script>
+        
+        
 
     @include('layout.footer')
 </body>

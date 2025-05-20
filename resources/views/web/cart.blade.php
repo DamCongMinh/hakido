@@ -10,7 +10,7 @@
     @include('layout.header')
 
     <!-- Giỏ hàng -->
-    <h2>Giỏ hàng</h2>
+    <h2 class="h2">Giỏ hàng</h2>
 
     <table>
         <thead>
@@ -28,38 +28,62 @@
             </tr>
         </thead>
         <tbody>
-            @forelse ($cart?->items ?? [] as $index => $item)
+            @php
+                $itemsToShow = $cart?->items ?? $sessionCart ?? collect();
+            @endphp
+        
+            @forelse ($itemsToShow as $index => $item)
+                @php
+                    $isArray = is_array($item);
+                    $type = $isArray ? $item['type'] : $item->product_type;
+                    $product = null;
+
+                    if ($isArray) {
+                        $product = $item['product'];
+                        $size = $item['size'] ?? null;
+                        $quantity = $item['quantity'];
+                        $unit_price = $item['unit_price'];
+                        $product_id = $item['product_id'];
+                    } else {
+                        $product = $type === 'food' ? $item->food : $item->beverage;
+                        $size = $item->size ?? null;
+                        $quantity = $item->quantity;
+                        $unit_price = $item->unit_price;
+                        $product_id = $item->product_id;
+                    }
+                @endphp
+        
                 <tr>
                     <td>
-                        <img src="{{ asset('storage/' . ($item->food?->image ?? $item->beverage?->image)) }}" 
-                            alt="{{ $item->food?->name ?? $item->beverage?->name ?? 'Không rõ' }}"
-                            style="width: 80px;" onerror="this.src='{{ asset('img/slide.png') }}'">
+                        <img src="{{ asset('storage/' . ($product->image ?? '')) }}" 
+                             alt="{{ $product->name ?? 'Không rõ' }}"
+                             style="width: 80px;" 
+                             onerror="this.src='{{ asset('img/slide.png') }}'">
                     </td>
                     <td>
-                        {{ $item->food?->name ?? $item->beverage?->name ?? 'Không rõ' }}
-                        @if ($item->product_type === 'beverage' && $item->size)
-                            (Size {{ $item->size }})
+                        {{ $product->name ?? 'Không rõ' }}
+                        @if ($type === 'beverage' && $size)
+                            (Size {{ $size }})
                         @endif
                     </td>
-                    <td>{{ number_format($item->unit_price) }}₫</td>
-                    <td>{{ $item->quantity }}</td>
-                    <td>{{ number_format($item->unit_price * $item->quantity) }}₫</td>
+                    <td>{{ number_format($unit_price) }}₫</td>
+                    <td>{{ $quantity }}</td>
+                    <td>{{ number_format($unit_price * $quantity) }}₫</td>
                     <td>
                         <form id="select-item-{{ $index }}">
                             <input type="checkbox" name="selected_items[{{ $index }}][selected]" value="1" class="item-checkbox" form="checkout-form">
-                            <input type="hidden" name="selected_items[{{ $index }}][product_id]" value="{{ $item->product_id }}" form="checkout-form">
-                            <input type="hidden" name="selected_items[{{ $index }}][product_type]" value="{{ $item->product_type }}" form="checkout-form">
-                            <input type="hidden" name="selected_items[{{ $index }}][size]" value="{{ $item->size }}" form="checkout-form">
+                            <input type="hidden" name="selected_items[{{ $index }}][product_id]" value="{{ $product_id }}" form="checkout-form">
+                            <input type="hidden" name="selected_items[{{ $index }}][product_type]" value="{{ $type }}" form="checkout-form">
+                            <input type="hidden" name="selected_items[{{ $index }}][size]" value="{{ $size }}" form="checkout-form">
                         </form>
                     </td>
                     <td>
-                        {{-- Xóa: FORM ĐẶT BÊN NGOÀI --}}
                         <form action="{{ route('cart.removeItem') }}" method="POST" onsubmit="return confirm('Bạn có chắc muốn xóa sản phẩm này?');">
                             @csrf
                             @method('DELETE')
-                            <input type="hidden" name="product_id" value="{{ $item->product_id }}">
-                            <input type="hidden" name="product_type" value="{{ $item->product_type }}">
-                            <input type="hidden" name="size" value="{{ $item->size }}">
+                            <input type="hidden" name="product_id" value="{{ $product_id }}">
+                            <input type="hidden" name="product_type" value="{{ $type }}">
+                            <input type="hidden" name="size" value="{{ $size }}">
                             <button type="submit" style="color:red; border:none; background:none;">🗑️</button>
                         </form>
                     </td>
@@ -97,6 +121,7 @@
         checkboxes.forEach(cb => cb.addEventListener('change', updateCount));
         updateCount();
     });
+
     </script>
 
 </body>

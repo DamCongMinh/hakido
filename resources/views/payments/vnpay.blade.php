@@ -1,21 +1,23 @@
+<!-- resources/views/web/vnpay.blade.php -->
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>VNPay</title>
+    <title>Thanh toán VNPAY</title>
 </head>
 <body>
-    <h2>VNPAY (Demo)</h2>
-    <p>Đây là trang mô phỏng thanh toán qua VNPAY.</p>
+    <h2>Thanh toán qua VNPAY</h2>
 
-    <p>Mã đơn hàng: #{{ $order->id }}</p>
-    <p>Số tiền: <strong>{{ number_format($order->total_amount) }}₫</strong></p>
+    @php
+        $checkoutData = session('checkout_data');
+        $amount = $checkoutData['finalTotal'] ?? 0;
+    @endphp
 
-    <form action="{{ route('order.success', ['id' => $order->id]) }}" method="GET">
-        <button type="submit">Giả lập thanh toán thành công</button>
+    <p>Tổng tiền cần thanh toán: <strong>{{ number_format($amount, 0, ',', '.') }} VNĐ</strong></p>
+
+    <form action="{{ route('vnpay.payment') }}" method="GET">
+        @csrf
+        <input type="hidden" name="amount" value="{{ $amount }}">
+        <button type="submit">Thanh toán qua VNPAY</button>
     </form>
-
 </body>
 </html>

@@ -1,69 +1,87 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+.h2, .h3, .h4 {
+    color: #23578b;
+    margin: 20px 46px;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
-    font-family: Arial, sans-serif;
+    background-color: white;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
 }
 
-thead {
-    background-color: #14d43e;
+table th, table td {
+    padding: 10px;
+    border: 1px solid #18b43c;
+    text-align: left;
 }
 
-th, td {
-    padding: 12px;
-    border: 1px solid #ddd;
-    text-align: center;
+table th {
+    background-color: #1dbf43;
 }
 
 img {
-    border-radius: 8px;
     max-width: 100%;
-    height: auto;
+    border-radius: 5px;
+}
+
+#checkout_form {
+    width: 600px;
+    margin: 46px auto;
+}
+
+label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: bold;
+}
+
+input[type="text"], textarea, select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 80px;
 }
 
 button[type="submit"] {
-    padding: 10px 20px;
-    background-color: #28a745;
+    background-color: #27ae60;
     color: white;
     border: none;
-    border-radius: 6px;
+    padding: 12px 20px;
+    border-radius: 5px;
     cursor: pointer;
+    margin: 20px auto;
     font-size: 16px;
     transition: background-color 0.3s;
 }
 
 button[type="submit"]:hover {
-    background-color: #218838;
+    background-color: #219150;
 }
 
-input[type="checkbox"] {
-    transform: scale(1.2);
+.alert {
+    padding: 15px;
+    background-color: #f9d34f;
+    border: 1px solid #f1c40f;
+    border-radius: 5px;
+    margin-bottom: 20px;
 }
 
-#selected-count {
-    font-weight: bold;
-    color: #007bff;
-}
-
-@media screen and (max-width: 768px) {
-    table, thead, tbody, th, td, tr {
-        display: block;
-    }
-
-    thead {
-        display: none;
-    }
-
-    td {
-        position: relative;
-        padding-left: 50%;
-        text-align: left;
-    }
-
-    td::before {
-        content: attr(data-label);
-        position: absolute;
-        left: 15px;
-        font-weight: bold;
-    }
+hr {
+    margin: 40px 0;
+    border: none;
+    border-top: 1px solid #ccc;
 }

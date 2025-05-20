@@ -93,7 +93,7 @@
                                         <button type="submit" class="btn-approve">
                                             @switch($order->status)
                                                 @case('pending')
-                                                    Duyệt
+                                                    Xác nhận đơn
                                                     @break
                                                 @case('processing')
                                                     Xác nhận giao

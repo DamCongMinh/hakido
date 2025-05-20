@@ -30,6 +30,11 @@ body {
     min-height: 625px;
 }
 
+.form-container h1 {
+    font-size: 2.0rem;
+    margin-bottom: 24px;
+}
+
 .container p {
     font-size: 1.3rem;
     line-height: 20px;
@@ -226,3 +231,11 @@ body {
     transform: translateX(200%);
 }
 
+.select_role {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    background-color: #eee;
+    border: none;
+    font-size: 1.3rem;
+}

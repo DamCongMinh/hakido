@@ -24,6 +24,7 @@ use App\Http\Controllers\ShowDetailController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\VnpayController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\Restaurant\RestaurantProductController;
@@ -60,7 +61,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/shiper', fn () => view('shiper.shiper'))->name('shiper');
 });
 
-
 // Admin routes
 Route::middleware(['auth', 'admin'])->prefix('admin/accounts')->name('admin.accounts.')->group(function () {
     Route::get('/', [AdminAccountController::class, 'index'])->name('index');
@@ -71,8 +71,6 @@ Route::get('/home_admin', fn () => view('admin.home_admin'))
     ->middleware(['auth', 'admin'])
     ->name('admin.dashboard');
 
-
-
 // Hiển thị giao diện đăng nhập + đăng ký (gộp chung 1 view)
 Route::get('/login', function () {
     return view('web.login'); 
@@ -80,9 +78,6 @@ Route::get('/login', function () {
 
 // hiển thị giao diện quản lý sản phẩm
 Route::get('/control_product', [ProductController::class, 'index'])->name('control_product')->middleware(['auth', 'admin']);
-
-
-
 
 // Xử lý đăng nhập
 Route::post('/login', [AuthController::class, 'login'])->name('postlogin');
@@ -100,7 +95,6 @@ Route::get('login/google', [GoogleController::class, 'redirect']);
 Route::get('login/google/callback', [GoogleController::class, 'callback']);
 
 //customer
-
 Route::middleware(['auth', 'role:customer'])->group(function () {
     // Giỏ hàng
     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
@@ -131,6 +125,16 @@ Route::middleware(['auth', 'role:customer'])->group(function () {
     //hủy đơn hàng
     Route::patch('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 
+    // thanh toán vn pay
+    Route::get('/vnpay/form', function () {
+        return view('vnpay.payment');
+    });
+    
+    Route::post('/vnpay/payment', [VnpayController::class, 'createPayment'])->name('vnpay.payment');
+    Route::get('/vnpay-return', [VnpayController::class, 'handleReturn'])->name('vnpay.return');
+    Route::post('/vnpay/ipn', [VnpayController::class, 'handleIpn']);
+
+
 });
 
 
@@ -144,10 +148,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile/change-password', [ProfileController::class, 'showChangePasswordForm'])->name('profile.change_password_form');
     Route::post('/profile/change-password', [ProfileController::class, 'changePassword'])->name('profile.change_password');
 
-
 });
-
-
 
 // Quên mật khẩu
 
@@ -218,8 +219,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/statistics', [AdminStatisticController::class, 'index'])->name('statistics');
 });
 
-
-
  // Restaurant quản lý sản phẩm và thống kê doanh thu
 
  Route::middleware(['auth', 'role:restaurant'])->prefix('restaurant')->name('restaurant.')->group(function () {
@@ -247,7 +246,5 @@ Route::prefix('shipper/orders')->name('shipper.orders.')->middleware(['auth'])->
     Route::get('/history', [ShipperOrderController::class, 'deliveryHistory'])->name('history');
     Route::get('/income-stats', [ShipperOrderController::class, 'incomeStats'])->name('incomeStats');
     Route::get('/shipper/income-stats', [ShipperOrderController::class, 'incomeStats'])->name('shipper.income.stats');
-
-
 });
 
