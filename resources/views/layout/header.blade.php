@@ -88,11 +88,17 @@
                             <!-- Nếu đã đăng nhập -->
                             @auth
                                 <li>
-                                    <img class="avatar" src="{{ asset('img/shiper_avt.jpg') }}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%;">
+                                    <img
+                                    class="avatar"
+                                    src="{{ asset('storage/' . Auth::user()->resolved_avatar) }}"
+                                    onerror="this.onerror=null;this.src='{{ asset('img/shiper_avt.jpg') }}';"
+                                    alt="Avatar"
+                                    style="width: 32px; height: 32px; border-radius: 50%;"
+                                />
                                     <h3>{{ Auth::user()->name }}</h3>
 
                                     <!-- Link cho tất cả user -->
-                                    <li><a href="{{ route('profile.home_info') }}"><i class="fa-solid fa-user"></i> Tài khoản của tôi</a></li>
+                                    {{-- <li><a href="{{ route('profile.home_info') }}"><i class="fa-solid fa-user"></i> Tài khoản của tôi</a></li> --}}
 
                                     <!-- Nếu là admin -->
                                     @if (Auth::user()->role === 'admin')
@@ -105,6 +111,7 @@
 
                                     <!-- Nếu là restaurant -->
                                     @if (Auth::user()->role === 'restaurant')
+                                        <li><a href="{{ route('profile.home_info') }}"><i class="fa-solid fa-user"></i> Tài khoản của tôi</a></li>
                                         <li><a href="{{ route('restaurant.products.home') }}"><i class="fa-solid fa-utensils"></i> Quản lý sản phẩm</a></li>
                                         <li><a href="{{ route('restaurant.statistics.index') }}"><i class="fa-solid fa-receipt"></i> Quản lý đơn hàng</a></li>
                                         <li><a href="{{ route('restaurant.statistics.home') }}"><i class="fa-solid fa-chart-pie"></i> Thống kê</a></li>
@@ -112,6 +119,7 @@
 
                                     <!-- Nếu là shipper -->
                                     @if (Auth::user()->role === 'shipper')
+                                        <li><a href="{{ route('profile.home_info') }}"><i class="fa-solid fa-user"></i> Tài khoản của tôi</a></li>
                                         <li><a href="{{ route('shipper.orders.available') }}"><i class="fa-solid fa-cart-arrow-down"></i> Đơn hàng đang chờ</a></li>
                                         <li><a href="{{ route('shipper.orders.current') }}"><i class="fa-solid fa-truck"></i> Đơn đang giao</a></li>
                                         <li><a href="{{ route('shipper.orders.history') }}"><i class="fa-solid fa-file-invoice"></i> Lịch sử giao hàng</a></li>
@@ -120,6 +128,7 @@
 
                                     <!-- Nếu là customer -->
                                     @if (Auth::user()->role === 'customer')
+                                        <li><a href="{{ route('profile.home_info') }}"><i class="fa-solid fa-user"></i> Tài khoản của tôi</a></li>
                                         <li><a href="{{ route('cart.show') }}"><i class="fa-solid fa-shopping-cart"></i> Giỏ hàng của tôi</a></li>
                                         <li><a href="{{ route('orders.items') }}"><i class="fa-solid fa-box"></i> Sản phẩm đã đặt</a></li>
                                     @endif

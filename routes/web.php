@@ -31,7 +31,10 @@ use App\Http\Controllers\Restaurant\RestaurantProductController;
 use App\Http\Controllers\Restaurant\RestaurantStatisticsController;
 // Giao diện chính (FE)
 
+
 Route::get('/', [HomeController::class, 'index'])->name('home');
+// Route::get('/home', fn () => view('web.home'))->name('homepage');
+
 
 // hiển thị danh sách sản phẩm trong trang list_product
 Route::get('/products/category/{category_id}', [ShowListProductController::class, 'byCategory'])->name('products.byCategory');
@@ -43,7 +46,7 @@ Route::get('/products/filter', [SearchAndFilterController::class, 'filter'])->na
 // tim kiem
 Route::get('/search', [SearchAndFilterController::class, 'search']);
 Route::get('/search-suggestions', [SearchAndFilterController::class, 'suggestions']);
-Route::get('/search-restaurant', [SearchRestaurantController::class, 'search'])->name('search.restaurant');
+// Route::get('/search-restaurant', [SearchRestaurantController::class, 'search'])->name('search.restaurant');
 
 //show detail product
 Route::get('/product/{type}/{id}', [ShowDetailController::class, 'show'])->name('product.show');
@@ -67,6 +70,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin/accounts')->name('admin.acco
     
 });
 
+Route::get('/home', [HomeController::class, 'index'])->name('home');
+// Route::get('/home', function () {
+//     dd(Auth::user());
+// })->name('home');
+
+
 Route::get('/home_admin', fn () => view('admin.home_admin'))
     ->middleware(['auth', 'admin'])
     ->name('admin.dashboard');
@@ -81,6 +90,7 @@ Route::get('/control_product', [ProductController::class, 'index'])->name('contr
 
 // Xử lý đăng nhập
 Route::post('/login', [AuthController::class, 'login'])->name('postlogin');
+// Route::post('/login', function(){ echo 'hchdfhdc';})->name('postlogin');
 
 // Xử lý đăng ký
 Route::post('/register', [AuthController::class, 'register'])->name('register');
@@ -88,8 +98,8 @@ Route::post('/register', [AuthController::class, 'register'])->name('register');
 // Logout
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::get('login/facebook', [FacebookController::class, 'redirect']);
-Route::get('login/facebook/callback', [FacebookController::class, 'callback']);
+Route::get('login/facebook', [FacebookController::class, 'redirectToFacebook'])->name('facebook.redirect');
+Route::get('login/facebook/callback', [FacebookController::class, 'handleFacebookCallback'])->name('facebook.callback');
 
 Route::get('login/google', [GoogleController::class, 'redirect']);
 Route::get('login/google/callback', [GoogleController::class, 'callback']);
@@ -106,37 +116,22 @@ Route::middleware(['auth', 'role:customer'])->group(function () {
 
     // Đặt hàng
     Route::post('/orders/store', [OrderController::class, 'store'])->name('orders.store');
-    
-   // Demo chuyển khoản ngân hàng
-    Route::get('/payment/bank/{order}', [PaymentController::class, 'bank'])->name('payment.bank');
-
-    // Demo VNPAY giả lập
-    Route::get('/payment/vnpay/{order}', [PaymentController::class, 'vnpay'])->name('payment.vnpay');
-
-    // Tùy chọn: route callback từ VNPAY (nếu tích hợp thật sau này)
-    Route::get('/vnpay-return', [PaymentController::class, 'vnpayReturn'])->name('vnpay.return');
-
-    // Đặt hàng thành công
     Route::get('/order/success', [OrderController::class, 'success'])->name('order.success');
-
-    // danh sách order
     Route::get('/ordered-items', [OrderController::class, 'orderedItems'])->name('orders.items');
-
-    //hủy đơn hàng
     Route::patch('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 
-    // thanh toán vn pay
-    Route::get('/vnpay/form', function () {
-        return view('vnpay.payment');
-    });
+    // Thanh toán 
+    Route::get('/payment/bank/{order}', [PaymentController::class, 'bank'])->name('payment.bank');
+    Route::get('/payment/vnpay/{order}', [PaymentController::class, 'vnpay'])->name('payment.vnpay');
+
     
-    Route::post('/vnpay/payment', [VnpayController::class, 'createPayment'])->name('vnpay.payment');
-    Route::get('/vnpay-return', [VnpayController::class, 'handleReturn'])->name('vnpay.return');
-    Route::post('/vnpay/ipn', [VnpayController::class, 'handleIpn']);
-
-
 });
-
+    // VNPAY thực tế
+    Route::get('/vnpay/form', fn() => view('vnpay.payment'));
+    Route::post('/vnpay/payment', [VnpayController::class, 'createPayment'])->name('vnpay.payment');
+    // Route::get('/vnpay/return', [VnpayController::class, 'handleReturn'])->name('vnpay.return');
+    Route::get('/vnpay/return', [VnpayController::class, 'vnpayReturn'])->name('vnpay.return');
+    Route::post('/vnpay/ipn', [VnpayController::class, 'handleIpn']);
 
 // Trang thông tin cá nhân
 Route::middleware(['auth'])->group(function () {

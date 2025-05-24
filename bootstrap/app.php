@@ -6,6 +6,9 @@ use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use App\Http\Middleware\AdminMiddleware;
 use Illuminate\Session\Middleware\StartSession;
+use App\Http\Middleware\UpdateLastActiveAt;
+use App\Http\Middleware\TrustProxies;
+use App\Http\Middleware\CheckRole;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -15,21 +18,25 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Aliases
         $middleware->alias([
             'guest' => RedirectIfAuthenticated::class,
-            'admin' => AdminMiddleware::class, 
-            'role' => \App\Http\Middleware\CheckRole::class,
+            'admin' => AdminMiddleware::class,
+            'role' => CheckRole::class,
         ]);
 
-        // 🟢 Bổ sung middleware xử lý session
-        $middleware->append([
+        // Thêm middleware cho nhóm 'web'
+        $middleware->appendToGroup('web', [
             StartSession::class,
-            \App\Http\Middleware\UpdateLastActiveAt::class,
+            UpdateLastActiveAt::class,
+        ]);
+
+        // ✅ Thêm TrustProxies vào toàn cục
+        $middleware->append([
+            TrustProxies::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })
     ->create();
-
-    

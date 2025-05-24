@@ -32,7 +32,7 @@ class AuthController extends Controller
 
         $role = $request->role;
 
-        // ✅ Tạo user trước
+       
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -42,7 +42,7 @@ class AuthController extends Controller
             'is_approved' => false,
         ]);
 
-        // ✅ Tạo bảng phụ gắn với user_id
+        
         $commonData = [
             'user_id' => $user->id,
             'name' => $user->name,
@@ -66,7 +66,9 @@ class AuthController extends Controller
     // Đăng nhập
     public function login(Request $request)
     {
+
         $credentials = $request->only('email', 'password');
+
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
@@ -80,6 +82,8 @@ class AuthController extends Controller
                 default => redirect('/login'),
             };
         }
+
+
 
         return back()->with('status', 'Email hoặc mật khẩu không đúng!');
     }

@@ -13,9 +13,14 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'password',
+        'google_id',
+        'avatar',
         'role',
+        'is_active',
+        'is_approved',
+        'password',
     ];
+    
 
     protected $hidden = [
         'password',
@@ -65,6 +70,17 @@ class User extends Authenticatable
     {
         return $this->hasOne(Cart::class);
     }
+
+    public function getResolvedAvatarAttribute()
+    {
+        return match ($this->role) {
+            'customer' => $this->customer->avatar ?? asset('img/shiper_avt.jpg'),
+            'shipper' => $this->shipper->avatar ?? asset('img/shiper_avt.jpg'),
+            'restaurant' => $this->restaurant->avatar ?? asset('img/shiper_avt.jpg'),
+            default => $this->avatar ?? asset('img/shiper_avt.jpg'),
+        };
+    }
+
 
 
 }

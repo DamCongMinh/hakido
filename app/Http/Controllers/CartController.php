@@ -324,7 +324,6 @@ class CartController extends Controller
                 'finalTotal' => $finalTotal,
             ]
         ]);
-        
 
         return view('web.checkout', [
             'groupedItems' => $groupedItems,

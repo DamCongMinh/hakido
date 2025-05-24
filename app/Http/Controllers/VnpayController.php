@@ -3,35 +3,23 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class VnpayController extends Controller
 {
     public function createPayment(Request $request)
     {
-        // Lấy thông tin thanh toán từ session
-        $checkoutData = session('checkout_data');
-
-        if (!$checkoutData) {
-            return redirect()->route('cart.show')->with('error', 'Phiên thanh toán đã hết hạn.');
-        }
-
-        $finalTotal = $checkoutData['finalTotal'];
-
-        // Thông tin cấu hình VNPAY
-        $vnp_Url = env('VNPAY_PAYMENT_URL', 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html');
-        $vnp_Returnurl = env('VNPAY_RETURN_URL');
-        $vnp_TmnCode = env('VNPAY_TMN_CODE');
-        $vnp_HashSecret = env('VNPAY_HASH_SECRET');
-
-        // Thông tin giao dịch
-        $vnp_TxnRef = uniqid();
-        $vnp_OrderInfo = "Thanh toán đơn hàng";
-        $vnp_OrderType = "billpayment";
-        $vnp_Amount = $finalTotal * 100;
-        $vnp_Locale = "vn";
-        $vnp_IpAddr = $request->ip();
-
-        $inputData = [
+        $vnp_TmnCode = config('vnpay.tmn_code');
+        $vnp_HashSecret = config('vnpay.hash_secret');
+        $vnp_Url = config('vnpay.payment_url');
+        $vnp_Returnurl = config('vnpay.return_url');
+        $vnp_TxnRef = time();
+        $vnp_OrderInfo = "Thanh toan don hang";
+        $vnp_Amount = 338108 * 100;
+        $vnp_Locale = 'vn';
+        $vnp_IpAddr = request()->header('CF-Connecting-IP') ?? request()->ip();
+        
+        $inputData = array(
             "vnp_Version" => "2.1.0",
             "vnp_TmnCode" => $vnp_TmnCode,
             "vnp_Amount" => $vnp_Amount,
@@ -41,105 +29,122 @@ class VnpayController extends Controller
             "vnp_IpAddr" => $vnp_IpAddr,
             "vnp_Locale" => $vnp_Locale,
             "vnp_OrderInfo" => $vnp_OrderInfo,
-            "vnp_OrderType" => $vnp_OrderType,
-            "vnp_ReturnUrl" => $vnp_Returnurl,
+            "vnp_OrderType" => "billpayment",
+            "vnp_Returnurl" => $vnp_Returnurl, // ✅ Bổ sung
             "vnp_TxnRef" => $vnp_TxnRef,
-        ];
-
-        // Sắp xếp theo thứ tự A-Z key
+            
+        );
+    
+        // Tạo chuỗi hash và query đúng chuẩn
         ksort($inputData);
-
-        // Tạo chuỗi dữ liệu để hash (KHÔNG dùng http_build_query)
-        $hashData = '';
+        $hashdataArr = [];
+        $queryArr = [];
+    
         foreach ($inputData as $key => $value) {
-            $hashData .= $key . "=" . $value . "&";
+            $hashdataArr[] = urlencode($key) . "=" . urlencode($value);
+            $queryArr[] = urlencode($key) . "=" . urlencode($value);
         }
-        $hashData = rtrim($hashData, '&');
+    
+        $hashdata = implode('&', $hashdataArr);
+        $vnpSecureHash = hash_hmac('sha512', $hashdata, $vnp_HashSecret);
+        $queryArr[] = 'vnp_SecureHashType=SHA512';
+        $queryArr[] = 'vnp_SecureHash=' . $vnpSecureHash;
+        $vnp_Url = $vnp_Url . '?' . implode('&', $queryArr);
+        Log::info("IP Address: " . $vnp_IpAddr);
+        Log::info("Return URL: " . $vnp_Returnurl);
+        Log::info("TxnRef: " . $vnp_TxnRef);
+        Log::info("Amount: " . $vnp_Amount);
 
-        // Tạo chữ ký SHA512
-        $vnp_SecureHash = hash_hmac('sha512', $hashData, $vnp_HashSecret);
-        $inputData['vnp_SecureHash'] = $vnp_SecureHash;
+        // Log hash data
+        Log::info("Hash Data: " . $hashdata);
 
-        // Tạo URL chuyển hướng
-        $vnp_Url .= '?' . http_build_query($inputData);
+        // Log secure hash
+        Log::info("Generated Secure Hash: " . $vnpSecureHash);
 
+        // Log full redirect URL
+        Log::info("Redirect URL: " . $vnp_Url);
+
+    
         return redirect($vnp_Url);
     }
+    
 
-    public function handleReturn(Request $request)
+
+    public function vnpayReturn(Request $request)
     {
-        \Log::info('VNPAY RETURN CALLED', $request->all());
-        $vnp_HashSecret = env('VNPAY_HASH_SECRET');
+        Log::info('🟢 Đã vào hàm vnpayReturn');
+        
         $inputData = $request->all();
-
-        $vnp_SecureHash = $inputData['vnp_SecureHash'] ?? null;
-        unset($inputData['vnp_SecureHash']);
-        unset($inputData['vnp_SecureHashType']);
-
-        // Sắp xếp các tham số theo thứ tự alphabet
+    
+        // Kiểm tra bắt buộc tham số
+        if (!isset($inputData['vnp_SecureHash'])) {
+            Log::warning('⚠️ vnp_SecureHash is missing in return URL');
+            return view('payments.vnpayfailed');
+        }
+    
+        $vnp_HashSecret = "57ON81SV4TSHSLDQE3Z225GZVWPGKHMK"; // hash secret từ VNPAY
+        $vnp_SecureHash = $inputData['vnp_SecureHash'];
+    
+        // Bỏ các key không cần hash
+        unset($inputData['vnp_SecureHash'], $inputData['vnp_SecureHashType']);
+    
+        // Sắp xếp và tạo chuỗi hash
         ksort($inputData);
-
-        // Tạo chuỗi hash để kiểm tra chữ ký
         $hashData = '';
         foreach ($inputData as $key => $value) {
-            $hashData .= $key . "=" . $value . "&";
+            $hashData .= $key . '=' . $value . '&';
         }
         $hashData = rtrim($hashData, '&');
-
-        $secureHash = hash_hmac('sha512', $hashData, $vnp_HashSecret);
-        dd([
-            'hashData' => $hashData,
-            'secureHash (calculated)' => $secureHash,
-            'vnp_SecureHash (from URL)' => $vnp_SecureHash,
-        ]);
-
+    
+        $secureHash = hash_hmac('SHA512', $hashData, $vnp_HashSecret);
+    
+        Log::info('✅ VNPAY return raw data:', $inputData);
+        Log::info('✅ VNPAY return hashData:', ['hashData' => $hashData]);
+        Log::info('✅ Generated secureHash:', ['secureHash' => $secureHash]);
+        Log::info('✅ Received secureHash:', ['vnp_SecureHash' => $vnp_SecureHash]);
+    
         if ($secureHash === $vnp_SecureHash) {
-            if ($inputData['vnp_ResponseCode'] == '00') {
-                // Giao dịch thành công
-                return view('vnpay.success', ['data' => $inputData]);
+            Log::info('✅ Checksum hợp lệ');
+    
+            if ($request->vnp_ResponseCode == '00') {
+                Log::info('🎉 Thanh toán thành công', ['order' => $request->vnp_TxnRef]);
+                // TODO: Cập nhật trạng thái đơn hàng trong DB tại đây
+                return view('payments.vnpaysuccess');
             } else {
-                // Giao dịch thất bại
-                return view('vnpay.failed', ['data' => $inputData]);
+                Log::warning('❌ Thanh toán thất bại', ['code' => $request->vnp_ResponseCode]);
+                return view('payments.vnpayfailed');
             }
         } else {
-            // Sai chữ ký xác thực
-            return response("Sai chữ ký xác thực!", 400);
+            Log::error('❌ Checksum không hợp lệ');
+            return view('payments.vnpayfailed');
         }
-        
     }
+    
+
 
     public function handleIpn(Request $request)
     {
         \Log::info('VNPAY IPN RETURN CALLED', $request->all());
 
-        // Xử lý y hệt như handleReturn nhưng trả JSON 200 OK
-        $vnp_HashSecret = env('VNPAY_HASH_SECRET');
+        $vnp_HashSecret = config('vnpay.hash_secret');
         $inputData = $request->all();
 
         $vnp_SecureHash = $inputData['vnp_SecureHash'] ?? null;
-        unset($inputData['vnp_SecureHash']);
-        unset($inputData['vnp_SecureHashType']);
+        unset($inputData['vnp_SecureHash'], $inputData['vnp_SecureHashType']);
+
         ksort($inputData);
-
-        $hashData = '';
-        foreach ($inputData as $key => $value) {
-            $hashData .= $key . "=" . $value . "&";
-        }
-        $hashData = rtrim($hashData, '&');
-
-        $secureHash = hash_hmac('sha512', $hashData, $vnp_HashSecret);
+        $hashData = urldecode(http_build_query($inputData));
+        $secureHash = hash_hmac('SHA512', $hashData, $vnp_HashSecret);
 
         if ($secureHash === $vnp_SecureHash) {
             if ($inputData['vnp_ResponseCode'] == '00') {
-                // Thành công → xử lý đơn hàng tại đây
+                // TODO: Cập nhật trạng thái đơn hàng ở đây
                 return response('OK', 200);
             } else {
-                // Thất bại → có thể xử lý log đơn hàng
                 return response('FAILED', 200);
             }
         } else {
             return response('INVALID CHECKSUM', 400);
         }
     }
-
 }

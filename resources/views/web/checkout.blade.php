@@ -100,6 +100,7 @@
             <input type="hidden" name="restaurantTotalSums" id="restaurant-total-sums-input">
 
             <button type="submit">Xác nhận & Thanh toán</button>
+
         </form>
     @endif
 
@@ -148,22 +149,26 @@
         
             form.addEventListener('submit', function (e) {
                 const paymentMethod = document.getElementById('payment_method').value;
-        
+
                 if (!paymentMethod) {
                     e.preventDefault();
                     alert('Vui lòng chọn phương thức thanh toán.');
                     return;
                 }
-        
+
                 submitButton.disabled = true;
                 submitButton.textContent = 'Đang xử lý...';
-        
+
                 if (paymentMethod === 'vnpay') {
-                    e.preventDefault(); // Ngăn submit mặc định
+                    e.preventDefault(); // Ngăn chặn submit mặc định
+
+                    // Đặt action mới là route VNPAY
                     form.action = '{{ route("vnpay.payment") }}';
-                    form.submit(); // Gửi form tới controller Laravel
+
+                    // Để chắc chắn, chờ một chút rồi submit lại
+                    setTimeout(() => form.submit(), 100);
+                    return;
                 }
-                // Nếu không phải vnpay thì vẫn để form tự submit theo action mặc định
             });
         });
         </script>

@@ -3,6 +3,7 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\View;
 use App\Models\Category;
+use Illuminate\Support\Facades\URL;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -21,8 +22,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // View::composer('layout.header', function ($view) {
-        //     $view->with('categories', Category::all());
-        // });
+        // if (request()->header('X-Forwarded-Proto') === 'https') {
+        //     URL::forceScheme('https');
+        //     request()->server->set('HTTPS', 'on');
+        // }
     }
 }
