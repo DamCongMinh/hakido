@@ -99,8 +99,12 @@
             <input type="hidden" name="restaurantTotalAmounts" id="restaurant-total-amounts-input">
             <input type="hidden" name="restaurantTotalSums" id="restaurant-total-sums-input">
 
-            <button type="submit">Xác nhận & Thanh toán</button>
+            
 
+        </form>
+        <form id="checkout_form" action="{{ route('vnpay.payment') }}" method="POST">
+            @csrf
+            <button type="submit" name = "redirect">Xác nhận & Thanh toán</button>
         </form>
     @endif
 
@@ -155,7 +159,6 @@
                     alert('Vui lòng chọn phương thức thanh toán.');
                     return;
                 }
-
                 submitButton.disabled = true;
                 submitButton.textContent = 'Đang xử lý...';
 

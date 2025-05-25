@@ -31,6 +31,9 @@ use App\Http\Controllers\Restaurant\RestaurantProductController;
 use App\Http\Controllers\Restaurant\RestaurantStatisticsController;
 // Giao diện chính (FE)
 
+//test
+Route::get('/test', fn () => view('web.test'))->name('test');
+
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 // Route::get('/home', fn () => view('web.home'))->name('homepage');
@@ -121,17 +124,24 @@ Route::middleware(['auth', 'role:customer'])->group(function () {
     Route::patch('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 
     // Thanh toán 
-    Route::get('/payment/bank/{order}', [PaymentController::class, 'bank'])->name('payment.bank');
-    Route::get('/payment/vnpay/{order}', [PaymentController::class, 'vnpay'])->name('payment.vnpay');
+    // Route::get('/payment/bank/{order}', [PaymentController::class, 'bank'])->name('payment.bank');
+    // Route::get('/payment/vnpay/{order}', [PaymentController::class, 'vnpay'])->name('payment.vnpay');
 
     
 });
     // VNPAY thực tế
-    Route::get('/vnpay/form', fn() => view('vnpay.payment'));
-    Route::post('/vnpay/payment', [VnpayController::class, 'createPayment'])->name('vnpay.payment');
-    // Route::get('/vnpay/return', [VnpayController::class, 'handleReturn'])->name('vnpay.return');
-    Route::get('/vnpay/return', [VnpayController::class, 'vnpayReturn'])->name('vnpay.return');
+    // Route::get('/vnpay/form', fn() => view('vnpay.payment'));
+    // // Route::post('/vnpay/payment', [VnpayController::class, 'createPayment'])->name('vnpay.payment');
+    // Route::post('/vnpay/payment', [VnpayController::class, 'vnpay_payment'])->name('vnpay.payment');
+    // // Route::get('/vnpay/return', [VnpayController::class, 'handleReturn'])->name('vnpay.return');
+    // Route::get('/vnpay/return', [VnpayController::class, 'vnpayReturn'])->name('vnpay.return');
+    
+    Route::post('/vnpay/payment', [VnpayController::class, 'PaymentVnpay'])->name('vnpay.payment');
+    Route::get('/vnpay/return', [VnpayController::class, 'vnpayReturn']);
+    Route::match(['GET', 'POST'], '/vnpay/ipn', [VnpayController::class, 'vnpay_ipn']);
     Route::post('/vnpay/ipn', [VnpayController::class, 'handleIpn']);
+
+
 
 // Trang thông tin cá nhân
 Route::middleware(['auth'])->group(function () {

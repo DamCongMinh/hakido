@@ -22,7 +22,10 @@ class CartController extends Controller
             return redirect()->route('login')->with('error', 'Bạn cần đăng nhập để thêm vào giỏ hàng.');
         }
 
-        $cart = $user->cart()->firstOrCreate([]);
+        // $cart = $user->cart()->firstOrCreate([]);
+        $cart = $user->cart()->firstOrCreate([
+            'user_id' => $user->id,
+        ]);
 
         $query = $cart->items()
             ->where('product_id', $validated['product_id'])
