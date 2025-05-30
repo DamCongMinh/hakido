@@ -18,7 +18,7 @@
       
 
 
-    <h2 class="h2">Biểu đồ thống kê theo năm</h2>
+    <h2 class="h2">Bảng thống kê số lượng đơn hàng trong năm</h2>
     <form id="statistic_form" method="GET" action="{{ route('admin.statistics') }}">
         <label for="year"><strong>Chọn năm:</strong></label>
         <select name="year" id="year" onchange="this.form.submit()">
@@ -44,8 +44,9 @@
                     </tr>
                 @endforeach
             </tbody>
-        </table>       
+        </table> 
 
+        <h2 class="h2">Biểu đồ thống kê theo năm</h2>
         <div style="width: 80%; margin: auto;">
             <canvas id="monthlyChart"></canvas>
         </div>

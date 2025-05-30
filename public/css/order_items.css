@@ -5,6 +5,11 @@ body, h2, p, table, ul {
     box-sizing: border-box;
 }
 
+.mt-3 { margin-top: 1rem; }
+.mt-5 { margin-top: 3rem; }
+.mb-4 { margin-bottom: 1.5rem; }
+
+
 body {
     font-family: 'Roboto', 'Segoe UI', Tahoma, sans-serif;
     background-color: #f1f3f5;
@@ -21,17 +26,49 @@ body {
 }
 
 /* Tiêu đề */
-h2 {
+h2,h1 {
     text-align: center;
     margin-bottom: 25px;
     color: #343a40;
 }
 
-/* Bảng */
+
+.filter-form {
+    padding: 10px 15px;
+    background-color: #a3b6ca;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    display: inline-block;
+}
+
+.filter_controller {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.filter-form label {
+    width: 40px;
+    font-size: 1.4rem;
+    margin-right: 8px;
+}
+
+.filter-form select {
+    font-size: 1.2rem;
+    padding: 6px 4px;
+    min-width: 160px;
+}
+
+.filter-form input[type='date'] {
+    font-size: 1.2rem;
+    padding: 6px 4px;
+}
+
 .table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+    text-align: center;
 }
 
 .table th {
@@ -40,6 +77,7 @@ h2 {
     padding: 12px;
     text-align: center;
     font-weight: 600;
+    vertical-align: middle;
 }
 
 .table td {
@@ -50,6 +88,7 @@ h2 {
     color: #212529;
     border: 1px solid #dee2e6;
     background-color: #fafafa;
+    vertical-align: middle;
 }
 
 .table td ul {
@@ -110,17 +149,23 @@ strong {
 
 /* Nút */
 .btn {
+    width: 150px;
+    font-size: 1.2rem;
     padding: 8px 16px;
     border: none;
     border-radius: 6px;
     cursor: pointer;
     font-weight: 500;
     transition: 0.3s;
+    margin: 0;
+    text-decoration: none;
+    
 }
 
 .btn-danger {
     background-color: #dc3545;
     color: white;
+    padding: 14px 0;
 }
 
 .btn-danger:hover {
@@ -134,17 +179,12 @@ strong {
     margin-top: 20px;
     text-decoration: none;
     text-align: center;
-    margin-left: 47%;
 }
 
 .btn-primary:hover {
     background-color: #0056b3;
 }
 
-/* Khoảng cách */
-.mt-3 { margin-top: 1rem; }
-.mt-5 { margin-top: 3rem; }
-.mb-4 { margin-bottom: 1.5rem; }
 
 /* Responsive */
 @media screen and (max-width: 768px) {

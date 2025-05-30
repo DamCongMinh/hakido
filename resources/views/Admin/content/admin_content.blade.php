@@ -46,12 +46,12 @@
                             <td>
                                 <!-- Lỗi có thể nằm ở đây -->
                                 <a href="{{ route('admin.slides.edit', $slide->id) }}">
-                                    <button type="button">Sửa</button>
+                                    <button class="btn btn-edit" type="button">Sửa</button>
                                 </a>
                                 <form action="{{ route('admin.slides.destroy', $slide->id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit">Xoá</button>
+                                    <button class ="btn btn-danger" type="submit">Xoá</button>
                                 </form>
                             </td>
                         </tr>
@@ -65,7 +65,7 @@
 
         {{-- Quản lý Danh mục --}}
         <section class="content-section">
-            <h2>Danh mục trong Header</h2>
+            <h2>Danh mục</h2>
             <a href="{{ route('admin.categories.create') }}" class="btn-add">+ Thêm danh mục mới</a>
             <table class="content-table">
                 <thead>
@@ -83,11 +83,11 @@
                             <td>{{ $category->name }}</td>
                             <td>{{ $category->is_active ? 'Hiển thị' : 'Ẩn' }}</td>
                             <td>
-                                <a href="{{ route('admin.categories.edit', $category->id) }}" class="btn-edit">Sửa</a>
+                                <a class="btn btn-edit" href="{{ route('admin.categories.edit', $category->id) }}">Sửa</a>
                                 <form action="{{ route('admin.categories.destroy', $category->id) }}" method="POST" style="display:inline-block;">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn-delete" onclick="return confirm('Bạn có chắc chắn muốn xóa?')">Xóa</button>
+                                    <button class="btn btn-danger" type="submit" class="btn-delete" onclick="return confirm('Bạn có chắc chắn muốn xóa?')">Xóa</button>
                                 </form>
                             </td>
                         </tr>
@@ -95,13 +95,10 @@
                 </tbody>
             </table>
         </section>
-
-        <a class="back" href="{{ route('admin.dashboard') }}">← Quay lại trang Admin</a>
     </div>
 
     @if(isset($categories) && count($categories) > 0)
     @foreach($categories as $category)
-        {{-- hiển thị danh mục --}}
     @endforeach
     @endif
 

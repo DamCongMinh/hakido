@@ -4,22 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Payment extends Model
+class FoodReview extends Model
 {
-    protected $fillable = [
-        'id',
-        'customer_id',
-        'order_id',
-        'txn_ref',
-        'amount',
-        'bank_code',
-        'status',
-        'raw_data',
-    ];
+    protected $fillable = ['customer_id', 'food_id', 'order_id', 'rating', 'comment'];
 
     public function customer()
     {
         return $this->belongsTo(Customer::class);
+    }
+
+    public function food()
+    {
+        return $this->belongsTo(Food::class);
     }
 
     public function order()
@@ -27,5 +23,3 @@ class Payment extends Model
         return $this->belongsTo(Order::class);
     }
 }
-
-

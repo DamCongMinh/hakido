@@ -28,13 +28,18 @@
                 <div class="image-slider">
                     <button class="prev-btn">&#10094;</button> <!-- Nút trái -->
                     <div class="list-img">
-                        <img src="{{ asset('img/slide2.jpg') }}" alt="product image">
-                        <img src="{{ asset('img/slide5.jpg') }}" alt="product image">
-                        <img src="{{ asset('img/slide6.png') }}" alt="product image">
-                        <img src="{{ asset('img/slide.png') }}" alt="product image">
-                        <img src="{{ asset('img/slide.png') }}" alt="product image">
-                        <img src="{{ asset('img/slide.png') }}" alt="product image">
+                        @foreach ($allProducts as $p)
+                            <img 
+                                src="{{ $p['image'] }}" 
+                                alt="{{ $p['name'] }}" 
+                                class="product-thumbnail"
+                                data-id="{{ $p['id'] }}"
+                                data-type="{{ $p['type'] }}"
+                            >
+                        @endforeach
                     </div>
+                    
+                    
                     <button class="next-btn">&#10095;</button> <!-- Nút phải -->
                 </div>                
             </div>
@@ -235,17 +240,34 @@
             </div>
             <div class="restaurant-right">
                 <div class="restaurant-stats">
-                    <div class="stat"><span>Đánh Giá</span><strong>{{ number_format($product->restaurant->rating_count ?? 0) }}</strong></div>
+                    <div class="stat">
+                        <span>Đánh Giá</span>
+                        <strong>{{ number_format($totalRestaurantReviews) }}</strong>
+                    </div>
+                    
                     <div class="stat">
                         <span>Sản Phẩm</span>
                         <strong>{{ $totalProducts }}</strong>
                     </div>
-                    <div class="stat"><span>Tỉ Lệ Phản Hồi</span><strong>{{ $product->restaurant->reply_rate ?? 'N/A' }}</strong></div>
-                    <div class="stat"><span>Thời Gian Phản Hồi</span><strong>{{ $product->restaurant->reply_time ?? 'N/A' }}</strong></div>
-                    <div class="stat"><span>Tham Gia</span><strong>{{ $product->restaurant->created_at->diffForHumans() }}</strong></div>
-                    <div class="stat"><span>Người Theo Dõi</span><strong>{{ number_format($product->restaurant->follower_count ?? 0) }}</strong></div>
+                    {{-- <div class="stat">
+                        <span>Tỉ Lệ Phản Hồi</span>
+                        <strong>{{ $restaurantStats['reply_rate'] }}</strong>
+                    </div>
+                    <div class="stat">
+                        <span>Thời Gian Phản Hồi</span>
+                        <strong>{{ $restaurantStats['reply_time'] }}</strong>
+                    </div> --}}
+                    <div class="stat">
+                        <span>Tham Gia</span>
+                        <strong>{{ $restaurantStats['joined'] }}</strong>
+                    </div>
+                    <div class="stat">
+                        <span>Người Theo Dõi</span>
+                        <strong>{{ number_format($restaurantStats['follower_count']) }}</strong>
+                    </div>
                 </div>
             </div>
+            
         </div>
         <div class="review-section">
             <div class="header-comment">
@@ -253,7 +275,15 @@
           
                 <div class="rating-summary">
                     <div class="average-rating">
-                        <span class="score">4.9</span> <span>trên 5</span>
+                        <div class="average-rating mb-3">
+                            @if ($productAvgRating !== null)
+                                <span class="score">{{ number_format($productAvgRating, 1) }}</span> <span>trên 5</span>
+                            @else
+                                <span class="text-muted">Chưa có đánh giá</span>
+                            @endif
+                        </div>
+                        
+                        
                         <div class="stars">
                             <i class="fa-solid fa-star"></i>
                             <i class="fa-solid fa-star"></i>
@@ -261,251 +291,55 @@
                             <i class="fa-solid fa-star"></i>
                             <i class="fa-solid fa-star"></i>
                         </div>
-                        <div class="rating-filters">
-                            <button>Tất Cả</button>
-                            <button>5 Sao (712)</button>
-                            <button>4 Sao (31)</button>
-                            <button>3 Sao (10)</button>
-                            <button>2 Sao (1)</button>
-                            <button>1 Sao (5)</button>
-                            <button>Có Hình Ảnh / Video (287)</button>
-                            <button>Có Bình Luận (495)</button>
+                        <div class="rating-filters mb-4">
+                            <button data-filter="all" class="active">Tất Cả ({{ $filters['all'] }})</button>
+                            <button data-filter="5">5 Sao ({{ $filters['5'] }})</button>
+                            <button data-filter="4">4 Sao ({{ $filters['4'] }})</button>
+                            <button data-filter="3">3 Sao ({{ $filters['3'] }})</button>
+                            <button data-filter="2">2 Sao ({{ $filters['2'] }})</button>
+                            <button data-filter="1">1 Sao ({{ $filters['1'] }})</button>
+                            <button data-filter="with_media">Có Hình Ảnh / Video ({{ $filters['with_media'] }})</button>
+                            <button data-filter="with_comment">Có Bình Luận ({{ $filters['with_comment'] }})</button>
                         </div>
                     </div>
                 </div>
             </div>
           
             <div class="review-list">
-                <div class="review-container">
-                    <div class="user-info">
-                        <img src="{{ asset ('img/shiper_avt.jpg') }}" alt="avatar">
-                        <div>
-                            <strong>hnglam417</strong>
-                            <div class="stars">⭐⭐⭐⭐⭐</div>
-                            <div class="time">2024-06-17 10:21 | Phân loại hàng: M</div>
+                @forelse ($reviews as $review)
+                    <div class="review-container mb-3 p-3 border rounded"
+                         data-rating="{{ $review->rating }}"
+                         data-has-media="{{ isset($review->media) && count($review->media) ? '1' : '0' }}"
+                         data-has-comment="{{ trim($review->comment) ? '1' : '0' }}">
+            
+                        <div class="d-flex align-items-center mb-2">
+                            <img class="avatar me-2"
+                                 src="{{ asset('storage/' . $review->customer->resolved_avatar) }}"
+                                 onerror="this.onerror=null;this.src='{{ asset('img/shiper_avt.jpg') }}';"
+                                 alt="Avatar"
+                                 style="width: 42px; height: 42px; border-radius: 50%;">
+                            <strong>{{ $review->customer->name ?? 'Ẩn danh' }}</strong>
                         </div>
-                    </div>
-                    <div class="review-content">
-                        <p><strong>Chất liệu:</strong> jean</p>
-                        <p><strong>Màu sắc:</strong> xanh than thẫm</p>
-                        <p><strong>Đúng với mô tả:</strong> chuẩn lắm luoonn</p>
-                        <p>Ê lần đầu tiên t đặt quần mà t thấy cái quần này đẹp nhất trong các số quần mà t đã từng đặt. Vừa khít eo luôn mà 💞</p>
-                    </div>
-                    <div class="media">
-                        <img src="{{ asset ('img/slide5.jpg') }}" alt="">
-                        <img src="{{ asset ('img/slide5.jpg') }}" alt="">
-                        <img src="{{ asset ('img/slide5.jpg') }}" alt="">
-                    </div>
-                    <div class="likes">👍 59</div>
-                </div>
 
-                <div class="review-container">
-                    <div class="user-info">
-                        <img src="{{ asset ('img/shiper_avt.jpg') }}" alt="avatar">
                         <div>
-                            <strong>hnglam417</strong>
-                            <div class="stars">⭐⭐⭐⭐⭐</div>
-                            <div class="time">2024-06-17 10:21 | Phân loại hàng: M</div>
+                            <div class="stars mb-2">
+                                {{ str_repeat('⭐', $review->rating) }}
+                            </div>
+                            <div class="time mb-2">{{ $review->created_at->format('Y-m-d H:i') }}</div>
                         </div>
-                    </div>
-                    <div class="review-content">
-                        <p><strong>Chất liệu:</strong> jean</p>
-                        <p><strong>Màu sắc:</strong> xanh than thẫm</p>
-                        <p><strong>Đúng với mô tả:</strong> chuẩn lắm luoonn</p>
-                        <p>Ê lần đầu tiên t đặt quần mà t thấy cái quần này đẹp nhất trong các số quần mà t đã từng đặt. Vừa khít eo luôn mà 💞</p>
-                    </div>
-                    <div class="media">
-                        <img src="{{ asset ('img/slide5.jpg') }}" alt="">
-                        <img src="{{ asset ('img/slide5.jpg') }}" alt="">
-                        <img src="{{ asset ('img/slide5.jpg') }}" alt="">
-                    </div>
-                    <div class="likes">👍 59</div>
-                </div>
 
-                <div class="review-container">
-                    <div class="user-info">
-                        <img src="{{ asset ('img/shiper_avt.jpg') }}" alt="avatar">
-                        <div>
-                            <strong>hnglam417</strong>
-                            <div class="stars">⭐⭐⭐⭐⭐</div>
-                            <div class="time">2024-06-17 10:21 | Phân loại hàng: M</div>
-                        </div>
+                        @if ($review->comment)
+                        <strong class="mb-2">Nhận xét:</strong>
+                            <div class="mb-2">
+                                {{ $review->comment }}
+                            </div>
+                        @endif
                     </div>
-                    <div class="review-content">
-                        <p><strong>Chất liệu:</strong> jean</p>
-                        <p><strong>Màu sắc:</strong> xanh than thẫm</p>
-                        <p><strong>Đúng với mô tả:</strong> chuẩn lắm luoonn</p>
-                        <p>Ê lần đầu tiên t đặt quần mà t thấy cái quần này đẹp nhất trong các số quần mà t đã từng đặt. Vừa khít eo luôn mà 💞</p>
-                    </div>
-                    <div class="media">
-                        <img src="{{ asset ('img/slide5.jpg') }}" alt="">
-                        <img src="{{ asset ('img/slide5.jpg') }}" alt="">
-                        <img src="{{ asset ('img/slide5.jpg') }}" alt="">
-                    </div>
-                    <div class="likes">👍 59</div>
-                </div>
-
-                <div class="review-container">
-                    <div class="user-info">
-                        <img src="{{ asset ('img/shiper_avt.jpg') }}" alt="avatar">
-                        <div>
-                            <strong>hnglam417</strong>
-                            <div class="stars">⭐⭐⭐⭐⭐</div>
-                            <div class="time">2024-06-17 10:21 | Phân loại hàng: M</div>
-                        </div>
-                    </div>
-                    <div class="review-content">
-                        <p><strong>Chất liệu:</strong> jean</p>
-                        <p><strong>Màu sắc:</strong> xanh than thẫm</p>
-                        <p><strong>Đúng với mô tả:</strong> chuẩn lắm luoonn</p>
-                        <p>Ê lần đầu tiên t đặt quần mà t thấy cái quần này đẹp nhất trong các số quần mà t đã từng đặt. Vừa khít eo luôn mà 💞</p>
-                    </div>
-                    <div class="media">
-                        <img src="{{ asset ('img/slide5.jpg') }}" alt="">
-                        <img src="{{ asset ('img/slide5.jpg') }}" alt="">
-                        <img src="{{ asset ('img/slide5.jpg') }}" alt="">
-                    </div>
-                    <div class="likes">👍 59</div>
-                </div>
-
-                <div class="review-container">
-                    <div class="user-info">
-                        <img src="{{ asset ('img/shiper_avt.jpg') }}" alt="avatar">
-                        <div>
-                            <strong>hnglam417</strong>
-                            <div class="stars">⭐⭐⭐⭐⭐</div>
-                            <div class="time">2024-06-17 10:21 | Phân loại hàng: M</div>
-                        </div>
-                    </div>
-                    <div class="review-content">
-                        <p><strong>Chất liệu:</strong> jean</p>
-                        <p><strong>Màu sắc:</strong> xanh than thẫm</p>
-                        <p><strong>Đúng với mô tả:</strong> chuẩn lắm luoonn</p>
-                        <p>Ê lần đầu tiên t đặt quần mà t thấy cái quần này đẹp nhất trong các số quần mà t đã từng đặt. Vừa khít eo luôn mà 💞</p>
-                    </div>
-                    <div class="media">
-                        <img src="{{ asset ('img/slide5.jpg') }}" alt="">
-                        <img src="{{ asset ('img/slide5.jpg') }}" alt="">
-                        <img src="{{ asset ('img/slide5.jpg') }}" alt="">
-                    </div>
-                    <div class="likes">👍 59</div>
-                </div>
-
-                <div class="review-container">
-                    <div class="user-info">
-                        <img src="{{ asset ('img/shiper_avt.jpg') }}" alt="avatar">
-                        <div>
-                            <strong>hnglam417</strong>
-                            <div class="stars">⭐⭐⭐⭐⭐</div>
-                            <div class="time">2024-06-17 10:21 | Phân loại hàng: M</div>
-                        </div>
-                    </div>
-                    <div class="review-content">
-                        <p><strong>Chất liệu:</strong> jean</p>
-                        <p><strong>Màu sắc:</strong> xanh than thẫm</p>
-                        <p><strong>Đúng với mô tả:</strong> chuẩn lắm luoonn</p>
-                        <p>Ê lần đầu tiên t đặt quần mà t thấy cái quần này đẹp nhất trong các số quần mà t đã từng đặt. Vừa khít eo luôn mà 💞</p>
-                    </div>
-                    <div class="media">
-                        <img src="{{ asset ('img/slide5.jpg') }}" alt="">
-                        <img src="{{ asset ('img/slide5.jpg') }}" alt="">
-                        <img src="{{ asset ('img/slide5.jpg') }}" alt="">
-                    </div>
-                    <div class="likes">👍 59</div>
-                </div>
-
-                <div class="review-container">
-                    <div class="user-info">
-                        <img src="{{ asset ('img/shiper_avt.jpg') }}" alt="avatar">
-                        <div>
-                            <strong>hnglam417</strong>
-                            <div class="stars">⭐⭐⭐⭐⭐</div>
-                            <div class="time">2024-06-17 10:21 | Phân loại hàng: M</div>
-                        </div>
-                    </div>
-                    <div class="review-content">
-                        <p><strong>Chất liệu:</strong> jean</p>
-                        <p><strong>Màu sắc:</strong> xanh than thẫm</p>
-                        <p><strong>Đúng với mô tả:</strong> chuẩn lắm luoonn</p>
-                        <p>Ê lần đầu tiên t đặt quần mà t thấy cái quần này đẹp nhất trong các số quần mà t đã từng đặt. Vừa khít eo luôn mà 💞</p>
-                    </div>
-                    <div class="media">
-                        <img src="{{ asset ('img/slide5.jpg') }}" alt="">
-                        <img src="{{ asset ('img/slide5.jpg') }}" alt="">
-                        <img src="{{ asset ('img/slide5.jpg') }}" alt="">
-                    </div>
-                    <div class="likes">👍 59</div>
-                </div>
-
-                <div class="review-container">
-                    <div class="user-info">
-                        <img src="{{ asset ('img/shiper_avt.jpg') }}" alt="avatar">
-                        <div>
-                            <strong>hnglam417</strong>
-                            <div class="stars">⭐⭐⭐⭐⭐</div>
-                            <div class="time">2024-06-17 10:21 | Phân loại hàng: M</div>
-                        </div>
-                    </div>
-                    <div class="review-content">
-                        <p><strong>Chất liệu:</strong> jean</p>
-                        <p><strong>Màu sắc:</strong> xanh than thẫm</p>
-                        <p><strong>Đúng với mô tả:</strong> chuẩn lắm luoonn</p>
-                        <p>Ê lần đầu tiên t đặt quần mà t thấy cái quần này đẹp nhất trong các số quần mà t đã từng đặt. Vừa khít eo luôn mà 💞</p>
-                    </div>
-                    <div class="media">
-                        <img src="{{ asset ('img/slide5.jpg') }}" alt="">
-                        <img src="{{ asset ('img/slide5.jpg') }}" alt="">
-                        <img src="{{ asset ('img/slide5.jpg') }}" alt="">
-                    </div>
-                    <div class="likes">👍 59</div>
-                </div>
-
-                <div class="review-container">
-                    <div class="user-info">
-                        <img src="{{ asset ('img/shiper_avt.jpg') }}" alt="avatar">
-                        <div>
-                            <strong>hnglam417</strong>
-                            <div class="stars">⭐⭐⭐⭐⭐</div>
-                            <div class="time">2024-06-17 10:21 | Phân loại hàng: M</div>
-                        </div>
-                    </div>
-                    <div class="review-content">
-                        <p><strong>Chất liệu:</strong> jean</p>
-                        <p><strong>Màu sắc:</strong> xanh than thẫm</p>
-                        <p><strong>Đúng với mô tả:</strong> chuẩn lắm luoonn</p>
-                        <p>Ê lần đầu tiên t đặt quần mà t thấy cái quần này đẹp nhất trong các số quần mà t đã từng đặt. Vừa khít eo luôn mà 💞</p>
-                    </div>
-                    <div class="media">
-                        <img src="{{ asset ('img/slide5.jpg') }}" alt="">
-                        <img src="{{ asset ('img/slide5.jpg') }}" alt="">
-                        <img src="{{ asset ('img/slide5.jpg') }}" alt="">
-                    </div>
-                    <div class="likes">👍 59</div>
-                </div>
-
-                <div class="review-container">
-                    <div class="user-info">
-                        <img src="{{ asset ('img/shiper_avt.jpg') }}" alt="avatar">
-                        <div>
-                            <strong>hnglam417</strong>
-                            <div class="stars">⭐⭐⭐⭐⭐</div>
-                            <div class="time">2024-06-17 10:21 | Phân loại hàng: M</div>
-                        </div>
-                    </div>
-                    <div class="review-content">
-                        <p><strong>Chất liệu:</strong> jean</p>
-                        <p><strong>Màu sắc:</strong> xanh than thẫm</p>
-                        <p><strong>Đúng với mô tả:</strong> chuẩn lắm luoonn</p>
-                        <p>Ê lần đầu tiên t đặt quần mà t thấy cái quần này đẹp nhất trong các số quần mà t đã từng đặt. Vừa khít eo luôn mà 💞</p>
-                    </div>
-                    <div class="media">
-                        <img src="{{ asset ('img/slide5.jpg') }}" alt="">
-                        <img src="{{ asset ('img/slide5.jpg') }}" alt="">
-                        <img src="{{ asset ('img/slide5.jpg') }}" alt="">
-                    </div>
-                    <div class="likes">👍 59</div>
-                </div>
+                @empty
+                    <p>Chưa có đánh giá nào.</p>
+                @endforelse
             </div>
+
             <!-- Phân trang -->
             <div class="pagination" style="margin-top: 20px;">
                 <button class="page-btn" data-page="1">1</button>
@@ -516,6 +350,10 @@
         </div>   
     </section>
     <script src="{{ url('js/detail_product.js') }}"></script>
+    <script>
+        const allProducts = @json($allProducts);
+    </script>
+    
 <!-------------- Footer của trang detail ---------------->
     @include('layout.footer')    
 </body>

@@ -49,14 +49,14 @@
                             @if (!$user->is_approved)
                                 <form action="{{ route('admin.accounts.approve', $user->user_id) }}" method="POST" style="display:inline;">
                                     @csrf
-                                    <button type="submit">✔️ Duyệt</button>
+                                    <button class="btn" type="submit">✔️ Duyệt</button>
                                 </form>
                             @endif
 
                             {{-- Khóa / Mở khóa --}}
                             <form action="{{ route('admin.accounts.toggle', $user->user_id) }}" method="POST" style="display:inline;">
                                 @csrf
-                                <button type="submit">
+                                <button class="btn" type="submit">
                                     {{ $user->is_active ? '🔒 Khóa' : '🔓 Mở khóa' }}
                                 </button>
                             </form>
@@ -65,7 +65,7 @@
                             <form action="{{ route('admin.accounts.delete', $user->user_id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn xóa tài khoản này?')">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit">🗑️ Xóa</button>
+                                <button class="btn"  type="submit">🗑️ Xóa</button>
                             </form>
                         </td>
                     </tr>
@@ -73,10 +73,6 @@
             </tbody>
         </table>
     @endforeach
-
-
-    <a href="{{ route('admin.dashboard') }}">← Quay lại trang Admin</a>
-
     @include('layout.footer')
 </body>
 </html>

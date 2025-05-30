@@ -4,11 +4,11 @@ body {
 }
 h2 {
     color: #333;
-    margin: 30px 0;
+    margin: 30px 42px;
 }
 .btn {
     display: inline-block;
-    margin-bottom: 20px;
+    margin: 0  0 20px 42px;
     padding: 8px 16px;
     background-color: #4CAF50;
     color: white;
@@ -16,9 +16,9 @@ h2 {
     border-radius: 5px;
     transition: background-color 0.3s ease;
 }
-.btn:hover {
+/* .btn:hover {
     background-color: #45a049;
-}
+} */
 
 
 .btn-danger {

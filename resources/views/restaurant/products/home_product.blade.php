@@ -45,7 +45,7 @@
                     </span>
                 </td>
                 <td>
-                    <a href="{{ route('restaurant.products.edit', $item->id) }}" class="btn btn-success">Sửa</a> |
+                    <a href="{{ route('restaurant.products.edit', $item->id) }}" class="btn btn-success">Sửa</a> 
                     <form action="{{ route('restaurant.products.destroy', $item->id) }}" method="POST" style="display:inline;">
                         @csrf
                         @method('DELETE')
@@ -60,49 +60,87 @@
     <a class="btn" href="{{ route('restaurant.products.create') }}?type=beverage">+ Thêm đồ uống</a>
 
     <table border="1" cellpadding="10" cellspacing="0">
-        <tr>
-            <th>ID</th>
-            <th>Hình</th>
-            <th>Tên</th>
-            <th>Danh mục</th>
-            <th>Tổng Số lượng</th>
-            <th>Giá</th>
-            <th>Trạng thái</th>
-            <th>Hành động</th>
-        </tr>
-            @foreach($beverages as $beverage)
+        <thead>
             <tr>
-                <td>{{ $beverage->id }}</td>
-                <td><img src="{{ asset('storage/' . $beverage->image) }}" width="60"></td>
-                <td>{{ $beverage->name }}</td>
-                <td>{{ $beverage->category?->name ?? 'Không có' }}</td>
-                <td>{{ $beverage->beverageSizes->sum('quantity') }}</td>
-                <td>
-                    @foreach ($beverage->beverageSizes as $size)
-                        <div>
-                            <strong>{{ strtoupper($size->size) }}</strong>: 
-                            {{ number_format($size->old_price * (1 - $size->discount_percent / 100)) }}đ 
-                            (SL: {{ $size->quantity }})
-                        </div>
-                    @endforeach
-                </td>
-                <td>
-                    <span class="{{ $beverage->status === 'approved' ? 'status-approved' : ($beverage->status === 'pending' ? 'status-pending' : 'status-rejected') }}">
-                        {{ $beverage->status === 'approved' ? 'Đã duyệt' : ($beverage->status === 'pending' ? 'Chờ duyệt' : 'Bị từ chối') }}
-                    </span>
-                </td>
-                <td>
-                    <a class="btn btn-success" href="{{ route('restaurant.products.edit', $beverage->id) }}">Sửa</a> |
-                    <form action="{{ route('restaurant.products.destroy', $beverage->id) }}" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button class="btn btn-danger" onclick="return confirm('Xóa?')">Xóa</button>
-                    </form>
-                </td>
+                <th>ID</th>
+                <th>Hình</th>
+                <th>Tên</th>
+                <th>Danh mục</th>
+                <th>Size</th>
+                <th>Giá sau giảm</th>
+                <th>Số lượng</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
             </tr>
-        @endforeach
-
+        </thead>
+        <tbody>
+            @foreach($beverages as $beverage)
+                @php $rowspan = count($beverage->beverageSizes) ?: 1; @endphp
+    
+                @foreach($beverage->beverageSizes as $index => $size)
+                    <tr>
+                        @if($index === 0)
+                            <td rowspan="{{ $rowspan }}">{{ $beverage->id }}</td>
+                            <td rowspan="{{ $rowspan }}"><img src="{{ asset('storage/' . $beverage->image) }}" width="60"></td>
+                            <td rowspan="{{ $rowspan }}">{{ $beverage->name }}</td>
+                            <td rowspan="{{ $rowspan }}">{{ $beverage->category?->name ?? 'Không có' }}</td>
+                        @endif
+    
+                        <td><strong>{{ strtoupper($size->size) }}</strong></td>
+                        <td>{{ number_format($size->old_price * (1 - $size->discount_percent / 100)) }}đ</td>
+                        <td>{{ $size->quantity }}</td>
+    
+                        @if($index === 0)
+                            <td rowspan="{{ $rowspan }}">
+                                <span class="{{ 
+                                    $beverage->status === 'approved' ? 'status-approved' :
+                                    ($beverage->status === 'pending' ? 'status-pending' : 'status-rejected') 
+                                }}">
+                                    {{ 
+                                        $beverage->status === 'approved' ? 'Đã duyệt' :
+                                        ($beverage->status === 'pending' ? 'Chờ duyệt' : 'Bị từ chối') 
+                                    }}
+                                </span>
+                            </td>
+                            <td rowspan="{{ $rowspan }}">
+                                <a class="btn btn-success" href="{{ route('restaurant.products.edit', $beverage->id) }}">Sửa</a> 
+                                <form action="{{ route('restaurant.products.destroy', $beverage->id) }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-danger" onclick="return confirm('Xóa?')">Xóa</button>
+                                </form>
+                            </td>
+                        @endif
+                    </tr>
+                @endforeach
+    
+                {{-- Nếu không có size nào --}}
+                @if($beverage->beverageSizes->isEmpty())
+                    <tr>
+                        <td>{{ $beverage->id }}</td>
+                        <td><img src="{{ asset('storage/' . $beverage->image) }}" width="60"></td>
+                        <td>{{ $beverage->name }}</td>
+                        <td>{{ $beverage->category?->name ?? 'Không có' }}</td>
+                        <td colspan="3" style="text-align: center;">Chưa có size</td>
+                        <td>
+                            <span class="{{ $beverage->status === 'approved' ? 'status-approved' : ($beverage->status === 'pending' ? 'status-pending' : 'status-rejected') }}">
+                                {{ $beverage->status === 'approved' ? 'Đã duyệt' : ($beverage->status === 'pending' ? 'Chờ duyệt' : 'Bị từ chối') }}
+                            </span>
+                        </td>
+                        <td>
+                            <a class="btn btn-success" href="{{ route('restaurant.products.edit', $beverage->id) }}">Sửa</a> 
+                            <form action="{{ route('restaurant.products.destroy', $beverage->id) }}" method="POST" style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn btn-danger" onclick="return confirm('Xóa?')">Xóa</button>
+                            </form>
+                        </td>
+                    </tr>
+                @endif
+            @endforeach
+        </tbody>
     </table>
+    
 
     @include('layout.footer')
 </body>

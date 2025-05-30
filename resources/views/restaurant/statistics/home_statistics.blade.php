@@ -9,6 +9,23 @@
 <body>
     @include('layout.header')
 
+    <div class="stat-buttons">
+        <form method="GET" action="{{ route('restaurant.statistics.home') }}" style="display: inline;">
+            <input type="hidden" name="type" value="revenue">
+            <button type="submit" class="{{ request('type', 'revenue') === 'revenue' ? 'active' : '' }}">Doanh thu & Đơn hàng</button>
+        </form>
+    
+        <form method="GET" action="{{ route('restaurant.statistics.home') }}" style="display: inline;">
+            <input type="hidden" name="type" value="inventory">
+            <button type="submit" class="{{ request('type') === 'inventory' ? 'active' : '' }}">Kho hàng</button>
+        </form>
+    
+        <form method="GET" action="{{ route('restaurant.statistics.home') }}" style="display: inline;">
+            <input type="hidden" name="type" value="product_sales">
+            <button type="submit" class="{{ request('type') === 'product_sales' ? 'active' : '' }}">Sản phẩm bán ra</button>
+        </form>
+    </div>
+
     <div class="container">
         <h1>📊 Thống kê Doanh thu & Đơn hàng của Nhà hàng</h1>
 
@@ -18,6 +35,7 @@
         </div>
 
         <div class="filter">
+            <h2>Thống kê doanh thu trong năm</h2>
             <form method="GET" action="{{ route('restaurant.statistics.home') }}">
                 <label for="year"><strong>Chọn năm:</strong></label>
                 <select name="year" id="year" onchange="this.form.submit()">
@@ -60,8 +78,6 @@
             <canvas id="orderChart"></canvas>
         </div>
     </div>
-
-    <a href="{{ route('restaurant') }}">← Quay lại trang Nhà hàng</a>
 
     @include('layout.footer')
 

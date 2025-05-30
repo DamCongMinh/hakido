@@ -23,75 +23,150 @@ class RestaurantStatisticsController extends Controller
         $restaurantId = $restaurant->id;
         $year = $request->input('year', now()->year);
         $today = now()->toDateString();
+        $type = $request->input('type', 'revenue');
 
-        // Lấy thống kê doanh thu theo tháng
-        $rawStats = DB::table('orders')
-            ->selectRaw('MONTH(created_at) as month, SUM(total) as revenue, COUNT(*) as orders')
-            ->whereYear('created_at', $year)
-            ->where('restaurant_id', $restaurantId)
-            ->where('status', 'completed')
-            ->groupBy(DB::raw('MONTH(created_at)'))
-            ->get()
-            ->keyBy('month');
+        switch ($type) {
+            case 'inventory':
+                // Lấy món ăn
+                $foodInventory = DB::table('foods')
+                    ->where('restaurant_id', $restaurantId)
+                    ->select('name as product_name', DB::raw("'Món ăn' as type"), 'quantity')
+                    ->get();
+            
+                // Lấy đồ uống kèm tổng quantity từ beverage_sizes
+                $beverageInventory = DB::table('beverages')
+                    ->join('beverage_sizes', 'beverages.id', '=', 'beverage_sizes.beverage_id')
+                    ->where('beverages.restaurant_id', $restaurantId)
+                    ->select(
+                        'name as product_name',
+                        DB::raw("'Đồ uống' as type"),
+                        DB::raw('SUM(beverage_sizes.quantity) as quantity')
+                    )
+                    ->groupBy('beverages.id', 'beverages.name')
+                    ->get();
+            
+                // Gộp lại
+                $inventoryData = $foodInventory->merge($beverageInventory);
+            
+                return view('restaurant.statistics.inventory', compact('inventoryData'));
+            
 
-        // Đảm bảo đủ 12 tháng
-        $monthlyStats = collect(range(1, 12))->map(function ($month) use ($rawStats) {
-            return (object) [
-                'month' => $month,
-                'revenue' => $rawStats[$month]->revenue ?? 0,
-                'orders' => $rawStats[$month]->orders ?? 0,
-            ];
-        });
+            case 'product_sales':
+                // Số lượng bán theo sản phẩm (món ăn)
+                $foodSales = DB::table('order_items')
+                    ->join('foods', 'order_items.product_id', '=', 'foods.id')
+                    ->where('order_items.product_type', 'food')
+                    ->where('foods.restaurant_id', $restaurantId)
+                    ->select('foods.name as product_name', DB::raw('SUM(order_items.quantity) as total_sold'))
+                    ->groupBy('foods.name')
+                    ->get();
 
-        // Tổng doanh thu trong năm
-        $totalRevenue = DB::table('orders')
-            ->whereYear('created_at', $year)
-            ->where('restaurant_id', $restaurantId)
-            ->where('status', 'completed')
-            ->sum('total');
+                // Số lượng bán theo đồ uống
+                $beverageSales = DB::table('order_items')
+                    ->join('beverages', 'order_items.product_id', '=', 'beverages.id')
+                    ->where('order_items.product_type', 'beverage')
+                    ->where('beverages.restaurant_id', $restaurantId)
+                    ->select('beverages.name as product_name', DB::raw('SUM(order_items.quantity) as total_sold'))
+                    ->groupBy('beverages.name')
+                    ->get();
 
-        // Tổng số đơn trong năm
-        $totalOrders = DB::table('orders')
-            ->whereYear('created_at', $year)
-            ->where('restaurant_id', $restaurantId)
-            ->count();
+                // Gộp tất cả sản phẩm đã bán
+                $productSales = $foodSales->merge($beverageSales);
 
-        // Các thống kê trong ngày
-        $todayOrders = DB::table('orders')
-            ->whereDate('created_at', $today)
-            ->where('restaurant_id', $restaurantId)
-            ->count();
+                // Top sản phẩm bán chạy
+                $topFoods = DB::table('order_items')
+                    ->join('foods', 'order_items.product_id', '=', 'foods.id')
+                    ->where('order_items.product_type', 'food')
+                    ->where('foods.restaurant_id', $restaurantId)
+                    ->select('foods.name as product_name', DB::raw("'Món ăn' as type"), DB::raw('SUM(order_items.quantity) as total_sold'))
+                    ->groupBy('foods.name')
+                    ->orderByDesc('total_sold')
+                    ->limit(10)
+                    ->get();
 
-        $processingOrders = DB::table('orders')
-            ->whereDate('created_at', $today)
-            ->where('restaurant_id', $restaurantId)
-            ->where('status', 'processing')
-            ->count();
+                $topBeverages = DB::table('order_items')
+                    ->join('beverages', 'order_items.product_id', '=', 'beverages.id')
+                    ->where('order_items.product_type', 'beverage')
+                    ->where('beverages.restaurant_id', $restaurantId)
+                    ->select('beverages.name as product_name', DB::raw("'Đồ uống' as type"), DB::raw('SUM(order_items.quantity) as total_sold'))
+                    ->groupBy('beverages.name')
+                    ->orderByDesc('total_sold')
+                    ->limit(10)
+                    ->get();
 
-        $shippingOrders = DB::table('orders')
-            ->whereDate('created_at', $today)
-            ->where('restaurant_id', $restaurantId)
-            ->where('status', 'delivering')
-            ->count();
+                $topSellingItems = $topFoods->merge($topBeverages)->sortByDesc('total_sold');
 
-        $canceledOrders = DB::table('orders')
-            ->whereDate('created_at', $today)
-            ->where('restaurant_id', $restaurantId)
-            ->where('status', 'canceled')
-            ->count();
+                return view('restaurant.statistics.product_sales', compact('productSales', 'topSellingItems'));
 
-        $completedTodayOrders = DB::table('orders')
-            ->whereDate('created_at', $today)
-            ->where('restaurant_id', $restaurantId)
-            ->where('status', 'completed')
-            ->count();
+            case 'revenue':
+            default:
+                // Lấy thống kê doanh thu theo tháng
+                $rawStats = DB::table('orders')
+                    ->selectRaw('MONTH(created_at) as month, SUM(total) as revenue, COUNT(*) as orders')
+                    ->whereYear('created_at', $year)
+                    ->where('restaurant_id', $restaurantId)
+                    ->where('status', 'completed')
+                    ->groupBy(DB::raw('MONTH(created_at)'))
+                    ->get()
+                    ->keyBy('month');
 
-        return view('restaurant.statistics.home_statistics', compact(
-            'year', 'monthlyStats', 'totalRevenue', 'totalOrders',
-            'todayOrders', 'processingOrders', 'shippingOrders',
-            'canceledOrders', 'completedTodayOrders'
-        ));
+                $monthlyStats = collect(range(1, 12))->map(function ($month) use ($rawStats) {
+                    return (object) [
+                        'month' => $month,
+                        'revenue' => $rawStats[$month]->revenue ?? 0,
+                        'orders' => $rawStats[$month]->orders ?? 0,
+                    ];
+                });
+
+                $totalRevenue = DB::table('orders')
+                    ->whereYear('created_at', $year)
+                    ->where('restaurant_id', $restaurantId)
+                    ->where('status', 'completed')
+                    ->sum('total');
+
+                $totalOrders = DB::table('orders')
+                    ->whereYear('created_at', $year)
+                    ->where('restaurant_id', $restaurantId)
+                    ->count();
+
+                // Thống kê trong ngày
+                $todayOrders = DB::table('orders')
+                    ->whereDate('created_at', $today)
+                    ->where('restaurant_id', $restaurantId)
+                    ->count();
+
+                $processingOrders = DB::table('orders')
+                    ->whereDate('created_at', $today)
+                    ->where('restaurant_id', $restaurantId)
+                    ->where('status', 'processing')
+                    ->count();
+
+                $shippingOrders = DB::table('orders')
+                    ->whereDate('created_at', $today)
+                    ->where('restaurant_id', $restaurantId)
+                    ->where('status', 'delivering')
+                    ->count();
+
+                $canceledOrders = DB::table('orders')
+                    ->whereDate('created_at', $today)
+                    ->where('restaurant_id', $restaurantId)
+                    ->where('status', 'canceled')
+                    ->count();
+
+                $completedTodayOrders = DB::table('orders')
+                    ->whereDate('created_at', $today)
+                    ->where('restaurant_id', $restaurantId)
+                    ->where('status', 'completed')
+                    ->count();
+
+                return view('restaurant.statistics.home_statistics', compact(
+                    'year', 'monthlyStats', 'totalRevenue', 'totalOrders',
+                    'todayOrders', 'processingOrders', 'shippingOrders',
+                    'canceledOrders', 'completedTodayOrders'
+                ));
+        }
     }
+
 
 
 

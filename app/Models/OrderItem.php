@@ -9,6 +9,7 @@ class OrderItem extends Model
     protected $fillable = [
         'order_id',
         'product_type',
+        'order_img',
         'product_id',
         'product_name',
         'size_id',
@@ -36,6 +37,7 @@ class OrderItem extends Model
         }
         return null;
     }
+
 
     // Nếu cần quan hệ với size (nếu size là một bảng riêng, ví dụ beverage_sizes)
     public function sizeRelation()

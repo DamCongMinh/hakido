@@ -11,7 +11,7 @@ h1, h2 {
 
 .filter-form {
     text-align: center;
-    margin: 20px 0;
+    margin: 20px 0 20px 46px;
     background: #fff;
     padding: 20px;
     display: inline-block;
@@ -39,9 +39,9 @@ h1, h2 {
 }
 
 table {
-    width: 100%;
+    width: 90%;
+    margin: 20px auto;
     border-collapse: collapse;
-    margin: 20px 0;
     background: #fff;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }

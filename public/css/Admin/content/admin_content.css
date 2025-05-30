@@ -1,4 +1,4 @@
-/* Reset & font */
+
 body {
     margin: 0;
     padding: 0;
@@ -83,7 +83,7 @@ img {
 }
 
 /* Action buttons */
-button {
+.btn {
     padding: 8px 14px;
     border: none;
     border-radius: 6px;
@@ -93,54 +93,29 @@ button {
     transition: background-color 0.3s ease;
 }
 
-button[type="button"] {
+.btn-edit {
+    text-decoration: none;
     background-color: #ffc107;
     color: #fff;
     width: 100%;
+    border: none;
 }
 
-button[type="button"]:hover {
+.btn-edit:hover {
     background-color: #e0a800;
 }
 
-button[type="submit"] {
+.btn-danger {
     background-color: #dc3545;
     color: white;
     width: 100%;
     margin-top: 12px;
 }
 
-button[type="submit"]:hover {
+.btn-danger:hover {
     background-color: #c82333;
 }
 
-.btn-edit {
-    background-color: #17a2b8;
-    color: #fff;
-    padding: 10px 16px;
-    border-radius: 5px;
-    text-decoration: none;
-    margin-right: 5px;
-}
-
-.btn-edit:hover {
-    background-color: #138496;
-}
-
-.btn-delete {
-    background-color: #dc3545;
-    color: white;
-    padding: 10px 16px;
-    border-radius: 5px;
-    border: none;
-    margin: 0 !important;
-}
-
-.btn-delete:hover {
-    background-color: #c82333;
-}
-
-/* Success alert */
 .alert-success {
     background-color: #d4edda;
     color: #155724;
@@ -150,7 +125,7 @@ button[type="submit"]:hover {
     margin: 20px;
 }
 
-/* Back link */
+
 .back {
     display: inline-block;
     margin-top: 20px;

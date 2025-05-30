@@ -23,6 +23,7 @@ class ProductController extends Controller
             'foodsApproved', 'foodsPending',
             'beveragesApproved', 'beveragesPending'
         ));
+        
     }
 
     public function uploadImage(Request $request, $id)
@@ -43,6 +44,9 @@ class ProductController extends Controller
 
         return response()->json(['success' => false], 400);
     }
+
+    // ProductController.php
+
 
 
 }

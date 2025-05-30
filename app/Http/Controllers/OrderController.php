@@ -8,6 +8,7 @@ use App\Models\OrderItem;
 use App\Models\Food;
 use App\Models\Beverage;
 use App\Models\BeverageSize;
+use App\Models\Customer;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -55,7 +56,8 @@ class OrderController extends Controller
 
                 // Tạo đơn hàng
                 $order = Order::create([
-                    'customer_id' => $customer->id,
+                    // 'customer_id' => $customer->id,
+                    'customer_id' => $user->id,
                     'restaurant_id' => $restaurantId,
                     'receiver_name' => $request->receiver_name,
                     'receiver_phone' => $request->receiver_phone,
@@ -74,6 +76,7 @@ class OrderController extends Controller
 
                     OrderItem::create([
                         'order_id' => $order->id,
+                        'order_img' => $item['image'],
                         'product_id' => $item['product_id'],
                         'product_type' => $item['product_type'],
                         'product_name' => $item['name'],
@@ -120,6 +123,7 @@ class OrderController extends Controller
             return view('web.order_success', ['orders' => $createdOrders]);
         } catch (\Exception $e) {
             DB::rollBack();
+            dd($e->getMessage());
             return back()->with('error', 'Đã xảy ra lỗi khi xử lý đơn hàng: ' . $e->getMessage());
         }
     }
@@ -137,22 +141,99 @@ class OrderController extends Controller
         return view('web.order_success', ['orders' => $orders]);
     }
 
-    public function orderedItems()
-    {
-        $customer = auth()->user()->customer;
+    // public function orderedItems(Request $request)
+    // {
+    //     $user = auth()->user();
+    //     $userId = $user->id;
+    //     $customerId = $user->customer->id ?? null;
+    //     $statusFilter = $request->input('status');
 
-        if (!$customer) {
-            return redirect()->route('home')->with('error', 'Không tìm thấy khách hàng.');
+    //     $ordersQuery = \App\Models\Order::with(['orderItems', 'restaurantProfile'])
+    //         ->where(function ($query) use ($userId, $customerId) {
+    //             $query->where('customer_id', $userId);
+    //             if ($customerId) {
+    //                 $query->orWhere('customer_id', $customerId);
+    //             }
+    //         });
+
+    //     if ($statusFilter) {
+    //         $ordersQuery->where('status', $statusFilter);
+    //     }
+
+    //     $orders = $ordersQuery->latest()->get();
+
+    //     // Preload products
+    //     $foodIds = [];
+    //     $beverageIds = [];
+
+    //     foreach ($orders as $order) {
+    //         foreach ($order->orderItems as $item) {
+    //             if ($item->product_type === 'food') {
+    //                 $foodIds[] = $item->product_id;
+    //             } elseif ($item->product_type === 'beverage') {
+    //                 $beverageIds[] = $item->product_id;
+    //             }
+    //         }
+    //     }
+
+    //     $foods = \App\Models\Food::whereIn('id', $foodIds)->get()->keyBy('id');
+    //     $beverages = \App\Models\Beverage::whereIn('id', $beverageIds)->get()->keyBy('id');
+
+    //     return view('web.ordered_items', compact('orders', 'foods', 'beverages', 'statusFilter'));
+    // }
+
+    public function orderedItems(Request $request)
+    {
+        $user = auth()->user();
+        $userId = $user->id;
+        $customerId = $user->customer->id ?? null;
+        $statusFilter = $request->input('status');
+        $fromDate = $request->input('from_date');
+        $toDate = $request->input('to_date');
+
+        $ordersQuery = \App\Models\Order::with(['orderItems', 'restaurantProfile'])
+            ->where(function ($query) use ($userId, $customerId) {
+                $query->where('customer_id', $userId);
+                if ($customerId) {
+                    $query->orWhere('customer_id', $customerId);
+                }
+            });
+
+        if ($statusFilter) {
+            $ordersQuery->where('status', $statusFilter);
         }
 
-        // Lấy danh sách đơn hàng kèm items và nhà hàng
-        $orders = \App\Models\Order::with(['orderItems', 'restaurantProfile'])
-            ->where('customer_id', $customer->id)
-            ->latest()
-            ->get();
+        if ($fromDate) {
+            $ordersQuery->whereDate('created_at', '>=', $fromDate);
+        }
 
-        return view('web.ordered_items', compact('orders'));
+        if ($toDate) {
+            $ordersQuery->whereDate('created_at', '<=', $toDate);
+        }
+
+        $orders = $ordersQuery->latest()->get();
+
+        $foodIds = [];
+        $beverageIds = [];
+
+        foreach ($orders as $order) {
+            foreach ($order->orderItems as $item) {
+                if ($item->product_type === 'food') {
+                    $foodIds[] = $item->product_id;
+                } elseif ($item->product_type === 'beverage') {
+                    $beverageIds[] = $item->product_id;
+                }
+            }
+        }
+
+        $foods = \App\Models\Food::whereIn('id', $foodIds)->get()->keyBy('id');
+        $beverages = \App\Models\Beverage::whereIn('id', $beverageIds)->get()->keyBy('id');
+
+        return view('web.ordered_items', compact('orders', 'foods', 'beverages', 'statusFilter', 'fromDate', 'toDate'));
     }
+
+
+
 
 
     public function cancel(Order $order)
@@ -175,7 +256,4 @@ class OrderController extends Controller
 
         return back()->with('success', 'Đơn hàng đã được hủy thành công.');
     }
-
-
-
 }

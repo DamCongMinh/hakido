@@ -15,6 +15,9 @@
     @include('layout.header')
 
     <section id="body">
+        <div class="slide_list-product">
+            <img src="{{ asset('img/slide_list-product.png') }}" alt="">
+        </div>
         <div class="container">
             <div class="products">
                 <!-- Nút mở bộ lọc -->

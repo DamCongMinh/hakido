@@ -2,6 +2,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const mainImage = document.querySelector(".product-show img");
     const thumbnails = document.querySelectorAll(".list-img img");
 
+    
+
     thumbnails.forEach((thumbnail) => {
         thumbnail.addEventListener("click", function () {
             mainImage.src = this.src;
@@ -68,6 +70,7 @@ document.addEventListener("DOMContentLoaded", function () {
             updateTotalPayouts();
         });
     });
+    
     
 
     const decreaseButton = document.querySelector('.decrease');
@@ -169,4 +172,101 @@ document.addEventListener("DOMContentLoaded", function () {
             icon.classList.add('fa-chevron-down');
         }
     });
+
+    
 });
+
+
+document.querySelectorAll('.rating-filters button').forEach(button => {
+    button.addEventListener('click', () => {
+        const filter = button.getAttribute('data-filter');
+
+        // Highlight nút đang chọn
+        document.querySelectorAll('.rating-filters button').forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+
+        // Lọc review
+        document.querySelectorAll('.review-container').forEach(review => {
+            const rating = review.getAttribute('data-rating');
+            const hasMedia = review.getAttribute('data-has-media') === '1';
+            const hasComment = review.getAttribute('data-has-comment') === '1';
+
+            let show = true;
+            switch (filter) {
+                case 'all':
+                    show = true; break;
+                case 'with_media':
+                    show = hasMedia; break;
+                case 'with_comment':
+                    show = hasComment; break;
+                default:
+                    show = rating === filter; break;
+            }
+            review.style.display = show ? 'block' : 'none';
+        });
+    });
+});
+
+document.querySelectorAll('.product-thumbnail').forEach(img => {
+    img.addEventListener('click', function () {
+        const productId = this.dataset.id;
+        const productType = this.dataset.type;
+        const product = allProducts.find(p => p.id == productId && p.type == productType);
+        if (!product) return;
+
+        // Cập nhật ảnh
+        document.querySelector('.product-show img').src = product.image;
+
+        // Cập nhật tên và mô tả
+        document.querySelector('.detail-product h2').textContent = product.name;
+        document.querySelector('.description').textContent = product.description;
+
+        // Cập nhật giá
+        document.getElementById('old-price').textContent = product.old_price.toLocaleString() + '₫';
+        document.getElementById('discount').textContent = product.discount_percent + '%';
+        document.getElementById('new-price').textContent = product.price.toLocaleString() + '₫';
+
+        // Cập nhật số lượng
+        document.getElementById('quantity').value = 1;
+        document.getElementById('quantity').max = product.quantity ?? 1;
+
+        // Cập nhật loại
+        document.querySelector('input[name="type"]').value = productType;
+        document.querySelector('input[name="product_id"]').value = productId;
+
+        // Nếu là đồ uống thì hiển thị size
+        const sizeList = document.querySelector('.size-item');
+        if (productType === 'beverage') {
+            sizeList.innerHTML = '';
+            product.sizes.forEach(size => {
+                const btn = document.createElement('input');
+                btn.type = 'button';
+                btn.className = 'size-btn';
+                btn.value = size.size;
+                btn.dataset.price = size.price;
+                btn.dataset.old = size.old_price;
+                btn.dataset.discount = size.discount_percent;
+                btn.dataset.quantity = size.quantity;
+                sizeList.appendChild(btn);
+            });
+        } else {
+            sizeList.innerHTML = ''; // Ẩn size nếu là food
+        }
+
+        // Cập nhật tổng tiền ban đầu
+        document.getElementById('total-amount').textContent = product.price.toLocaleString() + '₫';
+    });
+});
+
+document.getElementById('quantity').addEventListener('input', function () {
+    const quantity = parseInt(this.value);
+    const price = parseFloat(document.getElementById('new-price').textContent.replace(/[₫,]/g, '')) || 0;
+    document.getElementById('total-amount').textContent = (price * quantity).toLocaleString() + '₫';
+});
+
+
+
+
+
+
+

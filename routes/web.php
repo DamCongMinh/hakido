@@ -25,6 +25,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\VnpayController;
+use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\Restaurant\RestaurantProductController;
@@ -32,7 +33,6 @@ use App\Http\Controllers\Restaurant\RestaurantStatisticsController;
 // Giao diện chính (FE)
 
 //test
-Route::get('/test', fn () => view('web.test'))->name('test');
 
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -123,19 +123,19 @@ Route::middleware(['auth', 'role:customer'])->group(function () {
     Route::get('/ordered-items', [OrderController::class, 'orderedItems'])->name('orders.items');
     Route::patch('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 
-    // Thanh toán 
-    // Route::get('/payment/bank/{order}', [PaymentController::class, 'bank'])->name('payment.bank');
-    // Route::get('/payment/vnpay/{order}', [PaymentController::class, 'vnpay'])->name('payment.vnpay');
+    // show view và lấy order_id
+    Route::get('/review/{orderId}', [ReviewController::class, 'showOrderReviewForm'])
+    ->name('reviews.reviews');
 
-    
+    // gửi thông tin đánh giá
+    Route::post('/review/food', [ReviewController::class, 'FoodReview'])
+    ->name('reviews.FoodReview');
+    Route::post('/review/beverage', [ReviewController::class, 'BeverageReview'])
+    ->name('reviews.BeverageReview');
+    Route::post('/reviews/shipping', [ReviewController::class, 'ShippingReview'])->name('reviews.ShippingReview');
+        
 });
-    // VNPAY thực tế
-    // Route::get('/vnpay/form', fn() => view('vnpay.payment'));
-    // // Route::post('/vnpay/payment', [VnpayController::class, 'createPayment'])->name('vnpay.payment');
-    // Route::post('/vnpay/payment', [VnpayController::class, 'vnpay_payment'])->name('vnpay.payment');
-    // // Route::get('/vnpay/return', [VnpayController::class, 'handleReturn'])->name('vnpay.return');
-    // Route::get('/vnpay/return', [VnpayController::class, 'vnpayReturn'])->name('vnpay.return');
-    
+
     Route::post('/vnpay/payment', [VnpayController::class, 'PaymentVnpay'])->name('vnpay.payment');
     Route::get('/vnpay/return', [VnpayController::class, 'vnpayReturn']);
     Route::match(['GET', 'POST'], '/vnpay/ipn', [VnpayController::class, 'vnpay_ipn']);
@@ -192,6 +192,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::post('/approve/{id}', [FoodController::class, 'approve'])->name('approve');
         Route::delete('/destroy/{id}', [FoodController::class, 'destroy'])->name('destroy');
         Route::post('/reject/{id}', [FoodController::class, 'reject'])->name('reject');
+        
     });
 
     // Quản lý Đồ Uống

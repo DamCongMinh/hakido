@@ -31,25 +31,7 @@
                             </div>
                         @endif
                     @endforeach
-                </div>
-                
-
-                {{-- <div class="header_center--classify">
-                    <div class="classify-title">
-                        <ul>
-                            <li>đồ chay</li>
-                            <li>đồ mặn</li>
-                            <li>đồ khô</li>
-                            <li>đồ ướt</li>
-                        </ul>
-                    </div>
-                    <div class="classify-img">
-                        <div><img src="{{ asset('img/home_img2.jpg') }}" alt=""></div>
-                        <div><img src="{{ asset('img/home_img2.jpg') }}" alt=""></div>
-                        <div><img src="{{ asset('img/home_img2.jpg') }}" alt=""></div>
-                        <div><img src="{{ asset('img/home_img2.jpg') }}" alt=""></div>
-                    </div>
-                </div> --}}
+                </div>                
                 
             </div>
             <div class="header_right">
@@ -66,14 +48,15 @@
                 </form>
                 
                 
-                
-                <div class="header_right--email">
-                    <i class="fa-solid fa-envelope"></i>
-                </div>
-
                 <div class="header_right--cart">
                     <a href="{{ route('cart.show') }}"><i class="fa-solid fa-cart-shopping"></i></a>
                 </div>
+                
+                <div class="header_right--email">
+                    <i class="fa-solid fa-bell"></i>
+                </div>
+
+                
                 <div class="header_right--account">
                     <div class="account-icon"><i class="fa-solid fa-user"></i></div>
                     <div class="account-nav">
@@ -106,7 +89,7 @@
                                         <li><a href="{{ route('admin.orders.index') }}"><i class="fa-solid fa-clipboard-list"></i> Quản lý đơn hàng</a></li>
                                         <li><a href="{{ route('control_product') }}"><i class="fa-solid fa-box-open"></i> Quản lý sản phẩm</a></li>
                                         <li><a href="{{ route('admin.content') }}"><i class="fa-solid fa-images"></i> Quản lý nội dung</a></li>
-                                        <li><a href="{{ route('admin.statistics') }}"><i class="fa-solid fa-chart-line"></i> Thống kê doanh thu & đơn hàng</a></li>
+                                        <li><a href="{{ route('admin.statistics') }}"><i class="fa-solid fa-chart-line"></i> Báo cáo thống kê doanh thu & đơn hàng</a></li>
                                     @endif
 
                                     <!-- Nếu là restaurant -->
@@ -114,7 +97,7 @@
                                         <li><a href="{{ route('profile.home_info') }}"><i class="fa-solid fa-user"></i> Tài khoản của tôi</a></li>
                                         <li><a href="{{ route('restaurant.products.home') }}"><i class="fa-solid fa-utensils"></i> Quản lý sản phẩm</a></li>
                                         <li><a href="{{ route('restaurant.statistics.index') }}"><i class="fa-solid fa-receipt"></i> Quản lý đơn hàng</a></li>
-                                        <li><a href="{{ route('restaurant.statistics.home') }}"><i class="fa-solid fa-chart-pie"></i> Thống kê</a></li>
+                                        <li><a href="{{ route('restaurant.statistics.home') }}"><i class="fa-solid fa-chart-pie"></i> Báo cáo thống kê doanh thu & đơn hàng</a></li>
                                     @endif
 
                                     <!-- Nếu là shipper -->

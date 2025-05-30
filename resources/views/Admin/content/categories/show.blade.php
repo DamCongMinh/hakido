@@ -37,6 +37,6 @@
         @endif
     @endsection
 
-    @include('layout.footer')
+    {{-- @include('layout.footer') --}}
 </body>
 </html>

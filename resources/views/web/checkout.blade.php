@@ -64,118 +64,112 @@
 
         <h3 class="h3">Tổng tiền cần thanh toán: {{ number_format($finalTotal) }}₫</h3>
 
-        <form id="checkout_form" action="{{ route('orders.store') }}" method="POST">
+        <form id="checkout_form" method="POST">
             @csrf
-
+        
             @if (!$isGuest)
                 <label>
                     <input type="checkbox" id="use-default-info" checked>
                     Dùng thông tin mặc định
                 </label>
             @endif
-
+        
             <label>Họ tên người nhận</label>
             <input type="text" name="receiver_name" id="receiver_name"
                 value="{{ old('receiver_name', $isGuest ? '' : $user->name) }}" required>
-
+        
             <label>Số điện thoại</label>
             <input type="text" name="receiver_phone" id="receiver_phone"
                 value="{{ old('receiver_phone', $customer['phone'] ?? '') }}" required>
-
+        
             <label>Địa chỉ</label>
             <textarea name="receiver_address" id="receiver_address" required>{{ old('receiver_address', $customer['address'] ?? '') }}</textarea>
-
+        
             <label for="payment_method">Chọn phương thức thanh toán</label>
             <select name="payment_method" id="payment_method" required>
                 <option value="" disabled selected>-- Vui lòng chọn --</option>
                 <option value="cod">🛵 Thanh toán khi nhận hàng (COD)</option>
-                <option value="bank">🏦 Chuyển khoản ngân hàng</option>
                 <option value="vnpay">💳 Thanh toán qua VNPAY</option>
             </select>
-
+        
+            {{-- Các input hidden --}}
             <input type="hidden" name="items" id="items-input">
             <input type="hidden" name="shipping_fees" id="shipping-fees-input">
             <input type="hidden" name="distances" id="distances-input">
             <input type="hidden" name="restaurantTotalAmounts" id="restaurant-total-amounts-input">
             <input type="hidden" name="restaurantTotalSums" id="restaurant-total-sums-input">
-
-            
-
-        </form>
-        <form id="checkout_form" action="{{ route('vnpay.payment') }}" method="POST">
-            @csrf
-            <button type="submit" name = "redirect">Xác nhận & Thanh toán</button>
+        
+            <button type="submit" id="submit-button">Xác nhận & Thanh toán</button>
         </form>
     @endif
 
     @include('layout.footer')
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const form = document.getElementById('checkout_form');
-            const submitButton = form.querySelector('button[type="submit"]');
-        
-            const groupedItems = @json($groupedItems);
-            const shippingFees = @json($restaurantShippingFees);
-            const distances = @json($restaurantDistances);
-            const totalAmounts = @json($restaurantTotalAmounts);
-            const restaurantTotalSums = @json($restaurantTotalSums);
-            const isGuest = @json($isGuest);
-        
-            document.getElementById('items-input').value = JSON.stringify(groupedItems);
-            document.getElementById('shipping-fees-input').value = JSON.stringify(shippingFees);
-            document.getElementById('distances-input').value = JSON.stringify(distances);
-            document.getElementById('restaurant-total-amounts-input').value = JSON.stringify(totalAmounts);
-            document.getElementById('restaurant-total-sums-input').value = JSON.stringify(restaurantTotalSums);
-        
-            if (!isGuest) {
-                const defaultName = @json($user->name);
-                const defaultPhone = @json($customer['phone'] ?? '');
-                const defaultAddress = @json($customer['address'] ?? '');
-        
-                const checkbox = document.getElementById('use-default-info');
-                const nameInput = document.getElementById('receiver_name');
-                const phoneInput = document.getElementById('receiver_phone');
-                const addressInput = document.getElementById('receiver_address');
-        
-                checkbox.addEventListener('change', function () {
-                    if (this.checked) {
-                        nameInput.value = defaultName;
-                        phoneInput.value = defaultPhone;
-                        addressInput.value = defaultAddress;
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const form = document.getElementById('checkout_form');
+                const submitButton = form.querySelector('button[type="submit"]');
+                const paymentSelect = document.getElementById('payment_method');
+            
+                const groupedItems = @json($groupedItems);
+                const shippingFees = @json($restaurantShippingFees);
+                const distances = @json($restaurantDistances);
+                const totalAmounts = @json($restaurantTotalAmounts);
+                const restaurantTotalSums = @json($restaurantTotalSums);
+                const isGuest = @json($isGuest);
+            
+                // Gán dữ liệu JSON vào hidden inputs
+                document.getElementById('items-input').value = JSON.stringify(groupedItems);
+                document.getElementById('shipping-fees-input').value = JSON.stringify(shippingFees);
+                document.getElementById('distances-input').value = JSON.stringify(distances);
+                document.getElementById('restaurant-total-amounts-input').value = JSON.stringify(totalAmounts);
+                document.getElementById('restaurant-total-sums-input').value = JSON.stringify(restaurantTotalSums);
+            
+                if (!isGuest) {
+                    const defaultName = @json($user->name);
+                    const defaultPhone = @json($customer['phone'] ?? '');
+                    const defaultAddress = @json($customer['address'] ?? '');
+            
+                    const checkbox = document.getElementById('use-default-info');
+                    const nameInput = document.getElementById('receiver_name');
+                    const phoneInput = document.getElementById('receiver_phone');
+                    const addressInput = document.getElementById('receiver_address');
+            
+                    checkbox.addEventListener('change', function () {
+                        if (this.checked) {
+                            nameInput.value = defaultName;
+                            phoneInput.value = defaultPhone;
+                            addressInput.value = defaultAddress;
+                        } else {
+                            nameInput.value = '';
+                            phoneInput.value = '';
+                            addressInput.value = '';
+                        }
+                    });
+                }
+            
+                form.addEventListener('submit', function (e) {
+                    const paymentMethod = paymentSelect.value;
+            
+                    if (!paymentMethod) {
+                        e.preventDefault();
+                        alert('Vui lòng chọn phương thức thanh toán.');
+                        return;
+                    }
+            
+                    submitButton.disabled = true;
+                    submitButton.textContent = 'Đang xử lý...';
+            
+                    if (paymentMethod === 'vnpay') {
+                        form.action = '{{ route("vnpay.payment") }}';
                     } else {
-                        nameInput.value = '';
-                        phoneInput.value = '';
-                        addressInput.value = '';
+                        form.action = '{{ route("orders.store") }}';
                     }
                 });
-            }
-        
-            form.addEventListener('submit', function (e) {
-                const paymentMethod = document.getElementById('payment_method').value;
-
-                if (!paymentMethod) {
-                    e.preventDefault();
-                    alert('Vui lòng chọn phương thức thanh toán.');
-                    return;
-                }
-                submitButton.disabled = true;
-                submitButton.textContent = 'Đang xử lý...';
-
-                if (paymentMethod === 'vnpay') {
-                    e.preventDefault(); // Ngăn chặn submit mặc định
-
-                    // Đặt action mới là route VNPAY
-                    form.action = '{{ route("vnpay.payment") }}';
-
-                    // Để chắc chắn, chờ một chút rồi submit lại
-                    setTimeout(() => form.submit(), 100);
-                    return;
-                }
             });
-        });
         </script>
-        
+            
+            
     
 </body>
 </html>

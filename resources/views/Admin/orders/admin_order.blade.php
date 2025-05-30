@@ -32,8 +32,8 @@
         <label for="date">Hoặc chọn ngày:</label>
         <input type="date" name="date" id="date" value="{{ request('date') }}">
     
-        <button type="submit">Lọc</button>
-        <a href="{{ route('admin.orders.index') }}">Xóa lọc</a>
+        <button class="btn" type="submit">Lọc</button>
+        <a class="btn-danger" href="{{ route('admin.orders.index') }}">Xóa lọc</a>
     </form>
     
 
@@ -74,7 +74,7 @@
                                     <option value="delivering">Đang giao</option>
                                     <option value="completed">Hoàn thành</option>
                                 </select>                                
-                                <button type="submit">Cập nhật</button>
+                                <button class="btn" type="submit">Cập nhật</button>
                             </form>
                         @endif
 
@@ -82,7 +82,7 @@
                         @if($order->status !== 'đã hủy' && $order->status !== 'hoàn thành')
                             <form action="{{ route('admin.orders.cancel', $order->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Bạn chắc chắn muốn hủy đơn này?')">
                                 @csrf
-                                <button type="submit">Hủy đơn</button>
+                                <button class="btn-danger" type="submit">Hủy đơn</button>
                             </form>
                         @endif
                     </td>
@@ -90,9 +90,6 @@
             @endforeach
         </tbody>
     </table>
-
-    <a class="back" href="{{ route('admin.dashboard') }}">← Quay lại trang Admin</a>
-
     @include('layout.footer')
 </body>
 </html>

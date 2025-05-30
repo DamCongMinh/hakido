@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Food;
 use App\Models\Beverage;
+use App\Models\PendingPayment;
+use Illuminate\Support\Str;
 
 class CartController extends Controller
 {
@@ -82,7 +84,7 @@ class CartController extends Controller
         return view('web.cart', ['cart' => $cart]);
     }
 
-    // ✅ GET /cart/checkout (hiển thị form thanh toán)
+    //  GET /cart/checkout (hiển thị form thanh toán)
     public function showCheckout()
     {
         $user = auth()->user();
@@ -327,6 +329,18 @@ class CartController extends Controller
                 'finalTotal' => $finalTotal,
             ]
         ]);
+        // test
+        // $vnpTxnRef = strtoupper(Str::random(12)); // Mã giao dịch duy nhất
+
+        // PendingPayment::create([
+        //     'user_id' => $user->id,
+        //     'vnp_txn_ref' => $vnpTxnRef,
+        //     'items' => json_encode($groupedItems),
+        //     'total_amount' => $totalAmount,
+        //     'shipping_fee' => $totalShippingFee,
+        //     'final_amount' => $finalTotal,
+        //     'status' => 'pending',
+        // ]);
 
         return view('web.checkout', [
             'groupedItems' => $groupedItems,

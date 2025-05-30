@@ -43,11 +43,12 @@ select {
     border-radius: 4px;
 }
 
-button {
+.btn {
     background-color: #28a745;
     border: none;
     color: white;
-    padding: 6px 10px;
+    font-size: 1.0rem;
+    padding: 10px 14px;
     margin-left: 5px;
     border-radius: 4px;
     cursor: pointer;
@@ -56,6 +57,24 @@ button {
 
 button:hover {
     background-color: #218838;
+}
+
+.btn-danger {
+    background-color: #ea5f4c;
+    border: none;
+    font-size: 1.0rem;
+    color: rgb(29, 27, 27);
+    padding: 10px 14px;
+    margin-left: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-danger:hover {
+    background-color: #ea5f4c;
+    text-decoration: none;
 }
 
 .alert-success {
@@ -104,26 +123,3 @@ button:hover {
     border-radius: 4px;
 }
 
-.order-filter-form button {
-    padding: 6px 12px;
-    border: none;
-    background-color: #007bff;
-    color: #fff;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.order-filter-form button:hover {
-    background-color: #0056b3;
-}
-
-.order-filter-form a {
-    color: #dc3545;
-    text-decoration: none;
-    font-size: 14px;
-}
-
-.order-filter-form a:hover {
-    text-decoration: underline;
-}
