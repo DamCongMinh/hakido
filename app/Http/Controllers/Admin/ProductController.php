@@ -11,20 +11,33 @@ use App\Models\Beverage;
 class ProductController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
-        $foodsApproved = Food::with('restaurant')->where('status', 'approved')->get();
-        $foodsPending = Food::with('restaurant')->where('status', 'pending')->get();
+        $view = $request->input('view', 'food_pending');
 
-        $beveragesApproved = Beverage::with('restaurant')->where('status', 'approved')->get();
-        $beveragesPending = Beverage::with('restaurant')->where('status', 'pending')->get();
+        switch ($view) {
+            case 'food_pending':
+                $foodsPending = Food::where('status', 'pending')->get();
+                return view('Admin.products.sections.food_pending', compact('foodsPending'));
 
-        return view('products.product_control_management', compact(
-            'foodsApproved', 'foodsPending',
-            'beveragesApproved', 'beveragesPending'
-        ));
-        
+            case 'food_approved':
+                $foodsApproved = Food::where('status', 'approved')->get();
+                return view('Admin.products.sections.food_approved', compact('foodsApproved'));
+
+            case 'beverage_pending':
+                $beveragesPending = Beverage::where('status', 'pending')->get();
+                return view('Admin.products.sections.beverage_pending', compact('beveragesPending'));
+
+            case 'beverage_approved':
+                $beveragesApproved = Beverage::where('status', 'approved')->get();
+                return view('Admin.products.sections.beverages_pending', compact('beveragesApproved'));
+
+            default:
+                abort(404, 'Không tìm thấy loại dữ liệu phù hợp');
+        }
     }
+
+
 
     public function uploadImage(Request $request, $id)
     {

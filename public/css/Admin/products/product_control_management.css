@@ -14,7 +14,7 @@ body {
 }
 
 .product-section {
-    display: none;
+    display: flex;
 }
 
 .list-btn {

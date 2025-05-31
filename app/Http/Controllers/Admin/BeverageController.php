@@ -9,21 +9,40 @@ use App\Models\Food;
 
 class BeverageController extends Controller
 {
-    public function index()
+    // public function index()
+    // {
+    //     $foodsApproved = Food::with('restaurant')->where('status', 'approved')->get();
+    //     $foodsPending = Food::with('restaurant')->where('status', 'pending')->get();
+
+    //     $beveragesApproved = Beverage::with('restaurant')->where('status', 'approved')->get();
+    //     $beveragesPending = Beverage::with('restaurant')->where('status', 'pending')->get();
+
+    //     return view('products.product_control_management', compact(
+    //         'foodsApproved',
+    //         'foodsPending',
+    //         'beveragesApproved',
+    //         'beveragesPending'
+    //     ));
+    // }
+
+    public function index(Request $request)
     {
-        $foodsApproved = Food::with('restaurant')->where('status', 'approved')->get();
-        $foodsPending = Food::with('restaurant')->where('status', 'pending')->get();
+        $view = $request->input('view', 'beverage_pending');
 
-        $beveragesApproved = Beverage::with('restaurant')->where('status', 'approved')->get();
-        $beveragesPending = Beverage::with('restaurant')->where('status', 'pending')->get();
+        switch ($view) {
+            case 'beverage_pending':
+                $beveragesPending = Beverage::where('status', 'pending')->get();
+                return view('Admin.products.sections.beverage_pending', compact('beveragesPending'));
 
-        return view('products.product_control_management', compact(
-            'foodsApproved',
-            'foodsPending',
-            'beveragesApproved',
-            'beveragesPending'
-        ));
+            case 'beverage_approved':
+                $beveragesApproved = Beverage::where('status', 'approved')->get();
+                return view('Admin.products.sections.beverage_approved', compact('beveragesApproved'));
+
+            default:
+                abort(404);
+        }
     }
+
 
 
     public function edit($id)

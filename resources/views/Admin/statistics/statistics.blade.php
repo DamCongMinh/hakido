@@ -13,7 +13,7 @@
     <div class="stat-container">
         <h1>Thống kê Doanh thu & Đơn hàng</h1>
         <p><strong>Tổng doanh thu:</strong> {{ number_format($totalRevenue, 0, ',', '.') }} VND</p>
-        <p><strong>Tổng số đơn hàng:</strong> {{ $totalOrders }}</p>
+        
     </div>
       
 
@@ -30,18 +30,20 @@
         <table border="1" cellpadding="10" cellspacing="0">
             <thead>
                 <tr>
+                    <th>Tên nhà hàng</th>
                     <th>Tháng</th>
                     <th>Doanh thu (VND)</th>
-                    <th>Số đơn hàng</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($monthlyStats as $stat)
-                    <tr>
-                        <td>{{ $stat->month }}</td>
-                        <td>{{ number_format($stat->revenue, 0, ',', '.') }}</td>
-                        <td>{{ $stat->orders }}</td>
-                    </tr>
+                @foreach ($restaurants as $index => $restaurant)
+                    @if (isset($monthlyStats[$index]))
+                        <tr>
+                            <td>{{ $restaurant->name }}</td>
+                            <td>{{ $monthlyStats[$index]->month }}</td>
+                            <td>{{ number_format($monthlyStats[$index]->revenue, 0, ',', '.') }}</td>
+                        </tr>
+                    @endif
                 @endforeach
             </tbody>
         </table> 

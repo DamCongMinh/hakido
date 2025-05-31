@@ -222,7 +222,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('categories', CategoryController::class);
 
     // Thống kê
-    Route::get('/statistics', [AdminStatisticController::class, 'index'])->name('statistics');
+    Route::get('/home', [AdminStatisticController::class, 'showHomeStatistics'])->name('home_statistics');
+    Route::get('/statistics', [AdminStatisticController::class, 'revenueStatistics'])->name('statistics');
+    Route::get('/orderstatistics', [AdminStatisticController::class, 'orderStatistics'])->name('orderstatistics');
+    Route::get('/inventoryStatistics', [AdminStatisticController::class, 'inventoryStatistics'])->name('inventoryStatistics');
 });
 
  // Restaurant quản lý sản phẩm và thống kê doanh thu

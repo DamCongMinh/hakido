@@ -87,9 +87,9 @@
                                     @if (Auth::user()->role === 'admin')
                                         <li><a href="{{ route('admin.accounts.index') }}"><i class="fa-solid fa-users-gear"></i> Quản lý người dùng</a></li>
                                         <li><a href="{{ route('admin.orders.index') }}"><i class="fa-solid fa-clipboard-list"></i> Quản lý đơn hàng</a></li>
-                                        <li><a href="{{ route('control_product') }}"><i class="fa-solid fa-box-open"></i> Quản lý sản phẩm</a></li>
+                                        <li><a href="{{ route('admin.foods.index') }}"><i class="fa-solid fa-box-open"></i> Quản lý sản phẩm</a></li>
                                         <li><a href="{{ route('admin.content') }}"><i class="fa-solid fa-images"></i> Quản lý nội dung</a></li>
-                                        <li><a href="{{ route('admin.statistics') }}"><i class="fa-solid fa-chart-line"></i> Báo cáo thống kê doanh thu & đơn hàng</a></li>
+                                        <li><a href="{{ route('admin.home_statistics') }}"><i class="fa-solid fa-chart-line"></i> Báo cáo thống kê doanh thu & đơn hàng</a></li>
                                     @endif
 
                                     <!-- Nếu là restaurant -->
@@ -143,23 +143,6 @@
         localStorage.setItem('user', JSON.stringify({!! session('user') !!}));
     </script>
 
-    {{-- <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const form = document.getElementById('searchForm');
-            const keywordInput = document.getElementById('searchInput');
-            const typeInput = document.getElementById('searchType');
-
-            form.addEventListener('submit', function (e) {
-                const keyword = keywordInput.value.toLowerCase().trim();
-
-                if (keyword.includes('nhà hàng')) {
-                    typeInput.value = 'restaurant';
-                } else {
-                    typeInput.value = 'product';
-                }
-            });
-        });
-    </script> --}}
     @endif
 </body>
 </html>

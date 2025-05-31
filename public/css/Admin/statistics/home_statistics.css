@@ -1,0 +1,156 @@
+body {
+    background-color: #f8f9fa;
+}
+
+.contrainer {
+    width: 90%;
+    margin: 20px auto;
+}
+
+.top {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 42px;
+}
+
+.top-statistics {
+    width: 45%;
+    background-color: #5ca1d9;
+    border-radius: 25px;
+    display: flex;
+    flex-direction: column;
+}
+
+.top-statistics h2 {
+    width: 100%;
+    text-align: center;
+    margin: 24px 0;
+}
+
+.list_card {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+}
+
+.list_card .card {
+    width: 35%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    gap: 24px;
+}
+
+.list_card .card-items {
+    width: 100%;
+
+} 
+
+.list_card .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+}
+
+.list_card .card-body {
+    width: 100%;
+    padding: 25px;
+    text-align: center;
+}
+
+.list_card h5 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.list_card p {
+    font-size: 1.2rem;
+    margin: 0;
+    font-weight: 500;
+}
+
+.bg-primary {
+    background: linear-gradient(135deg, #f7971e, #ffd200)
+}
+
+.bg-success {
+    background: linear-gradient(135deg, #f7971e, #ffd200)
+}
+
+.list-group {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.list-group a {
+    min-width: 180px;
+    padding: 16px 24px;
+    background: linear-gradient(135deg, #4caf50, #81c784);
+    color: white;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.list-group a:hover {
+    background: linear-gradient(135deg, #388e3c, #66bb6a);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+
+
+.list_chart {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+}
+
+h3 {
+    width: 100%;
+    text-align: center;
+    font-weight: 600;
+    margin: 20px;
+}
+
+canvas {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 250px;
+}
+
+.chart-container {
+    width: 90%;
+    margin: 0 auto;
+    background: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+}
+
+.row > .col-md-4 {
+    margin-bottom: 30px;
+}
+
