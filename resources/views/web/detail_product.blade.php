@@ -26,22 +26,29 @@
                 </div>
                 
                 <div class="image-slider">
-                    <button class="prev-btn">&#10094;</button> <!-- Nút trái -->
+                    <button class="prev-btn">&#10094;</button> 
                     <div class="list-img">
                         @foreach ($allProducts as $p)
                             <img 
                                 src="{{ $p['image'] }}" 
                                 alt="{{ $p['name'] }}" 
-                                class="product-thumbnail"
+                                class="product-thumbnail {{ $p['id'] == $product->id && $p['type'] == $type ? 'active' : '' }}"
                                 data-id="{{ $p['id'] }}"
                                 data-type="{{ $p['type'] }}"
+                                data-name="{{ $p['name'] }}"
+                                data-description="{{ $p['description'] }}"
+                                @if($p['type'] == 'food')
+                                    data-old-price="{{ $p['old_price'] }}"
+                                    data-discount-percent="{{ $p['discount_percent'] }}"
+                                    data-quantity="{{ $p['quantity'] }}"
+                                @elseif($p['type'] == 'beverage' && isset($p['sizes']))
+                                    data-sizes="{{ json_encode($p['sizes']) }}"
+                                @endif
                             >
                         @endforeach
                     </div>
-                    
-                    
-                    <button class="next-btn">&#10095;</button> <!-- Nút phải -->
-                </div>                
+                    <button class="next-btn">&#10095;</button> 
+                </div>              
             </div>
             <div class="detail-product">
                 <h2>{{ $product->name }}</h2>
@@ -96,13 +103,13 @@
                                 <p class="size-title">Size:</p>
                                 <div class="size-list">
                                     <div class="size-item">
-                                        @foreach($product->beverageSizes as $size)
+                                        @foreach($product->beverageSizes as $index => $size)
                                             @php
                                                 $price = $size->old_price * (100 - $size->discount_percent) / 100;
                                             @endphp
                                             <input 
                                                 type="button" 
-                                                class="size-btn"
+                                                class="size-btn {{ $index === 0 ? 'active' : '' }}"
                                                 value="{{ $size->size }}"
                                                 data-price="{{ $price }}" 
                                                 data-old="{{ $size->old_price }}" 
@@ -126,7 +133,18 @@
                         </div>                        
                     
                         <div class="total-payouts">
-                            <p>Tổng tiền cần thanh toán: <span id="total-amount">{{ number_format($product->price ?? 0) }}₫</span></p>
+                            <p>Tổng tiền cần thanh toán: 
+                                <span id="total-amount">
+                                    @if ($type === 'food')
+                                        {{ number_format(($product->old_price ?? 0) * (100 - ($product->discount_percent ?? 0)) / 100) }}₫
+                                    @elseif ($type === 'beverage' && isset($product->beverageSizes[0]))
+                                        {{ number_format($product->beverageSizes[0]->old_price * (100 - $product->beverageSizes[0]->discount_percent) / 100) }}₫
+                                    @else
+                                        0₫
+                                    @endif
+                                </span>
+                            </p>
+                            
                         </div>                               
                         <div class="btn-nav">
                             <form action="{{ route('cart.add') }}" method="POST">
@@ -143,20 +161,19 @@
 
                             </form>
 
-                            @if(session('success'))
-                                <div class="alert alert-success">
-                                    {{ session('success') }}
-                                </div>
-                            @endif
-
-                            @if(session('error'))
-                                <div class="alert alert-danger">
-                                    {{ session('error') }}
-                                </div>
-                            @endif
-
                                            
-                            <button class="btn-buy"> Mua hàng</button>
+                            <form method="POST" action="{{ route('checkout.now') }}">
+                                @csrf
+                                <input type="hidden" name="selected_items[0][selected]" value="true">
+                                <input type="hidden" name="selected_items[0][product_id]" value="{{ $product->id }}">
+                                <input type="hidden" name="selected_items[0][product_type]" value="{{ $type }}">
+                                <input type="hidden" name="selected_items[0][quantity]" id="checkout-quantity" value="1">
+                                @if($type === 'beverage')
+                                    <input type="hidden" name="selected_items[0][size]" id="checkout-selected-size" value="">
+                                @endif
+                                <button class="btn-buy" type="submit">Mua ngay</button>
+                            </form>
+             
                         </div>
                     </div>
                     <div class="title-right">
@@ -350,9 +367,37 @@
         </div>   
     </section>
     <script src="{{ url('js/detail_product.js') }}"></script>
+
     <script>
-        const allProducts = @json($allProducts);
+        window.productData = {
+            currentProduct: {
+                id: "{{ $product->id }}",
+                type: "{{ $type }}",
+                name: "{{ $product->name }}",
+                description: "{{ $product->description }}",
+                @if($type === 'food')
+                    old_price: {{ $product->old_price }},
+                    discount_percent: {{ $product->discount_percent }},
+                    quantity: {{ $product->quantity }}
+                @endif
+            },
+            allProducts: @json($allProducts)
+        };
     </script>
+
+    @if (session('success'))
+    <script>
+        alert(@json(session('success')));
+    </script>
+    @endif
+
+    @if (session('error'))
+    <script>
+        alert(@json(session('error')));
+    </script>
+    @endif
+    
+
     
 <!-------------- Footer của trang detail ---------------->
     @include('layout.footer')    

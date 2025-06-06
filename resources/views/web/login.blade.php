@@ -19,16 +19,31 @@
                     <h1>Đăng ký tài khoản</h1>
 
                     <select class="select_role" name="role" required>
-                        <option value="">--Chọn vai trò--</option>
-                        <option value="customer">Khách hàng</option>
-                        <option value="restaurant">Nhà hàng</option>
-                        <option value="shipper">Shipper</option>
+                        <option value="customer">Tôi là Khách hàng</option>
+                        <option value="restaurant">Tôi là Nhà hàng</option>
+                        <option value="shipper">Tôi là Shipper</option>
                     </select>
 
-                    <input type="text" name="name" placeholder="Họ và tên" value="{{ old('name') }}">
-                    <input type="email" name="email" placeholder="Email" value="{{ old('email') }}">
-                    <input type="password" name="password" placeholder="Mật khẩu">
-                    <input type="password" name="password_confirmation" placeholder="Nhập lại mật khẩu">
+                    <div class="login-email">
+                        <input type="text" name="name" placeholder="Họ và tên" value="{{ old('name') }}">
+                    </div>
+                    <div class="login-email">
+                        <input type="email" name="email" placeholder="Email" value="{{ old('email') }}">
+                    </div>
+                    <div class="password-wrapper">
+                        <input type="password" name="password" placeholder="Mật khẩu" class="password-input">
+                        <span class="toggle-password">
+                            <i class="fas fa-eye"></i>
+                        </span>
+                    </div>
+                    
+                    <div class="password-wrapper">
+                        <input type="password" name="password_confirmation" placeholder="Nhập lại mật khẩu" class="password-input">
+                        <span class="toggle-password">
+                            <i class="fas fa-eye"></i>
+                        </span>
+                    </div>
+                    
 
                     @if ($errors->any())
                         <div style="color: red;">
@@ -47,8 +62,16 @@
                 <form method="POST" action="{{ route('postlogin') }}">
                     @csrf
                     <h1>Đăng nhập</h1>
-                    <input type="email" name="email" placeholder="Email" required>
-                    <input type="password" name="password" placeholder="Mật khẩu" required>
+                    <div class="login-email">
+                        <input type="email" name="email" placeholder="Email" required>
+                    </div>
+                    <div class="password-wrapper">
+                        <input type="password" name="password" placeholder="Mật khẩu" required class="password-input">
+                        <span class="toggle-password">
+                            <i class="fas fa-eye"></i>
+                        </span>
+                    </div>
+                    
 
                     @if(session('status'))
                         <p style="color:red">{{ session('status') }}</p>
@@ -86,6 +109,7 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            const toggleIcons = document.querySelectorAll('.toggle-password');
             const container = document.getElementById('container');
             const registerBtn = document.getElementById('register');
             const loginBtn = document.getElementById('login');
@@ -94,6 +118,20 @@
                 registerBtn.addEventListener('click', () => container.classList.add("active"));
                 loginBtn.addEventListener('click', () => container.classList.remove("active"));
             }
+    
+            toggleIcons.forEach(icon => {
+                icon.addEventListener('click', function () {
+                    const input = this.previousElementSibling;
+    
+                    if (input.type === "password") {
+                        input.type = "text";
+                        this.innerHTML = '<i class="fas fa-eye-slash"></i>';
+                    } else {
+                        input.type = "password";
+                        this.innerHTML = '<i class="fas fa-eye"></i>';
+                    }
+                });
+            });
         });
     </script>
 </body>

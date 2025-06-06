@@ -53,12 +53,12 @@ body {
     background-color: #512da8;
     color: #fff;
     font-size: 14px;
-    padding: 10px 45px;
+    padding: 14px 45px;
     border-radius: 8px;
     font-weight: 600;
     letter-spacing: 0.5px;
     text-transform: uppercase;
-    margin-top: 10px;
+    margin-top: 20px;
     cursor: pointer;
 }
 
@@ -120,6 +120,36 @@ body {
     animation: move 0.6s;
 }
 
+.login-email {
+    width: 100%;
+    background-color: #eee;
+    margin-bottom: 18px;
+}
+
+.password-wrapper {
+    width: 100%;
+    background-color: #eee;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 18px;
+
+}
+
+.password-wrapper input {
+    background-color: #eee;
+}
+
+.password-wrapper .toggle-password {
+    width: 42px;
+    font-size: 1.4rem;
+}
+
+.password-wrapper .toggle-password:hover {
+    cursor: pointer;
+}
+
 @keyframes move {
     0%,
     49.99% {
@@ -146,11 +176,12 @@ body {
     margin-bottom: 16px;
     justify-content: center;
     align-items: center;
-    margin: 0 3px;
+    margin: 8px 3px;
     width: 100%;
     height: 40px;
     font-size: 1.2rem;
     color: black;
+    padding: 28px;
 }
 
 .social-icons i {
@@ -233,8 +264,8 @@ body {
 
 .select_role {
     width: 100%;
-    padding: 10px 12px;
-    margin-bottom: 10px;
+    padding: 18px 12px;
+    margin-bottom: 18px;
     background-color: #eee;
     border: none;
     font-size: 1.3rem;

@@ -17,4 +17,11 @@ class PendingPayment extends Model
         'checkout_data' => 'array',
         'cart_data' => 'array',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'customer_id');
+    }
+
+
 }

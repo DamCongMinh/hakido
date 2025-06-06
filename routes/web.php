@@ -122,6 +122,9 @@ Route::middleware(['auth', 'role:customer'])->group(function () {
     Route::get('/order/success', [OrderController::class, 'success'])->name('order.success');
     Route::get('/ordered-items', [OrderController::class, 'orderedItems'])->name('orders.items');
     Route::patch('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+    Route::post('/checkout-now', [ShowDetailController::class, 'processCheckout'])->name('checkout.now');
+    Route::post('/checkout', [ShowDetailController::class, 'checkout'])->name('checkout');
+
 
     // show view và lấy order_id
     Route::get('/review/{orderId}', [ReviewController::class, 'showOrderReviewForm'])

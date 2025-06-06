@@ -30,14 +30,21 @@ class Order extends Model
         'receiver_address',
         'payment_method',
         'note',
+        'vnp_TxnRef',
     ];
     
     
     // Mối quan hệ với khách hàng (customer)
+    // public function customer()
+    // {
+    //     return $this->belongsTo(User::class, 'customer_id');
+    // }
+
     public function customer()
     {
-        return $this->belongsTo(User::class, 'customer_id');
+        return $this->belongsTo(\App\Models\Customer::class, 'customer_id');
     }
+
 
     // Mối quan hệ với nhà hàng (restaurant)
     public function restaurant()

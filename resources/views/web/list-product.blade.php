@@ -80,7 +80,7 @@
                 
                 <!-- Danh sách sản phẩm -->
                 <div class="products-title active list-products">
-                    <h1>| Đồ ăn ngon</h1>
+                    <h1>| Sản phẩm đề xuất</h1>
                     <div class="title-list grid-container">
                         @foreach ($products as $product)
                             <div class="product-card">

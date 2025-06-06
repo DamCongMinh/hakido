@@ -1,14 +1,72 @@
 document.addEventListener("DOMContentLoaded", function () {
+    // Khai báo các biến cần thiết
     const mainImage = document.querySelector(".product-show img");
     const thumbnails = document.querySelectorAll(".list-img img");
+    const productName = document.querySelector(".detail-product h2");
+    const description = document.querySelector(".description");
+    const oldPriceEl = document.getElementById('old-price');
+    const discountEl = document.getElementById('discount');
+    const newPriceEl = document.getElementById('new-price');
+    const quantityInput = document.getElementById('quantity');
+    const formQuantityInput = document.getElementById('form-quantity');
+    const checkoutQuantityInput = document.getElementById('checkout-quantity');
+    const selectedSizeInput = document.getElementById('selected-size');
+    const checkoutSelectedSizeInput = document.getElementById('checkout-selected-size');
+    const totalAmountElement = document.getElementById('total-amount');
+    const sizeContainer = document.querySelector('.size-item');
+    const sizeSection = document.querySelector('.size');
+    const typeInput = document.querySelector('input[name="type"]');
+    const productIdInput = document.querySelector('input[name="product_id"]');
+    const checkoutProductIdInput = document.querySelector('input[name="selected_items[0][product_id]"]');
+    const checkoutTypeInput = document.querySelector('input[name="selected_items[0][product_type]"]');
+ 
 
-    
+    // Hàm hiển thị thông tin sản phẩm (dùng chung cho cả 2 luồng)
+    function displayProductInfo(thumbnail) {
+        // Cập nhật ảnh chính và active thumbnail
+        mainImage.src = thumbnail.src;
+        thumbnails.forEach(img => img.classList.remove("active"));
+        thumbnail.classList.add("active");
 
-    thumbnails.forEach((thumbnail) => {
-        thumbnail.addEventListener("click", function () {
-            mainImage.src = this.src;
-            thumbnails.forEach(img => img.classList.remove("active"));
-            this.classList.add("active");
+        // Cập nhật thông tin cơ bản
+        productName.textContent = thumbnail.dataset.name;
+        description.textContent = thumbnail.dataset.description;
+
+        // Xử lý theo loại sản phẩm
+        if (thumbnail.dataset.type === 'food') {
+            updateFoodProductInfo(thumbnail);
+        } else if (thumbnail.dataset.type === 'beverage') {
+            updateBeverageProductInfo(thumbnail);
+        }
+    }
+
+    // Sửa lại hàm initProductDetails
+    function initProductDetails() {
+        resetTotalAmount();
+        
+        // Tìm thumbnail tương ứng với sản phẩm hiện tại từ server
+        const initialProduct = window.productData.currentProduct;
+        const initialThumbnail = Array.from(thumbnails).find(thumb => 
+            thumb.dataset.id == initialProduct.id && 
+            thumb.dataset.type == initialProduct.type
+        );
+
+        if (initialThumbnail) {
+            // Hiển thị thông tin từ thumbnail tương ứng
+            displayProductInfo(initialThumbnail);
+        } else if (thumbnails.length > 0) {
+            // Fallback: hiển thị sản phẩm đầu tiên
+            displayProductInfo(thumbnails[0]);
+        }
+        
+        bindSizeEvents();
+    }
+
+    // Sửa lại sự kiện click thumbnail để cập nhật nguồn gốc
+    thumbnails.forEach(thumbnail => {
+        thumbnail.addEventListener("click", function() {
+            currentProductSource = 'thumbnail';
+            displayProductInfo(this);
         });
     });
 
@@ -21,252 +79,226 @@ document.addEventListener("DOMContentLoaded", function () {
         nextBtn.addEventListener("click", () => listImg.scrollBy({ left: 120, behavior: "smooth" }));
     }
 
-    const sizeButtons = document.querySelectorAll('.size-btn');
-    const newPriceEl = document.getElementById('new-price');
-    const oldPriceEl = document.getElementById('old-price');
-    const discountEl = document.getElementById('discount');
-    const quantityInput = document.querySelector('#quantity');
-    const formQuantityInput = document.querySelector('#form-quantity');
-    const selectedSizeInput = document.querySelector('#selected-size');
-    const totalAmountElement = document.querySelector('#total-amount');
+    function bindSizeEvents() {
+        const sizeButtons = document.querySelectorAll('.size-btn');
+        sizeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Xóa active khỏi tất cả các nút
+                sizeButtons.forEach(btn => btn.classList.remove('active'));
+                // Thêm active cho nút được click
+                this.classList.add('active');
+                
+                // Cập nhật giá trị từ data attributes
+                const price = parseFloat(this.dataset.price);
+                const oldPrice = parseFloat(this.dataset.old);
+                const discount = this.dataset.discount;
+                const maxQuantity = this.dataset.quantity;
+                
+                // Cập nhật hiển thị giá
+                newPriceEl.textContent = formatCurrency(price);
+                oldPriceEl.textContent = formatCurrency(oldPrice);
+                discountEl.textContent = discount + '%';
+                
+                // Cập nhật số lượng tối đa
+                quantityInput.max = maxQuantity;
+                quantityInput.value = 1;
+                
+                // Cập nhật giá trị cho input ẩn
+                if (selectedSizeInput) selectedSizeInput.value = this.value;
+                if (checkoutSelectedSizeInput) checkoutSelectedSizeInput.value = this.value;
+                
+                // Cập nhật tổng tiền
+                updateTotalPayouts();
+            });
+        });
+    }
 
-    function formatCurrency(amount) {
-        return amount.toLocaleString('vi-VN') + '₫';
+    function resetTotalAmount() {
+        totalAmountElement.textContent = formatCurrency(0);
+    }
+
+    function updateFormInputs(product, type, id) {
+        if (typeInput) typeInput.value = type;
+        if (productIdInput) productIdInput.value = id;
+        if (checkoutProductIdInput) checkoutProductIdInput.value = id;
+        if (checkoutTypeInput) checkoutTypeInput.value = type;
+        
+        // Cập nhật tổng tiền ngay khi thay đổi sản phẩm
+        updateTotalPayouts();
+    }
+
+
+    
+    // Hàm định dạng tiền tệ
+    function formatCurrency(value) {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+            minimumFractionDigits: 0
+        }).format(value);
     }
 
     function updateTotalPayouts() {
-        const quantity = parseInt(quantityInput.value, 10);
-        const priceText = newPriceEl.textContent.replace(/[^\d]/g, '');
-        const price = parseFloat(priceText);
-        const total = price * quantity;
-        if (totalAmountElement) {
-            totalAmountElement.textContent = formatCurrency(total);
+        const quantity = parseInt(quantityInput.value) || 1;
+        let price = 0;
+    
+        // Lấy sản phẩm đang active
+        const activeThumb = document.querySelector('.list-img img.active');
+        if (!activeThumb) return; // Thoát nếu không có sản phẩm nào active
+    
+        // Kiểm tra loại sản phẩm
+        if (activeThumb.dataset.type === 'beverage') {
+            // Xử lý beverage - lấy giá từ size được chọn (đã là giá mới)
+            const activeSize = document.querySelector('.size-btn.active');
+            if (activeSize) {
+                price = parseFloat(activeSize.dataset.price) || 0; // Sử dụng data-price (giá mới)
+            }
+        } else {
+            // Xử lý food - tính toán giá mới từ thumbnail
+            const oldPrice = parseFloat(activeThumb.dataset.oldPrice) || 0;
+            const discount = parseFloat(activeThumb.dataset.discountPercent) || 0;
+            price = oldPrice * (100 - discount) / 100; // Tính giá mới
         }
+    
+        const total = price * quantity;
+        totalAmountElement.textContent = formatCurrency(total);
     }
 
-    sizeButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const newPrice = parseFloat(button.dataset.price);
-            const oldPrice = parseFloat(button.dataset.old);
-            const discount = Math.round(((oldPrice - newPrice) / oldPrice) * 100);
-    
-            newPriceEl.textContent = formatCurrency(newPrice);
-            oldPriceEl.textContent = formatCurrency(oldPrice);
-            discountEl.textContent = `${discount}%`;
-    
-            sizeButtons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-
-            if (selectedSizeInput) {
-                selectedSizeInput.value = button.value;
-            }
-    
-            // Hiển thị phần tổng tiền nếu đang ẩn
-            const totalBox = document.querySelector('.total-payouts');
-            if (totalBox.style.display === 'none') {
-                totalBox.style.display = 'block';
-            }
-    
-            updateTotalPayouts();
-        });
-    });
-    
-    
-
+    // Sửa lại hàm xử lý nút tăng/giảm
     const decreaseButton = document.querySelector('.decrease');
     const increaseButton = document.querySelector('.increase');
 
-    function syncFormQuantity() {
-        if (formQuantityInput) {
-            formQuantityInput.value = quantityInput.value;
-        }
-    }
-
-    if (increaseButton && decreaseButton && quantityInput) {
-        increaseButton.addEventListener('click', () => {
-            let quantity = parseInt(quantityInput.value, 10);
-            const max = parseInt(quantityInput.max || 100);
+    if (increaseButton && decreaseButton) {
+        increaseButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            let quantity = parseInt(quantityInput.value, 10) || 1;
+            const max = parseInt(quantityInput.max) || 100;
             if (quantity < max) {
-                quantity += 1;
-                quantityInput.value = quantity;
-                syncFormQuantity();
-                updateTotalPayouts();
+                quantityInput.value = quantity + 1;
+                syncQuantity();
             }
         });
 
-        decreaseButton.addEventListener('click', () => {
-            let quantity = parseInt(quantityInput.value, 10);
+        decreaseButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            let quantity = parseInt(quantityInput.value, 10) || 1;
             if (quantity > 1) {
-                quantity -= 1;
-                quantityInput.value = quantity;
-                syncFormQuantity();
-                updateTotalPayouts();
+                quantityInput.value = quantity - 1;
+                syncQuantity();
             }
         });
-
-        quantityInput.addEventListener('input', () => {
-            let quantity = parseInt(quantityInput.value, 10);
-            const max = parseInt(quantityInput.max || 100);
-            if (isNaN(quantity) || quantity < 1) quantity = 1;
-            if (quantity > max) quantity = max;
-            quantityInput.value = quantity;
-            syncFormQuantity();
-            updateTotalPayouts();
-        });
     }
 
-    window.copyCoupon = function (code) {
-        navigator.clipboard.writeText(code);
-        alert("Đã sao chép mã: " + code);
-    };
-
-    const reviewList = document.querySelector('.review-list');
-    const reviews = reviewList?.querySelectorAll('.review-container') ?? [];
-    const paginationButtons = document.querySelectorAll('.page-btn');
-    const commentsPerPage = 6;
-
-    function showPage(page) {
-        const start = (page - 1) * commentsPerPage;
-        const end = start + commentsPerPage;
-
-        reviews.forEach((review, index) => {
-            review.style.display = (index >= start && index < end) ? 'block' : 'none';
-        });
-
-        paginationButtons.forEach(btn => btn.classList.remove('active'));
-        const currentBtn = document.querySelector(`.page-btn[data-page="${page}"]`);
-        currentBtn?.classList.add('active');
+    // Sửa lại hàm syncQuantity
+    function syncQuantity() {
+        const quantity = parseInt(quantityInput.value) || 1;
+        const max = parseInt(quantityInput.max) || 100;
+        
+        quantityInput.value = Math.min(Math.max(quantity, 1), max);
+        
+        if (formQuantityInput) formQuantityInput.value = quantityInput.value;
+        if (checkoutQuantityInput) checkoutQuantityInput.value = quantityInput.value;
+        
+        // Cập nhật ngay lập tức
+        updateTotalPayouts();
     }
 
-    paginationButtons.forEach(button => {
-        button.addEventListener('click', function () {
-            const page = parseInt(this.dataset.page);
-            showPage(page);
-        });
+    // Thêm sự kiện input cho quantity
+    quantityInput.addEventListener('input', function() {
+        syncQuantity();
     });
 
-    if (reviews.length > 0) {
-        showPage(1);
+    function updateFoodProductInfo(thumbnail) {
+        sizeSection.style.display = 'none';
+        
+        const oldPrice = parseFloat(thumbnail.dataset.oldPrice) || 0;
+        const discount = parseFloat(thumbnail.dataset.discountPercent) || 0;
+        const discountedPrice = oldPrice * (100 - discount) / 100;
+        
+        oldPriceEl.textContent = formatCurrency(oldPrice);
+        discountEl.textContent = discount + '%';
+        newPriceEl.textContent = formatCurrency(discountedPrice); 
+        
+        quantityInput.value = 1;
+        quantityInput.max = thumbnail.dataset.quantity || 100;
+        
+        updateFormInputs({
+            id: thumbnail.dataset.id,
+            type: thumbnail.dataset.type,
+            name: thumbnail.dataset.name,
+            price: discountedPrice 
+        }, thumbnail.dataset.type, thumbnail.dataset.id);
+        
+        updateTotalPayouts();
     }
 
-    // Đồng bộ initial form quantity
-    syncFormQuantity();
-
-    updateTotalPayouts();
-
-    // js của nút mở rộng mô tả
-    const toggleBtn = document.getElementById('toggleBtn');
-    const description = document.querySelector('.description');
-
-    toggleBtn.addEventListener('click', function() {
-        description.classList.toggle('expanded');
-        toggleBtn.classList.toggle('expanded');
-
-        // Đổi icon nếu cần (nếu không thích xoay)
-        const icon = toggleBtn.querySelector('i');
-        if (description.classList.contains('expanded')) {
-            icon.classList.remove('fa-chevron-down');
-            icon.classList.add('fa-chevron-up');
-        } else {
-            icon.classList.remove('fa-chevron-up');
-            icon.classList.add('fa-chevron-down');
-        }
-    });
-
+    function updateBeverageProductInfo(thumbnail) {
+        sizeSection.style.display = 'flex';
+        sizeContainer.innerHTML = '';
+        resetTotalAmount();
     
-});
-
-
-document.querySelectorAll('.rating-filters button').forEach(button => {
-    button.addEventListener('click', () => {
-        const filter = button.getAttribute('data-filter');
-
-        // Highlight nút đang chọn
-        document.querySelectorAll('.rating-filters button').forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
-
-        // Lọc review
-        document.querySelectorAll('.review-container').forEach(review => {
-            const rating = review.getAttribute('data-rating');
-            const hasMedia = review.getAttribute('data-has-media') === '1';
-            const hasComment = review.getAttribute('data-has-comment') === '1';
-
-            let show = true;
-            switch (filter) {
-                case 'all':
-                    show = true; break;
-                case 'with_media':
-                    show = hasMedia; break;
-                case 'with_comment':
-                    show = hasComment; break;
-                default:
-                    show = rating === filter; break;
-            }
-            review.style.display = show ? 'block' : 'none';
-        });
-    });
-});
-
-document.querySelectorAll('.product-thumbnail').forEach(img => {
-    img.addEventListener('click', function () {
-        const productId = this.dataset.id;
-        const productType = this.dataset.type;
-        const product = allProducts.find(p => p.id == productId && p.type == productType);
-        if (!product) return;
-
-        // Cập nhật ảnh
-        document.querySelector('.product-show img').src = product.image;
-
-        // Cập nhật tên và mô tả
-        document.querySelector('.detail-product h2').textContent = product.name;
-        document.querySelector('.description').textContent = product.description;
-
-        // Cập nhật giá
-        document.getElementById('old-price').textContent = product.old_price.toLocaleString() + '₫';
-        document.getElementById('discount').textContent = product.discount_percent + '%';
-        document.getElementById('new-price').textContent = product.price.toLocaleString() + '₫';
-
-        // Cập nhật số lượng
-        document.getElementById('quantity').value = 1;
-        document.getElementById('quantity').max = product.quantity ?? 1;
-
-        // Cập nhật loại
-        document.querySelector('input[name="type"]').value = productType;
-        document.querySelector('input[name="product_id"]').value = productId;
-
-        // Nếu là đồ uống thì hiển thị size
-        const sizeList = document.querySelector('.size-item');
-        if (productType === 'beverage') {
-            sizeList.innerHTML = '';
-            product.sizes.forEach(size => {
-                const btn = document.createElement('input');
-                btn.type = 'button';
-                btn.className = 'size-btn';
-                btn.value = size.size;
-                btn.dataset.price = size.price;
-                btn.dataset.old = size.old_price;
-                btn.dataset.discount = size.discount_percent;
-                btn.dataset.quantity = size.quantity;
-                sizeList.appendChild(btn);
+        const sizes = JSON.parse(thumbnail.dataset.sizes || '[]');
+        
+        sizes.forEach((size, index) => {
+            const sizeButton = document.createElement('button');
+            sizeButton.type = 'button';
+            sizeButton.className = `size-btn ${index === 0 ? 'active' : ''}`;
+            sizeButton.textContent = size.size;
+            
+            // Tính toán giá mới dựa trên giá gốc và phần trăm giảm giá
+            const discountedPrice = size.old_price * (100 - size.discount_percent) / 100;
+            
+            sizeButton.dataset.price = discountedPrice; // Lưu giá sau giảm
+            sizeButton.dataset.old = size.old_price;
+            sizeButton.dataset.discount = size.discount_percent;
+            sizeButton.dataset.quantity = size.quantity;
+            
+            sizeButton.addEventListener('click', function() {
+                document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Hiển thị giá gốc và giá sau giảm
+                oldPriceEl.textContent = formatCurrency(this.dataset.old);
+                discountEl.textContent = this.dataset.discount + '%';
+                newPriceEl.textContent = formatCurrency(this.dataset.price); 
+                
+                quantityInput.max = this.dataset.quantity;
+                quantityInput.value = 1;
+                
+                if (selectedSizeInput) selectedSizeInput.value = this.textContent;
+                if (checkoutSelectedSizeInput) checkoutSelectedSizeInput.value = this.textContent;
+                
+                updateTotalPayouts();
             });
-        } else {
-            sizeList.innerHTML = ''; // Ẩn size nếu là food
+            
+            sizeContainer.appendChild(sizeButton);
+        });
+    
+        if (sizes.length > 0) {
+            const firstSize = sizes[0];
+            const firstDiscountedPrice = firstSize.old_price * (100 - firstSize.discount_percent) / 100;
+            
+            // Hiển thị giá gốc và giá sau giảm
+            oldPriceEl.textContent = formatCurrency(firstSize.old_price);
+            discountEl.textContent = firstSize.discount_percent + '%';
+            newPriceEl.textContent = formatCurrency(firstDiscountedPrice);
+            
+            quantityInput.value = 1;
+            quantityInput.max = firstSize.quantity;
+            
+            if (selectedSizeInput) selectedSizeInput.value = sizes[0].size;
+            if (checkoutSelectedSizeInput) checkoutSelectedSizeInput.value = sizes[0].size;
+            
+            updateTotalPayouts();
         }
+        
+        updateFormInputs({
+            id: thumbnail.dataset.id,
+            type: thumbnail.dataset.type,
+            name: thumbnail.dataset.name
+        }, thumbnail.dataset.type, thumbnail.dataset.id);
+    }
 
-        // Cập nhật tổng tiền ban đầu
-        document.getElementById('total-amount').textContent = product.price.toLocaleString() + '₫';
-    });
+    // Khởi tạo khi trang được tải
+    initProductDetails();
 });
-
-document.getElementById('quantity').addEventListener('input', function () {
-    const quantity = parseInt(this.value);
-    const price = parseFloat(document.getElementById('new-price').textContent.replace(/[₫,]/g, '')) || 0;
-    document.getElementById('total-amount').textContent = (price * quantity).toLocaleString() + '₫';
-});
-
-
-
-
-
-
-

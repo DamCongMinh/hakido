@@ -307,11 +307,6 @@ h2 {
     gap: 16px;
 }
 
-.size-list input {
-    padding: 10px 36px;
-    font-size: 1.2rem;
-}
-
 .size-list input:hover {
     background-color: red;
     color: white;
@@ -319,16 +314,20 @@ h2 {
     cursor: pointer;
 }
 
-.size-btn.active {
+.size-btn {
     background-color: #24c43c;
     color: #fff;
     border-color: #3b1e99;
     font-weight: bold;
     transform: scale(1.05);
+    padding: 10px 36px;
+    font-size: 1.2rem;
+    margin-left: 16px;
 }
 
-
-
+.size-btn.active {
+    background-color: #e74c3c;
+}
 
 /* Số lượng sản phẩm */
 .amount {
@@ -500,6 +499,11 @@ h2 {
     border-radius: 5px;
     cursor: pointer;
     transition: 0.3s ease-in-out;
+}
+
+.btn-buy {
+    margin-left: 12px;
+    background-color: #e74c3c;
 }
 
 .btn-nav i {

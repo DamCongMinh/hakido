@@ -20,87 +20,98 @@
             Dữ liệu thanh toán chưa sẵn sàng. Vui lòng chọn sản phẩm từ giỏ hàng để tiến hành thanh toán.
         </div>
     @else
-        <h2 class="h2">Xác nhận thanh toán</h2>
-
-        @foreach ($groupedItems as $restaurantId => $items)
-            <h3 class="h3">Nhà hàng: {{ $restaurantNames[$restaurantId] ?? 'Không rõ' }}</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Hình ảnh</th>
-                        <th>Sản phẩm</th>
-                        <th>Số lượng</th>
-                        <th>Đơn giá</th>
-                        <th>Tổng tiền sản phẩm</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($items as $item)
-                        <tr>
-                            <td data-label="Hình ảnh">
-                                <img 
-                                    src="{{ asset('storage/' . $item['image']) }}" 
-                                    alt="{{ $item['name'] }}" 
-                                    style="width: 80px; height: auto;"
-                                    onerror="this.src='{{ asset('img/slide.png') }}'"
-                                >
-                            </td>
-                            <td>{{ $item['name'] }}</td>
-                            <td>{{ $item['quantity'] }}</td>
-                            <td>{{ number_format($item['price']) }}₫</td>
-                            <td>{{ number_format($item['total']) }}₫</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-
-            <h4 class="h4">Khoảng cách: {{ number_format($restaurantDistances[$restaurantId], 2) }} km</h4>
-            <h4 class="h4">Phí ship: {{ number_format($restaurantShippingFees[$restaurantId]) }}₫</h4>
-            <h4 class="h4">Tổng tiền tất cả sản phẩm: {{ number_format($restaurantTotalAmounts[$restaurantId]) }}₫</h4>
-            <h3 class="h3">Tổng cộng: {{ number_format($restaurantTotalSums[$restaurantId]) }}₫</h3>
-
-            <hr>
-        @endforeach
-
-        <h3 class="h3">Tổng tiền cần thanh toán: {{ number_format($finalTotal) }}₫</h3>
-
-        <form id="checkout_form" method="POST">
-            @csrf
-        
-            @if (!$isGuest)
-                <label>
-                    <input type="checkbox" id="use-default-info" checked>
-                    Dùng thông tin mặc định
-                </label>
-            @endif
-        
-            <label>Họ tên người nhận</label>
-            <input type="text" name="receiver_name" id="receiver_name"
-                value="{{ old('receiver_name', $isGuest ? '' : $user->name) }}" required>
-        
-            <label>Số điện thoại</label>
-            <input type="text" name="receiver_phone" id="receiver_phone"
-                value="{{ old('receiver_phone', $customer['phone'] ?? '') }}" required>
-        
-            <label>Địa chỉ</label>
-            <textarea name="receiver_address" id="receiver_address" required>{{ old('receiver_address', $customer['address'] ?? '') }}</textarea>
-        
-            <label for="payment_method">Chọn phương thức thanh toán</label>
-            <select name="payment_method" id="payment_method" required>
-                <option value="" disabled selected>-- Vui lòng chọn --</option>
-                <option value="cod">🛵 Thanh toán khi nhận hàng (COD)</option>
-                <option value="vnpay">💳 Thanh toán qua VNPAY</option>
-            </select>
-        
-            {{-- Các input hidden --}}
-            <input type="hidden" name="items" id="items-input">
-            <input type="hidden" name="shipping_fees" id="shipping-fees-input">
-            <input type="hidden" name="distances" id="distances-input">
-            <input type="hidden" name="restaurantTotalAmounts" id="restaurant-total-amounts-input">
-            <input type="hidden" name="restaurantTotalSums" id="restaurant-total-sums-input">
-        
-            <button type="submit" id="submit-button">Xác nhận & Thanh toán</button>
-        </form>
+        <div class="container">
+            <div class="check-product">
+                <h2 class="h2">Thông tin đơn hàng</h2>
+    
+                @foreach ($groupedItems as $restaurantId => $items)
+                    <h3 class="h3">Nhà hàng: {{ $restaurantNames[$restaurantId] ?? 'Không rõ' }}</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Hình ảnh</th>
+                                <th>Sản phẩm</th>
+                                <th>Số lượng</th>
+                                <th>Đơn giá</th>
+                                <th>Tổng tiền sản phẩm</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($items as $item)
+                                <tr>
+                                    <td data-label="Hình ảnh">
+                                        <img 
+                                            src="{{ asset('storage/' . $item['image']) }}" 
+                                            alt="{{ $item['name'] }}" 
+                                            style="width: 80px; height: auto;"
+                                            onerror="this.src='{{ asset('img/slide.png') }}'"
+                                        >
+                                    </td>
+                                    <td>{{ $item['name'] }}</td>
+                                    <td>{{ $item['quantity'] }}</td>
+                                    <td>{{ number_format($item['price']) }}₫</td>
+                                    <td>{{ number_format($item['total']) }}₫</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+    
+                    {{-- <h4 class="h4">Khoảng cách: {{ number_format($restaurantDistances[$restaurantId], 2) }} km</h4> --}}
+                    <h4 class="h4">Phí ship: {{ number_format($restaurantShippingFees[$restaurantId]) }}₫</h4>
+                    <h4 class="h4">Tổng tiền tất cả sản phẩm: {{ number_format($restaurantTotalAmounts[$restaurantId]) }}₫</h4>
+                    <h3 class="h3">Tổng cộng: {{ number_format($restaurantTotalSums[$restaurantId]) }}₫</h3>
+                    <h3 class="h3">Tổng tiền cần thanh toán: {{ number_format($finalTotal) }}₫</h3>
+                    @if (session('error'))
+                        <div class="alert alert-danger">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+    
+                    <hr>
+                @endforeach
+            </div>
+    
+            
+            <div class="check-info">
+                <h2 class="h2">Thông tin người mua hàng</h2>
+                <form id="checkout_form" method="POST">
+                    @csrf
+                
+                    @if (!$isGuest)
+                        <label>
+                            <input type="checkbox" id="use-default-info" checked>
+                            Dùng thông tin mặc định
+                        </label>
+                    @endif
+                
+                    <label>Họ tên người nhận</label>
+                    <input type="text" name="receiver_name" id="receiver_name"
+                        value="{{ old('receiver_name', $isGuest ? '' : $user->name) }}" required>
+                
+                    <label>Số điện thoại</label>
+                    <input type="text" name="receiver_phone" id="receiver_phone"
+                        value="{{ old('receiver_phone', $customer['phone'] ?? '') }}" required>
+                
+                    <label>Địa chỉ</label>
+                    <textarea name="receiver_address" id="receiver_address" required>{{ old('receiver_address', $customer['address'] ?? '') }}</textarea>
+                
+                    <label for="payment_method">Chọn phương thức thanh toán</label>
+                    <select name="payment_method" id="payment_method" required>
+                        <option value="cod">🛵 Thanh toán khi nhận hàng (COD)</option>
+                        <option value="vnpay">💳 Thanh toán qua VNPAY</option>
+                    </select>
+                
+                    {{-- Các input hidden --}}
+                    <input type="hidden" name="items" id="items-input">
+                    <input type="hidden" name="shipping_fees" id="shipping-fees-input">
+                    <input type="hidden" name="distances" id="distances-input">
+                    <input type="hidden" name="restaurantTotalAmounts" id="restaurant-total-amounts-input">
+                    <input type="hidden" name="restaurantTotalSums" id="restaurant-total-sums-input">
+                
+                    <button type="submit" id="submit-button">Xác nhận & Thanh toán</button>
+                </form>
+            </div>
+        </div>
     @endif
 
     @include('layout.footer')

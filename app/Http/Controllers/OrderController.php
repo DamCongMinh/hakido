@@ -28,41 +28,47 @@ class OrderController extends Controller
             'shipping_fees' => 'required|string',
             'distances' => 'required|string',
             'restaurantTotalAmounts' => 'required|string',
+            'restaurantTotalSums' => 'required|string',
         ]);
 
         $user = auth()->user();
         $customer = $user->customer;
+
         if (!$customer) {
             throw new \Exception('Không tìm thấy thông tin khách hàng.');
         }
-        
 
-        // Decode các dữ liệu JSON
+        // Decode JSON từ request
         $groupedItems = json_decode($request->input('items'), true);
         $shippingFees = json_decode($request->input('shipping_fees'), true);
         $distances = json_decode($request->input('distances'), true);
         $restaurantTotalAmounts = json_decode($request->input('restaurantTotalAmounts'), true);
         $restaurantTotalSums = json_decode($request->input('restaurantTotalSums'), true);
-        $orders = []; 
-        $createdOrders = [];
-        // dd($groupedItems);
 
+        $createdOrders = [];
+        $maxDistanceKm = 10; // ngưỡng tối đa cho khoảng cách
 
         DB::beginTransaction();
 
         try {
             foreach ($groupedItems as $restaurantId => $items) {
-                $totalAmount = 0;
+                // Kiểm tra khoảng cách
+                if (!isset($distances[$restaurantId])) {
+                    throw new \Exception("Không có dữ liệu khoảng cách cho nhà hàng $restaurantId.");
+                }
+
+                $distance = $distances[$restaurantId];
+                if ($distance > $maxDistanceKm) {
+                    throw new \Exception("Khoảng cách đến nhà hàng $restaurantId vượt quá giới hạn ($distance km).");
+                }
 
                 // Tạo đơn hàng
                 $order = Order::create([
-                    // 'customer_id' => $customer->id,
-                    'customer_id' => $user->id,
+                    'customer_id' => $customer->id,
                     'restaurant_id' => $restaurantId,
                     'receiver_name' => $request->receiver_name,
                     'receiver_phone' => $request->receiver_phone,
                     'receiver_address' => $request->receiver_address,
-                    // 'distance' => $distances[$restaurantId] ?? 0,
                     'shipping_fee' => $shippingFees[$restaurantId] ?? 0,
                     'total' => $restaurantTotalSums[$restaurantId] ?? 0,
                     'status' => 'pending',
@@ -71,62 +77,52 @@ class OrderController extends Controller
 
                 // Tạo chi tiết đơn hàng
                 foreach ($items as $item) {
-                    $itemTotal = $item['price'] * $item['quantity'];
-                    $totalAmount += $itemTotal;
-
                     OrderItem::create([
                         'order_id' => $order->id,
                         'order_img' => $item['image'],
                         'product_id' => $item['product_id'],
                         'product_type' => $item['product_type'],
                         'product_name' => $item['name'],
-                        'price' => $item['price'], 
+                        'price' => $item['price'],
                         'total_price' => $item['price'] * $item['quantity'],
                         'quantity' => $item['quantity'],
                         'size' => $item['size'] ?? null,
                     ]);
-                    
                 }
-                
-                // ✅ Load các quan hệ để dùng ở view
+
                 $order->load('orderItems', 'restaurantProfile');
-                
-
-                // ✅ Thêm vào danh sách để hiển thị
                 $createdOrders[] = $order;
-                
             }
-            // ✅ Xoá giỏ hàng sau khi tạo đơn xong
+
+            // Xoá các item trong giỏ hàng
             $cart = $user->cart;
-                if ($cart) {
-                    foreach ($groupedItems as $restaurantId => $items) {
-                        foreach ($items as $item) {
-                            $query = $cart->items()
-                                ->where('product_id', $item['product_id'])
-                                ->where('product_type', $item['product_type']);
+            if ($cart) {
+                foreach ($groupedItems as $restaurantId => $items) {
+                    foreach ($items as $item) {
+                        $query = $cart->items()
+                            ->where('product_id', $item['product_id'])
+                            ->where('product_type', $item['product_type']);
 
-                            if (!empty($item['size'])) {
-                                $query->where('size', $item['size']);
-                            } else {
-                                $query->whereNull('size');
-                            }
-
-                            $query->delete();
+                        if (!empty($item['size'])) {
+                            $query->where('size', $item['size']);
+                        } else {
+                            $query->whereNull('size');
                         }
+
+                        $query->delete();
                     }
                 }
+            }
 
-
-            
             DB::commit();
-
             return view('web.order_success', ['orders' => $createdOrders]);
+
         } catch (\Exception $e) {
             DB::rollBack();
-            dd($e->getMessage());
             return back()->with('error', 'Đã xảy ra lỗi khi xử lý đơn hàng: ' . $e->getMessage());
         }
     }
+
 
 
     public function success(Request $request)

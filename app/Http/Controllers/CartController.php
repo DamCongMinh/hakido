@@ -24,7 +24,6 @@ class CartController extends Controller
             return redirect()->route('login')->with('error', 'Bạn cần đăng nhập để thêm vào giỏ hàng.');
         }
 
-        // $cart = $user->cart()->firstOrCreate([]);
         $cart = $user->cart()->firstOrCreate([
             'user_id' => $user->id,
         ]);
@@ -207,7 +206,7 @@ class CartController extends Controller
 
 
 
-    // ✅ POST /cart/checkout (submit đơn hàng)
+    
     public function processCheckout(Request $request)
     {
         $selectedItems = $request->input('selected_items');
@@ -317,30 +316,26 @@ class CartController extends Controller
         // Tổng toàn bộ đơn hàng (gồm tất cả nhà hàng)
         $totalAmount = array_sum($restaurantTotalAmounts);
         $totalShippingFee = array_sum($restaurantShippingFees);
-        $finalTotal = array_sum($restaurantTotalSums); // Tổng cộng toàn bộ (sản phẩm + ship)
+        $finalTotal = array_sum($restaurantTotalSums); 
+
+        $restaurantIds = array_keys($groupedItems);
+        $restaurantId = $restaurantIds[0] ?? null;
+
         session([
             'checkout_data' => [
                 'groupedItems' => $groupedItems,
+                'restaurant_id' => $restaurantId,
                 'restaurantShippingFees' => $restaurantShippingFees,
                 'restaurantTotalAmounts' => $restaurantTotalAmounts,
                 'restaurantTotalSums' => $restaurantTotalSums,
                 'totalAmount' => $totalAmount,
                 'totalShippingFee' => $totalShippingFee,
                 'finalTotal' => $finalTotal,
+                'receiver_name' => $customer->name,
+                'receiver_phone' => $customer->phone,
+                'receiver_address' => $customer->address,
             ]
         ]);
-        // test
-        // $vnpTxnRef = strtoupper(Str::random(12)); // Mã giao dịch duy nhất
-
-        // PendingPayment::create([
-        //     'user_id' => $user->id,
-        //     'vnp_txn_ref' => $vnpTxnRef,
-        //     'items' => json_encode($groupedItems),
-        //     'total_amount' => $totalAmount,
-        //     'shipping_fee' => $totalShippingFee,
-        //     'final_amount' => $finalTotal,
-        //     'status' => 'pending',
-        // ]);
 
         return view('web.checkout', [
             'groupedItems' => $groupedItems,
