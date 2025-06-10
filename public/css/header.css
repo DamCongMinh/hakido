@@ -1,4 +1,4 @@
-/* Reset cơ bản */
+
 * {
     margin: 0;
     padding: 0;
@@ -246,4 +246,109 @@ body {
 }
 .search-suggestions li:hover {
     background: #f7f7f7;
+}
+
+/* css thông báo */
+.header_right--email {
+    position: relative;
+    display: inline-block;
+}
+
+.header_right--email i.fa-bell {
+    font-size: 24px;
+    cursor: pointer;
+    position: relative;
+    color: #fcfcfc;
+    transition: color 0.3s ease;
+}
+
+/* .header_right--email i.fa-bell:hover {
+    color: #007bff;
+} */
+
+.header_right--email .badge.notification-count {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background-color: red;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.notification-dropdown {
+    position: absolute;
+    top: 30px;
+    right: 0;
+    width: 300px;
+    overflow-x: hidden;
+    white-space: normal;
+    word-break: break-word;
+    max-height: 400px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    overflow-y: auto;
+    list-style: none;
+    padding: 10px;
+    margin: 0;
+    z-index: 1000;
+}
+
+.notification-dropdown li {
+    padding: 10px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+    color: #333;
+}
+
+.notification-dropdown li:last-child {
+    border-bottom: none;
+}
+
+.notification-dropdown li small {
+    display: block;
+    color: #888;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+
+@keyframes ping {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    75% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0;
+    }
+}
+
+.notification-badge::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: #d32f2f;
+    animation: ping 2s infinite;
+    z-index: -1;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .notification-dropdown {
+        width: 280px;
+        right: -50px;
+    }
 }

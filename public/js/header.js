@@ -5,6 +5,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const guestEls = document.querySelectorAll('.guest');
     const authEls = document.querySelectorAll('.auth');
 
+    const notificationWrapper = document.querySelector('.header_right--email');
+    const notificationDropdown = document.querySelector('.notification-dropdown');
+    const markAllRead = document.querySelector('.mark-all-read');
+    const unreadItems = document.querySelectorAll('.notification-item.unread');
+    const notificationBadge = document.querySelector('.notification-badge');
+
     if (token && user) {
         guestEls.forEach(el => el.style.display = 'none');
         authEls.forEach(el => el.style.display = 'list-item');
@@ -166,29 +172,56 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     });
-    
-
-    
-    
 
     // Enter để submit
-    searchInput.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            const keyword = searchInput.value.trim();
-            if (keyword) {
-                saveSearchHistory(keyword);
-                searchForm.submit();
-            }
-        }
-    });
+    // searchInput.addEventListener('keydown', function (e) {
+    //     if (e.key === 'Enter') {
+    //         e.preventDefault();
+    //         const keyword = searchInput.value.trim();
+    //         if (keyword) {
+    //             saveSearchHistory(keyword);
+    //             searchForm.submit();
+    //         }
+    //     }
+    // });
 
-    // Click ra ngoài form thì ẩn box
-    document.addEventListener('click', function (event) {
-        if (!searchForm.contains(event.target)) {
-            suggestionsBox.style.display = 'none';
-        }
-    });
+    // // Click ra ngoài form thì ẩn box
+    // document.addEventListener('click', function (event) {
+    //     if (!searchForm.contains(event.target)) {
+    //         suggestionsBox.style.display = 'none';
+    //     }
+    // });
+
+
+    // // Đánh dấu đã đọc khi click
+    // markAllRead.addEventListener('click', function() {
+    //     unreadItems.forEach(item => {
+    //         item.classList.remove('unread');
+    //     });
+        
+    //     // Cập nhật số thông báo
+    //     notificationBadge.textContent = '0';
+    //     notificationBadge.style.display = 'none';
+    // });
+    
+    // // Đóng dropdown khi click ra ngoài
+    // document.addEventListener('click', function(e) {
+    //     if (!notificationWrapper.contains(e.target)) {
+    //         notificationDropdown.style.display = 'none';
+    //     }
+    // });
+
+    // document.getElementById('notification-list').addEventListener('click', function (e) {
+    //     e.stopPropagation(); // chặn lan ra ngoài
+    //     const item = e.target.closest('.notification-item');
+    //     if (item && item.dataset.url && item.dataset.url !== '#') {
+    //         console.log('Đi tới:', item.dataset.url); // debug thử
+    //         window.location.href = item.dataset.url;
+    //     }
+    // });
+    
+    
+    
 
 
     

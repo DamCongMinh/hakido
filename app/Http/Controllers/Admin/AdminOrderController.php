@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class AdminOrderController extends Controller
 {
-    // Hiển thị danh sách đơn hàng
+    
     public function index(Request $request)
     {
         $query = Order::with(['customer', 'restaurant', 'shipper']);
@@ -26,7 +26,7 @@ class AdminOrderController extends Controller
             }
         }
 
-        // Lọc theo ngày cụ thể nếu có
+        // Lọc theo ngày cụ thể
         if ($request->filled('date')) {
             $query->whereDate('created_at', $request->date);
         }

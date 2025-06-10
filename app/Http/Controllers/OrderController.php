@@ -46,7 +46,7 @@ class OrderController extends Controller
         $restaurantTotalSums = json_decode($request->input('restaurantTotalSums'), true);
 
         $createdOrders = [];
-        $maxDistanceKm = 10; // ngưỡng tối đa cho khoảng cách
+        $maxDistanceKm = 20;
 
         DB::beginTransaction();
 
@@ -64,7 +64,7 @@ class OrderController extends Controller
 
                 // Tạo đơn hàng
                 $order = Order::create([
-                    'customer_id' => $customer->id,
+                    'customer_id' => $user->id,
                     'restaurant_id' => $restaurantId,
                     'receiver_name' => $request->receiver_name,
                     'receiver_phone' => $request->receiver_phone,
@@ -90,7 +90,7 @@ class OrderController extends Controller
                     ]);
                 }
 
-                $order->load('orderItems', 'restaurantProfile');
+                $order->load('orderItems', 'restaurant');
                 $createdOrders[] = $order;
             }
 
@@ -137,46 +137,6 @@ class OrderController extends Controller
         return view('web.order_success', ['orders' => $orders]);
     }
 
-    // public function orderedItems(Request $request)
-    // {
-    //     $user = auth()->user();
-    //     $userId = $user->id;
-    //     $customerId = $user->customer->id ?? null;
-    //     $statusFilter = $request->input('status');
-
-    //     $ordersQuery = \App\Models\Order::with(['orderItems', 'restaurantProfile'])
-    //         ->where(function ($query) use ($userId, $customerId) {
-    //             $query->where('customer_id', $userId);
-    //             if ($customerId) {
-    //                 $query->orWhere('customer_id', $customerId);
-    //             }
-    //         });
-
-    //     if ($statusFilter) {
-    //         $ordersQuery->where('status', $statusFilter);
-    //     }
-
-    //     $orders = $ordersQuery->latest()->get();
-
-    //     // Preload products
-    //     $foodIds = [];
-    //     $beverageIds = [];
-
-    //     foreach ($orders as $order) {
-    //         foreach ($order->orderItems as $item) {
-    //             if ($item->product_type === 'food') {
-    //                 $foodIds[] = $item->product_id;
-    //             } elseif ($item->product_type === 'beverage') {
-    //                 $beverageIds[] = $item->product_id;
-    //             }
-    //         }
-    //     }
-
-    //     $foods = \App\Models\Food::whereIn('id', $foodIds)->get()->keyBy('id');
-    //     $beverages = \App\Models\Beverage::whereIn('id', $beverageIds)->get()->keyBy('id');
-
-    //     return view('web.ordered_items', compact('orders', 'foods', 'beverages', 'statusFilter'));
-    // }
 
     public function orderedItems(Request $request)
     {
@@ -187,7 +147,7 @@ class OrderController extends Controller
         $fromDate = $request->input('from_date');
         $toDate = $request->input('to_date');
 
-        $ordersQuery = \App\Models\Order::with(['orderItems', 'restaurantProfile'])
+        $ordersQuery = \App\Models\Order::with(['orderItems', 'restaurant'])
             ->where(function ($query) use ($userId, $customerId) {
                 $query->where('customer_id', $userId);
                 if ($customerId) {

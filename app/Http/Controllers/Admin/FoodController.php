@@ -10,21 +10,6 @@ use App\Models\Beverage;
 
 class FoodController extends Controller
 {
-    // public function index()
-    // {
-    //     $foodsApproved = Food::with('restaurant')->where('status', 'approved')->get();
-    //     $foodsPending = Food::with('restaurant')->where('status', 'pending')->get();
-
-    //     $beveragesApproved = Beverage::with('restaurant')->where('status', 'approved')->get();
-    //     $beveragesPending = Beverage::with('restaurant')->where('status', 'pending')->get();
-
-    //     return view('products.product_control_management', compact(
-    //         'foodsApproved',
-    //         'foodsPending',
-    //         'beveragesApproved',
-    //         'beveragesPending'
-    //     ));
-    // }  
     
     public function index(Request $request)
     {

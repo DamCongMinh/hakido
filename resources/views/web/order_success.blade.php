@@ -17,10 +17,9 @@
     <div class="order-success">
         <h2>Đặt hàng thành công!</h2>
         <p>Cảm ơn bạn đã đặt hàng. Dưới đây là các đơn hàng của bạn:</p>
-        {{-- <pre>{{ print_r($orders, true) }}</pre> --}}
-        @foreach ($orders as $order)
+        @foreach ($orders  as $order)
             <section class="restaurant-order">
-                <h4>Đơn hàng #{{ $order->id }} từ nhà hàng {{ $order->restaurantProfile->name ?? 'Không rõ' }}</h4>
+                <h4>Đơn hàng #{{ $order->id }} từ {{ $order->restaurant->name ?? 'Không rõ' }}</h4>
 
                 </h3>
                 <p><strong>Đơn hàng:</strong> #{{ $order->id }}</p>
@@ -59,7 +58,7 @@
 
 
         <br>
-        <a href="{{ route('home') }}">Trở về trang chủ</a>
+        {{-- <a href="{{ route('home') }}">Trở về trang chủ</a> --}}
     </div>
 
     @include('layout.footer')

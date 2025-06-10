@@ -67,7 +67,7 @@ class GoogleController extends Controller
             return redirect('/home');
 
         } catch (\Exception $e) {
-            Log::error('❌ Lỗi khi đăng nhập Google: ' . $e->getMessage());
+            Log::error(' Lỗi khi đăng nhập Google: ' . $e->getMessage());
             return redirect('/login')->withErrors([
                 'google_error' => 'Đăng nhập Google thất bại: ' . $e->getMessage()
             ]);

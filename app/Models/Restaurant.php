@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
 
 class Restaurant extends Model
 {
+    use Notifiable;
     protected $casts = [
         'last_active_at' => 'datetime',
     ];
@@ -27,6 +29,11 @@ class Restaurant extends Model
     public function beverages()
     {
         return $this->hasMany(Beverage::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(\App\Models\Order::class, 'restaurant_id', 'id');
     }
 
     

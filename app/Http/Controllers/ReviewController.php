@@ -133,7 +133,7 @@ class ReviewController extends Controller
             'shipping_comment' => 'nullable|string|max:1000',
         ]);
     
-        // Tìm shipper từ user_id (bạn gửi lên là user_id)
+        // Tìm shipper từ user_id 
         $shipper = \App\Models\Shipper::where('user_id', $request->shipper_id)->first();
     
         if (!$shipper) {
@@ -151,7 +151,7 @@ class ReviewController extends Controller
     
         ShippingReview::create([
             'order_id' => $request->order_id,
-            'shipper_id' => $shipper->id, // sử dụng id thật từ bảng shippers
+            'shipper_id' => $shipper->id,
             'customer_id' => $request->customer_id,
             'rating' => $request->shipping_rating,
             'comment' => $request->shipping_comment,

@@ -51,10 +51,40 @@
                 <div class="header_right--cart">
                     <a href="{{ route('cart.show') }}"><i class="fa-solid fa-cart-shopping"></i></a>
                 </div>
+
                 
                 <div class="header_right--email">
-                    <i class="fa-solid fa-bell"></i>
+                    <i class="fa-solid fa-bell" style="cursor: pointer;"></i>
+                
+                    @if ($notifications->whereNull('read_at')->count() > 0)
+                        <span class="badge notification-count">
+                            {{ $notifications->whereNull('read_at')->count() }}
+                        </span>
+                    @endif
+                
+                    <ul class="notification-dropdown max-w-sm overflow-x-hidden whitespace-normal break-words" id="notification-list" style="display: none;">
+                        @forelse ($notifications->take(5) as $notification)
+                            <li
+                                data-url="{{ route('notifications.read', $notification->id) }}"
+                                class="notification-item"
+                                style="cursor: pointer;"
+                            >
+                                {{ $notification->data['message'] ?? 'Thông báo mới' }}
+                                <br>
+                                <small>{{ $notification->created_at->diffForHumans() }}</small>
+                            </li>
+                        @empty
+                            <li>Không có thông báo nào.</li>
+                        @endforelse
+                    </ul>
                 </div>
+                
+                
+                
+                
+                
+                
+                
 
                 
                 <div class="header_right--account">
@@ -136,6 +166,7 @@
         </div>
     </section>
     <script src="{{ asset('js/header.js') }}"></script>
+    <script src="{{ asset('js/notification.js') }}"></script>
     @if (session('token') && session('user'))
     <script>
     // Lưu dữ liệu vào localStorage sau khi đăng nhập bằng Google

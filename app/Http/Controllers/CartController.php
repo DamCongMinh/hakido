@@ -84,7 +84,7 @@ class CartController extends Controller
     }
 
     //  GET /cart/checkout (hiển thị form thanh toán)
-    public function showCheckout()
+    public function showCheckout(Request $request)
     {
         $user = auth()->user();
         $cart = $user->cart()->with('items')->first();
@@ -128,7 +128,7 @@ class CartController extends Controller
     
             if (!isset($restaurantShippingFees[$restaurantId])) {
                 $restaurant = $product->restaurant;
-    
+            
                 if (
                     $restaurant && $restaurant->latitude && $restaurant->longitude &&
                     $customer->latitude && $customer->longitude
@@ -139,16 +139,19 @@ class CartController extends Controller
                         $customer->latitude,
                         $customer->longitude
                     );
-    
+            
                     $restaurantDistances[$restaurantId] = $distance;
-    
-                    // Nếu cùng tỉnh thì phí cố định là 30.000
-                    if ($restaurant->province === $customer->province) {
-                        $shippingFee = 30000;
+            
+                    if ($distance < 10) {
+                        $shippingFee = 15000;
+                    } elseif ($distance < 20) {
+                        $shippingFee = 25000;
+                    } elseif ($distance <= 30) {
+                        $shippingFee = 35000;
                     } else {
-                        $shippingFee = min(100000, max(15000, round($distance * 1000)));
+                        $shippingFee = 50000;
                     }
-    
+            
                     $restaurantShippingFees[$restaurantId] = $shippingFee;
                 } else {
                     $restaurantDistances[$restaurantId] = null;
@@ -222,8 +225,8 @@ class CartController extends Controller
         $groupedItems = [];
         $restaurantShippingFees = [];
         $restaurantDistances = [];
-        $restaurantTotalAmounts = []; // Tổng tiền sản phẩm từng nhà hàng
-        $restaurantTotalSums = [];    // Tổng cộng từng nhà hàng
+        $restaurantTotalAmounts = [];
+        $restaurantTotalSums = [];
         $restaurantNames = [];
 
         foreach ($selectedItems as $data) {
@@ -272,10 +275,9 @@ class CartController extends Controller
 
             if (!isset($restaurantShippingFees[$restaurantId])) {
                 $restaurant = $product->restaurant;
-
+            
                 if (
-                    $restaurant && $customer &&
-                    $restaurant->latitude && $restaurant->longitude &&
+                    $restaurant && $restaurant->latitude && $restaurant->longitude &&
                     $customer->latitude && $customer->longitude
                 ) {
                     $distance = $this->haversineDistance(
@@ -284,14 +286,19 @@ class CartController extends Controller
                         $customer->latitude,
                         $customer->longitude
                     );
-
+            
                     $restaurantDistances[$restaurantId] = $distance;
-
-                    $shippingFee = (
-                        abs($restaurant->latitude - $customer->latitude) < 0.01 &&
-                        abs($restaurant->longitude - $customer->longitude) < 0.01
-                    ) ? 30000 : min(100000, max(15000, round($distance * 1000)));
-
+            
+                    if ($distance < 10) {
+                        $shippingFee = 15000;
+                    } elseif ($distance < 20) {
+                        $shippingFee = 25000;
+                    } elseif ($distance <= 30) {
+                        $shippingFee = 35000;
+                    } else {
+                        $shippingFee = 50000;
+                    }
+            
                     $restaurantShippingFees[$restaurantId] = $shippingFee;
                 } else {
                     $restaurantDistances[$restaurantId] = null;

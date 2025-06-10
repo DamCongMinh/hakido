@@ -58,8 +58,6 @@ class ProductController extends Controller
         return response()->json(['success' => false], 400);
     }
 
-    // ProductController.php
-
 
 
 }

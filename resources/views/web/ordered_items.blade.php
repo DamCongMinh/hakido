@@ -72,7 +72,7 @@
                                 @if ($index === 0)
                                     <td rowspan="{{ $itemCount }}">{{ $order->id }}</td>
                                     <td rowspan="{{ $itemCount }}">{{ $order->created_at->format('d/m/Y H:i') }}</td>
-                                    <td rowspan="{{ $itemCount }}">{{ $order->restaurantProfile->name ?? 'Không rõ' }}</td>
+                                    <td rowspan="{{ $itemCount }}">{{ $order->restaurant->name ?? 'Không rõ' }}</td>
                                 @endif
                                 <td>
                                     @php

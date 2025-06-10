@@ -35,7 +35,7 @@ class ProfileController extends Controller
             'longitude' => 'nullable|numeric',
         ];
 
-        // Các rule riêng theo vai trò
+        
         switch ($user->role) {
             case 'customer':
                 $rules = array_merge($commonRules, [
@@ -58,10 +58,8 @@ class ProfileController extends Controller
                 $rules = $commonRules;
         }
 
-        // Validate input chung + riêng
         $validated = $request->validate($rules);
 
-        // Xử lý avatar (nếu có)
         $avatarPath = null;
         if ($request->hasFile('avatar')) {
             $avatarPath = $request->file('avatar')->store('avatars', 'public');
@@ -121,7 +119,6 @@ class ProfileController extends Controller
                 break;
         }
 
-        // Cập nhật bảng cha users
         $user->update([
             'name' => $validated['name'],
             'email' => $validated['email'],

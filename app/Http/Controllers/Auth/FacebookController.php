@@ -25,7 +25,7 @@ class FacebookController extends Controller
             'name' => $facebookUser->getName(),
             'facebook_id' => $facebookUser->getId(),
             'avatar' => $facebookUser->getAvatar(),
-            'password' => bcrypt('facebook_login'), // hoặc null nếu bạn không cần
+            'password' => bcrypt('facebook_login'),
         ]
     );
 

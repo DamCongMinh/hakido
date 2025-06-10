@@ -26,6 +26,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\VnpayController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\Restaurant\RestaurantProductController;
@@ -111,6 +112,7 @@ Route::get('login/google/callback', [GoogleController::class, 'callback']);
 Route::middleware(['auth', 'role:customer'])->group(function () {
     // Giỏ hàng
     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+    Route::post('/detail/add', [ShowDetailController::class, 'add'])->name('detail.add');
     Route::get('/cart', [CartController::class, 'show'])->name('cart.show');
     Route::get('/cart/checkout', [CartController::class, 'showCheckout'])->name('cart.checkout');
     Route::post('/cart/checkout', [CartController::class, 'processCheckout'])->name('cart.processCheckout'); 
@@ -122,8 +124,8 @@ Route::middleware(['auth', 'role:customer'])->group(function () {
     Route::get('/order/success', [OrderController::class, 'success'])->name('order.success');
     Route::get('/ordered-items', [OrderController::class, 'orderedItems'])->name('orders.items');
     Route::patch('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
-    Route::post('/checkout-now', [ShowDetailController::class, 'processCheckout'])->name('checkout.now');
-    Route::post('/checkout', [ShowDetailController::class, 'checkout'])->name('checkout');
+    Route::match(['get', 'post'], '/checkout-now', [ShowDetailController::class, 'processCheckout'])->name('checkout.now');
+    Route::get('/checkout', [ShowDetailController::class, 'checkout'])->name('checkout');
 
 
     // show view và lấy order_id
@@ -155,6 +157,15 @@ Route::middleware(['auth'])->group(function () {
     // Route đổi mật khẩu
     Route::get('/profile/change-password', [ProfileController::class, 'showChangePasswordForm'])->name('profile.change_password_form');
     Route::post('/profile/change-password', [ProfileController::class, 'changePassword'])->name('profile.change_password');
+
+    // Route::post('/orders/{order}/update-status', [NotificationController::class, 'updateOrderStatus'])->name('notification');
+    Route::get('/notifications/fetch', [NotificationController::class, 'fetch']);
+    Route::get('/notifications/read/{id}', function ($id) {
+        $notification = Auth::user()->notifications()->findOrFail($id);
+        $notification->markAsRead();
+        return redirect($notification->data['url'] ?? '/');
+    })->name('notifications.read');
+    
 
 });
 

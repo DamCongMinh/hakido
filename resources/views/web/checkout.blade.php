@@ -14,6 +14,7 @@
         $isGuest = !$user;
         $customer = $isGuest ? session('guest_customer') : ($user->customer ?? null);
     @endphp
+    
 
     @if (empty($restaurantTotalAmounts))
         <div class="alert alert-warning">
@@ -179,6 +180,11 @@
                 });
             });
         </script>
+
+
+
+
+
             
             
     

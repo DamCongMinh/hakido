@@ -11,7 +11,7 @@ class AdminAccountController extends Controller
         $customers = User::with('customer')
             ->where('role', 'customer')
             ->get()
-            ->filter(fn($user) => $user->customer) // Bỏ user không có bản ghi phụ
+            ->filter(fn($user) => $user->customer) 
             ->map(function ($user) {
                 $profile = $user->customer;
                 $profile->user_id = $user->id;
@@ -65,12 +65,12 @@ class AdminAccountController extends Controller
         };
 
         if ($profile) {
-            // Gộp thêm các thông tin từ bảng users
+            
             foreach (['email', 'name', 'password', 'is_active', 'is_approved', 'id'] as $field) {
                 $profile->$field = $this->$field;
             }
 
-            // Alias user_id cho tiện trong view
+            
             $profile->user_id = $this->id;
         }
 
@@ -85,7 +85,7 @@ class AdminAccountController extends Controller
     {
         $user = User::findOrFail($id);
         
-        // Chỉ cập nhật cột is_approved trong bảng users
+        
         if (!$user->is_approved) {
             $user->is_approved = 1;
             $user->save();
