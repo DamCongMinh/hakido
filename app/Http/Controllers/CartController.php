@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Food;
 use App\Models\Beverage;
 use App\Models\PendingPayment;
+use App\Models\Voucher;
 use Illuminate\Support\Str;
 
 class CartController extends Controller
@@ -83,7 +84,7 @@ class CartController extends Controller
         return view('web.cart', ['cart' => $cart]);
     }
 
-    //  GET /cart/checkout (hiển thị form thanh toán)
+    //  hiển thị form thanh toán
     public function showCheckout(Request $request)
     {
         $user = auth()->user();
@@ -176,6 +177,27 @@ class CartController extends Controller
         $totalShippingFee = array_sum($restaurantShippingFees);
         $finalTotal = array_sum($restaurantTotalSums);
     
+        // $voucherData = session('voucher_data');
+        // $discount = 0;
+        // $voucher = null;
+    
+        // if ($voucherData) {
+        //     $voucher = \App\Models\Voucher::find($voucherData['id']);
+    
+        //     if ($voucher && $voucher->is_active && (is_null($voucher->end_date) || $voucher->end_date > now())) {
+        //         if ($voucher->type === 'percent') {
+        //             $discount = ($voucher->value / 100) * $totalAmount;
+        //         } elseif ($voucher->type === 'free_shipping') {
+        //             $discount = $totalShippingFee;
+        //         }
+    
+        //         $finalTotal -= $discount;
+        //     } else {
+                
+        //         session()->forget('voucher_data');
+        //     }
+        // }
+
         return view('web.checkout', [
             'groupedItems' => $groupedItems,
             'restaurantDistances' => $restaurantDistances,
@@ -187,8 +209,69 @@ class CartController extends Controller
             'totalShippingFee' => $totalShippingFee,
             'finalTotal' => $finalTotal,
             'customer' => $customer,
+            // 'voucher' => $voucher, 
+            // 'discount' => $discount, 
         ]);
     }
+
+    public function applyVoucher(Request $request)
+    {
+        $voucherCode = $request->input('voucher_code');
+        $groupedItems = $request->input('groupedItems', []); // array: restaurant_id => [items]
+        $shippingFees = $request->input('shippingFees', []); // array: restaurant_id => fee
+    
+        // Tìm voucher
+        $voucher = \App\Models\Voucher::where('code', $voucherCode)
+            ->where('is_active', true)
+            ->where(function ($q) {
+                $q->whereNull('end_date')->orWhere('end_date', '>', now());
+            })
+            ->first();
+    
+        if (!$voucher) {
+            session()->forget(['code', 'id', 'type', 'value', 'discount']);
+            return response()->json(['success' => false, 'message' => 'Mã không hợp lệ hoặc đã hết hạn.']);
+        }
+    
+        $restaurantId = $voucher->restaurant_id;
+        if (!isset($groupedItems[$restaurantId])) {
+            return response()->json(['success' => false, 'message' => 'Voucher này không áp dụng cho nhà hàng đã chọn.']);
+        }
+    
+        $items = $groupedItems[$restaurantId];
+        $totalAmount = collect($items)->sum('total');
+        $shippingFee = $shippingFees[$restaurantId] ?? 0;
+    
+        // Kiểm tra điều kiện đơn hàng tối thiểu
+        if ($voucher->min_order_value && $totalAmount < $voucher->min_order_value) {
+            return response()->json(['success' => false, 'message' => 'Đơn hàng chưa đạt giá trị tối thiểu để sử dụng mã giảm giá.']);
+        }
+    
+        $discount = 0;
+        if ($voucher->type === 'percent') {
+            $discount = ($voucher->value / 100) * $totalAmount;
+        } elseif ($voucher->type === 'free_shipping') {
+            $discount = $shippingFee;
+        }
+    
+        $finalTotal = $totalAmount + $shippingFee - $discount;
+    
+        session([
+            'code' => $voucher->code,
+            'id' => $voucher->id,
+            'type' => $voucher->type,
+            'value' => $voucher->value,
+            'discount' => $discount,
+        ]);
+        return response()->json([
+            'success' => true,
+            'discount' => $discount,
+            'finalTotal' => $finalTotal,
+            'voucher_id' => $voucher->id,
+            'message' => 'Áp dụng mã thành công!',
+        ]);
+    }
+    
     
 
     private function haversineDistance($lat1, $lon1, $lat2, $lon2)
@@ -230,9 +313,7 @@ class CartController extends Controller
         $restaurantNames = [];
 
         foreach ($selectedItems as $data) {
-            if (empty($data['selected']) || !isset($data['product_id'], $data['product_type'])) {
-                continue;
-            }
+            if (empty($data['selected']) || !isset($data['product_id'], $data['product_type'])) continue;
 
             $query = $cart->items()
                 ->where('product_id', $data['product_id'])
@@ -243,22 +324,17 @@ class CartController extends Controller
             }
 
             $item = $query->first();
-
             if (!$item) continue;
 
-            if ($item->product_type === 'food') {
-                $product = Food::find($item->product_id);
-                $productName = $product?->name ?? 'Không rõ';
-                $image = $product?->image;
-                $restaurantId = $product?->restaurant_id;
-            } else {
-                $product = Beverage::find($item->product_id);
-                $productName = $product ? $product->name . ' (Size ' . $item->size . ')' : 'Không rõ';
-                $image = $product?->image;
-                $restaurantId = $product?->restaurant_id;
-            }
+            $product = $item->product_type === 'food'
+                ? Food::find($item->product_id)
+                : Beverage::find($item->product_id);
 
-            if (!$product || !$restaurantId) continue;
+            if (!$product || !$product->restaurant_id) continue;
+
+            $productName = $product->name . ($item->product_type === 'beverage' ? ' (Size ' . $item->size . ')' : '');
+            $image = $product->image;
+            $restaurantId = $product->restaurant_id;
 
             $groupedItems[$restaurantId][] = [
                 'product_id' => $item->product_id,
@@ -275,30 +351,21 @@ class CartController extends Controller
 
             if (!isset($restaurantShippingFees[$restaurantId])) {
                 $restaurant = $product->restaurant;
-            
-                if (
-                    $restaurant && $restaurant->latitude && $restaurant->longitude &&
-                    $customer->latitude && $customer->longitude
-                ) {
+
+                if ($restaurant && $restaurant->latitude && $restaurant->longitude && $customer->latitude && $customer->longitude) {
                     $distance = $this->haversineDistance(
                         $restaurant->latitude,
                         $restaurant->longitude,
                         $customer->latitude,
                         $customer->longitude
                     );
-            
                     $restaurantDistances[$restaurantId] = $distance;
-            
-                    if ($distance < 10) {
-                        $shippingFee = 15000;
-                    } elseif ($distance < 20) {
-                        $shippingFee = 25000;
-                    } elseif ($distance <= 30) {
-                        $shippingFee = 35000;
-                    } else {
-                        $shippingFee = 50000;
-                    }
-            
+
+                    if ($distance < 10) $shippingFee = 15000;
+                    elseif ($distance < 20) $shippingFee = 25000;
+                    elseif ($distance <= 30) $shippingFee = 35000;
+                    else $shippingFee = 50000;
+
                     $restaurantShippingFees[$restaurantId] = $shippingFee;
                 } else {
                     $restaurantDistances[$restaurantId] = null;
@@ -311,7 +378,6 @@ class CartController extends Controller
             return back()->with('error', 'Không có sản phẩm hợp lệ để thanh toán.');
         }
 
-        // Tính tổng tiền sản phẩm và tổng cộng của từng nhà hàng
         foreach ($groupedItems as $restaurantId => $items) {
             $totalItems = collect($items)->sum('total');
             $shipping = $restaurantShippingFees[$restaurantId] ?? 0;
@@ -320,18 +386,26 @@ class CartController extends Controller
             $restaurantTotalSums[$restaurantId] = $totalItems + $shipping;
         }
 
-        // Tổng toàn bộ đơn hàng (gồm tất cả nhà hàng)
         $totalAmount = array_sum($restaurantTotalAmounts);
         $totalShippingFee = array_sum($restaurantShippingFees);
-        $finalTotal = array_sum($restaurantTotalSums); 
+        $finalTotal = array_sum($restaurantTotalSums);
 
-        $restaurantIds = array_keys($groupedItems);
-        $restaurantId = $restaurantIds[0] ?? null;
+        // Dùng dữ liệu voucher từ session (đã set trong applyVoucher)
+        $voucherData = session()->only(['id', 'code', 'type', 'value', 'discount']);
+        $voucher = null;
+        $discount = 0;
+
+        if (!empty($voucherData['id']) && !empty($voucherData['discount'])) {
+            $voucher = (object) $voucherData; // Tạo object giả để hiển thị trong view
+            $discount = $voucherData['discount'];
+            $finalTotal -= $discount;
+        } else {
+            session()->forget(['id', 'code', 'type', 'value', 'discount']);
+        }
 
         session([
             'checkout_data' => [
                 'groupedItems' => $groupedItems,
-                'restaurant_id' => $restaurantId,
                 'restaurantShippingFees' => $restaurantShippingFees,
                 'restaurantTotalAmounts' => $restaurantTotalAmounts,
                 'restaurantTotalSums' => $restaurantTotalSums,
@@ -341,23 +415,18 @@ class CartController extends Controller
                 'receiver_name' => $customer->name,
                 'receiver_phone' => $customer->phone,
                 'receiver_address' => $customer->address,
+                'voucher_id' => $voucherData['id'] ?? null,
+                'voucher_code' => $voucherData['code'] ?? null,
+                'voucher_discount' => $discount,
             ]
         ]);
 
-        return view('web.checkout', [
-            'groupedItems' => $groupedItems,
-            'restaurantDistances' => $restaurantDistances,
-            'restaurantShippingFees' => $restaurantShippingFees,
-            'restaurantTotalAmounts' => $restaurantTotalAmounts,
-            'restaurantTotalSums' => $restaurantTotalSums,
-            'restaurantNames' => $restaurantNames,
-            'totalAmount' => $totalAmount,
-            'totalShippingFee' => $totalShippingFee,
-            'finalTotal' => $finalTotal,
-            'customer' => $customer,
-        ]);
+        return view('web.checkout', compact(
+            'groupedItems', 'restaurantDistances', 'restaurantShippingFees', 'restaurantTotalAmounts',
+            'restaurantTotalSums', 'restaurantNames', 'totalAmount', 'totalShippingFee',
+            'finalTotal', 'customer'
+        ));
     }
-
 
 
 

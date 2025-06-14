@@ -54,7 +54,7 @@
                 <tr>
                     <td>{{ $order->id }}</td>
                     <td>
-                        {{ $order->receiver_name ?? ($order->customer->name ?? 'Không có tên khách') }}
+                        {{ $order->receiver_name ?? ($order->user->name ?? 'Không có tên khách') }}
                     </td>                    
                     <td>
                         {{ $order->restaurantProfile->name ?? ($order->restaurant->name ?? 'Không có tên nhà hàng') }}

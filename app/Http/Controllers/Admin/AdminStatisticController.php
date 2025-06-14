@@ -15,19 +15,30 @@ use Carbon\Carbon;
 
 class AdminStatisticController extends Controller
 {
-    
+    public function showHomeStatistics(Request $request)
+    {
+        return $this->handleHomeStatistics($request);
+    }
+
 
     public function revenueStatistics(Request $request)
     {
         $restaurants = Restaurant::all();
-
         $year = $request->input('year', now()->year);
 
         $totalRevenue = Order::whereYear('created_at', $year)
             ->whereIn('status', ['completed', 'hoàn thành'])
             ->sum('total');
 
-        $monthlyStats = Order::selectRaw('MONTH(created_at) as month, SUM(total) as revenue')
+        $monthlyStats = Order::selectRaw('restaurant_id, MONTH(created_at) as month, SUM(total) as revenue')
+            ->whereYear('created_at', $year)
+            ->whereIn('status', ['completed', 'hoàn thành'])
+            ->groupByRaw('restaurant_id, MONTH(created_at)')
+            ->orderByRaw('restaurant_id, MONTH(created_at)')
+            ->get()
+            ->groupBy('restaurant_id');
+
+        $monthlyTotalStats = Order::selectRaw('MONTH(created_at) as month, SUM(total) as revenue')
             ->whereYear('created_at', $year)
             ->whereIn('status', ['completed', 'hoàn thành'])
             ->groupByRaw('MONTH(created_at)')
@@ -38,38 +49,41 @@ class AdminStatisticController extends Controller
                 return $item;
             });
 
-        return view('Admin.statistics.statistics', compact('totalRevenue', 'monthlyStats', 'year', 'restaurants'));
+        return view('Admin.statistics.statistics', compact(
+            'monthlyStats', 'monthlyTotalStats', 'year', 'restaurants', 'totalRevenue'
+        ));
     }
 
     public function orderStatistics(Request $request)
     {
+        $year = $request->input('year', now()->year);
 
         $restaurants = Restaurant::all();
-        // dd($restaurants->toArray());
-        $year = $request->input('year', now()->year);
 
         $totalOrders = Order::whereYear('created_at', $year)->count();
 
-        $monthlyStats = Order::selectRaw('MONTH(created_at) as month, COUNT(*) as orders')
+        // Truy vấn thống kê theo nhà hàng và tháng
+        $orderStats = DB::table('orders')
+            ->selectRaw('restaurant_id, MONTH(created_at) as month, COUNT(*) as orders')
             ->whereYear('created_at', $year)
-            ->groupByRaw('MONTH(created_at)')
-            ->orderByRaw('MONTH(created_at)')
-            ->get()
-            ->map(function ($item) {
-                $item->month = 'Tháng ' . $item->month;
-                return $item;
-            });
+            ->groupBy('restaurant_id', DB::raw('MONTH(created_at)'))
+            ->get();
 
-        return view('Admin.statistics.order_statistics', compact('totalOrders', 'monthlyStats', 'year', 'restaurants'));
+        // Gom dữ liệu theo restaurant_id
+        $statsByRestaurant = [];
+        foreach ($orderStats as $stat) {
+            $statsByRestaurant[$stat->restaurant_id][] = [
+                'month' => 'Tháng ' . $stat->month,
+                'orders' => $stat->orders,
+            ];
+        }
+
+        return view('Admin.statistics.order_statistics', compact('restaurants', 'totalOrders', 'statsByRestaurant', 'year'));
     }
 
 
 
-    public function showHomeStatistics(Request $request)
-    {
-        return $this->handleHomeStatistics($request);
-    }
-
+    
     
     private function handleHomeStatistics(Request $request)
     {

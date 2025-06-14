@@ -27,18 +27,16 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\VnpayController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\VoucherController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\Restaurant\RestaurantProductController;
 use App\Http\Controllers\Restaurant\RestaurantStatisticsController;
+
 // Giao diện chính (FE)
 
-//test
-
-
 Route::get('/', [HomeController::class, 'index'])->name('home');
-// Route::get('/home', fn () => view('web.home'))->name('homepage');
-
 
 // hiển thị danh sách sản phẩm trong trang list_product
 Route::get('/products/category/{category_id}', [ShowListProductController::class, 'byCategory'])->name('products.byCategory');
@@ -107,6 +105,13 @@ Route::get('login/facebook/callback', [FacebookController::class, 'handleFaceboo
 
 Route::get('login/google', [GoogleController::class, 'redirect']);
 Route::get('login/google/callback', [GoogleController::class, 'callback']);
+
+//lưu voucher
+Route::post('/remember-voucher', function (Request $request) {
+    session(['voucher_code' => $request->code]);
+    return response()->json(['message' => 'Voucher saved']);
+});
+Route::post('/apply-voucher', [CartController::class, 'applyVoucher'])->name('checkout.applyVoucher');
 
 //customer
 Route::middleware(['auth', 'role:customer'])->group(function () {
@@ -251,6 +256,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/products/{id}/edit', [RestaurantProductController::class, 'edit'])->name('products.edit');
     Route::put('/products/{id}', [RestaurantProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{id}', [RestaurantProductController::class, 'destroy'])->name('products.destroy');
+    //vouchers
+    // Route::get('/vouchers', function () {
+    //     return view('web.vouchers');
+    // })->name('voucher.view');
+    
+    Route::get('/create/vouchers', [VoucherController::class, 'createVoucher'])->name('create.voucher');
+    Route::post('/add/vouchers', [VoucherController::class, 'addVoucher'])->name('add.voucher');
+    Route::get('/vouchers/home', [VoucherController::class, 'homeVoucher'])->name('home.voucher');
+    Route::get('/detail/{type}/{id}', [VoucherController::class, 'showDetailWithVouchers'])->name('detail.voucher');
 
     //thống kê và quản lý đơn hàng
     Route::get('/statistics', [RestaurantStatisticsController::class, 'index'])->name('statistics.index');

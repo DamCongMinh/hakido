@@ -1,0 +1,117 @@
+.container {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.container h2 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e74c3c;
+    font-size: 28px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+th {
+    background-color: #e74c3c;
+    color: white;
+    font-weight: 600;
+    text-align: left;
+    padding: 15px;
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+td {
+    padding: 15px;
+    border-bottom: 1px solid #ecf0f1;
+    vertical-align: middle;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* Style cho rowspan */
+td[rowspan] {
+    font-weight: bold;
+    color: #2c3e50;
+    background-color: #ecf0f1;
+    border-right: 2px solid #bdc3c7;
+}
+
+/* Style cho ô "Không có dữ liệu" */
+td[colspan="3"] {
+    text-align: center;
+    color: #7f8c8d;
+    font-style: italic;
+}
+
+/* Màu cho các loại sản phẩm */
+td:contains("Món ăn") {
+    color: #27ae60;
+    font-weight: 500;
+}
+
+td:contains("Đồ uống") {
+    color: #2980b9;
+    font-weight: 500;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+        margin: 15px;
+    }
+    
+    table {
+        display: block;
+        overflow-x: auto;
+    }
+    
+    th, td {
+        padding: 10px 8px;
+        font-size: 13px;
+    }
+    
+    .container h2 {
+        font-size: 22px;
+    }
+}
+
+/* Animation */
+tr {
+    transition: all 0.2s ease;
+}
+
+/* Highlight số lượng tồn thấp */
+td:nth-child(4) {
+    font-weight: 500;
+}
+
+td:nth-child(4):not(:contains("0")) {
+    color: #27ae60;
+}
+
+td:nth-child(4):contains("0") {
+    color: #e74c3c;
+    font-weight: bold;
+}

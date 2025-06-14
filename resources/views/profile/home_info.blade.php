@@ -30,7 +30,7 @@
             <div class="avatar-wrapper">
                 <div class="avatar-container">
                     <img class="profile-pic" id="avatar-preview" 
-                        src="{{ $info->avatar ? asset('storage/' . $info->avatar) : asset('img/default-avatar.png') }}" 
+                        src="{{ $info->avatar ? asset('storage/' . $info->avatar) : asset('img/shiper_avt.jpg') }}" 
                         alt="Avatar"
                         style="cursor: pointer; width: 120px; height: 120px; object-fit: cover; border-radius: 50%;">
                     <!-- icon camera nhấp vào để chọn ảnh -->
@@ -84,12 +84,7 @@
                     <strong>Địa chỉ:</strong> {{ $user->shipper->address }}
                 </div>
             @endif
-            
-
-
-            
-            
-        
+     
             <input type="hidden" id="latitude" name="latitude">
             <input type="hidden" id="longitude" name="longitude">
             <input type="hidden" name="address" id="address" value="{{ old('address', $info->address) }}">
@@ -97,8 +92,6 @@
         
             <button type="submit">Cập nhật</button>
             <p id="location-preview" style="display: none; margin-top:10px;"></p>
-
-
         </form>
         
         <hr>

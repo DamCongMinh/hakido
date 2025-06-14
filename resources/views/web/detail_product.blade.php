@@ -177,46 +177,34 @@
                         </div>
                     </div>
                     <div class="title-right">
-                        <div class="coupon-card">
-                            <div class="coupon-header">
-                                <h2>GIẢM 20%</h2>
-                                <p>Áp dụng cho đơn hàng từ 200K</p>
+                        @foreach ($vouchers as $voucher)
+                            <div class="coupon-card">
+                                <div class="coupon-header">
+                                    <h2>
+                                        @if ($voucher->type === 'percent')
+                                            GIẢM {{ $voucher->value }}%
+                                        @elseif ($voucher->type === 'free_shipping')
+                                            FREESHIP
+                                        @else
+                                            GIẢM {{ number_format($voucher->value, 0, ',', '.') }}đ
+                                        @endif
+                                    </h2>
+                                    <p>
+                                        Áp dụng cho đơn hàng từ {{ number_format($voucher->min_order_value, 0, ',', '.') }}đ
+                                    </p>
+                                </div>
+                                <div class="coupon-body">
+                                    <span class="coupon-code">{{ $voucher->code }}</span>
+                                    <button class="copy-btn" onclick="copyCoupon('{{ $voucher->code }}')">Sao chép</button>
+                                </div>
+                                <div class="coupon-footer">
+                                    <p>Hạn dùng: {{ \Carbon\Carbon::parse($voucher->end_date)->format('d/m/Y') }}</p>
+                                </div>
                             </div>
-                            <div class="coupon-body">
-                                <span class="coupon-code">SALE20</span>
-                                <button class="copy-btn" onclick="copyCoupon('SALE20')">Sao chép</button>
-                            </div>
-                            <div class="coupon-footer">
-                                <p>Hạn dùng: 31/12/2025</p>
-                            </div>
-                        </div> 
-                        <div class="coupon-card">
-                            <div class="coupon-header">
-                                <h2>GIẢM 20%</h2>
-                                <p>Áp dụng cho đơn hàng từ 200K</p>
-                            </div>
-                            <div class="coupon-body">
-                                <span class="coupon-code">SALE20</span>
-                                <button class="copy-btn" onclick="copyCoupon('SALE20')">Sao chép</button>
-                            </div>
-                            <div class="coupon-footer">
-                                <p>Hạn dùng: 31/12/2025</p>
-                            </div>
-                        </div> 
-                        <div class="coupon-card">
-                            <div class="coupon-header">
-                                <h2>GIẢM 20%</h2>
-                                <p>Áp dụng cho đơn hàng từ 200K</p>
-                            </div>
-                            <div class="coupon-body">
-                                <span class="coupon-code">SALE20</span>
-                                <button class="copy-btn" onclick="copyCoupon('SALE20')">Sao chép</button>
-                            </div>
-                            <div class="coupon-footer">
-                                <p>Hạn dùng: 31/12/2025</p>
-                            </div>
-                        </div> 
+                        @endforeach
                     </div>
+                    
+                    
                 </div>                   
             </div>
         </div>
@@ -389,6 +377,8 @@
     <script>
         alert(@json(session('success')));
     </script>
+    
+    
     @endif
 
     @if (session('error'))
@@ -396,6 +386,36 @@
         alert(@json(session('error')));
     </script>
     @endif
+    <script>
+        function copyCoupon(code) {
+            // Loại bỏ ký tự đặc biệt trước khi xử lý
+            const cleanCode = code.replace(/[^a-zA-Z0-9]/g, '');
+            
+            navigator.clipboard.writeText(cleanCode).then(() => {
+                fetch("/remember-voucher", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({ code: cleanCode })
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Network error');
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Voucher saved:', data);
+                    alert("Đã sao chép mã: " + cleanCode);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("Sao chép thành công nhưng lưu mã thất bại");
+                });
+            });
+        }
+
+    </script>
     
 
     

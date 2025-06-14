@@ -27,9 +27,21 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         View::composer('layout.header', function ($view) {
-            $notifications = Auth::check() ? Auth::user()->notifications : collect();
-            $view->with('notifications', $notifications);
+            $user = Auth::user();
+
+            $notifications = $user ? $user->notifications : collect();
+            $cartItemCount = 0;
+
+            if ($user && $user->cart) {
+                $cartItemCount = $user->cart->items()->sum('quantity');
+            }
+
+            $view->with([
+                'notifications' => $notifications,
+                'cartItemCount' => $cartItemCount,
+            ]);
         });
+
         Order::observe(OrderObserver::class);
     }
 }

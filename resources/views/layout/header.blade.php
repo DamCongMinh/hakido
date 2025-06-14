@@ -48,9 +48,17 @@
                 </form>
                 
                 
-                <div class="header_right--cart">
-                    <a href="{{ route('cart.show') }}"><i class="fa-solid fa-cart-shopping"></i></a>
+                <div class="header_right--cart" style="position: relative;">
+                    <a href="{{ route('cart.show') }}" style="position: relative; display: inline-block;">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        @if($cartItemCount > 0)
+                            <span class="badge notification-count">
+                                {{ $cartItemCount }}
+                            </span>
+                        @endif
+                    </a>
                 </div>
+                
 
                 
                 <div class="header_right--email">
@@ -62,7 +70,7 @@
                         </span>
                     @endif
                 
-                    <ul class="notification-dropdown max-w-sm overflow-x-hidden whitespace-normal break-words" id="notification-list" style="display: none;">
+                    <ul class="notification-dropdown" id="notification-list" style="display: none;">
                         @forelse ($notifications->take(5) as $notification)
                             <li
                                 data-url="{{ route('notifications.read', $notification->id) }}"
@@ -77,16 +85,8 @@
                             <li>Không có thông báo nào.</li>
                         @endforelse
                     </ul>
-                </div>
-                
-                
-                
-                
-                
-                
-                
-
-                
+                </div>    
+           
                 <div class="header_right--account">
                     <div class="account-icon"><i class="fa-solid fa-user"></i></div>
                     <div class="account-nav">
@@ -106,7 +106,7 @@
                                     src="{{ asset('storage/' . Auth::user()->resolved_avatar) }}"
                                     onerror="this.onerror=null;this.src='{{ asset('img/shiper_avt.jpg') }}';"
                                     alt="Avatar"
-                                    style="width: 32px; height: 32px; border-radius: 50%;"
+                                    
                                 />
                                     <h3>{{ Auth::user()->name }}</h3>
 
@@ -126,6 +126,7 @@
                                     @if (Auth::user()->role === 'restaurant')
                                         <li><a href="{{ route('profile.home_info') }}"><i class="fa-solid fa-user"></i> Tài khoản của tôi</a></li>
                                         <li><a href="{{ route('restaurant.products.home') }}"><i class="fa-solid fa-utensils"></i> Quản lý sản phẩm</a></li>
+                                        <li><a href="{{ route('restaurant.home.voucher') }}"><i class="fa-solid fa-utensils"></i> Quản lý voucher</a></li>
                                         <li><a href="{{ route('restaurant.statistics.index') }}"><i class="fa-solid fa-receipt"></i> Quản lý đơn hàng</a></li>
                                         <li><a href="{{ route('restaurant.statistics.home') }}"><i class="fa-solid fa-chart-pie"></i> Báo cáo thống kê doanh thu & đơn hàng</a></li>
                                     @endif
@@ -152,10 +153,6 @@
                                     </form>
                                 </li>
                             @endauth
-
-
-
-
 
                         </ul>                                      
                         

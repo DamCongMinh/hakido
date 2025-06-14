@@ -12,7 +12,9 @@ class AdminOrderController extends Controller
     
     public function index(Request $request)
     {
-        $query = Order::with(['customer', 'restaurant', 'shipper']);
+        $query = Order::with(['user', 'restaurant', 'shipper', 'orderItems']);
+
+
 
         // Lọc theo filter_type
         if ($request->filled('filter_type')) {
@@ -41,7 +43,8 @@ class AdminOrderController extends Controller
     // Hiển thị chi tiết 1 đơn hàng
     public function show(Order $order)
     {
-        $order->load(['customer', 'restaurant', 'shipper', 'orderItems']);
+        $order->load(['user', 'restaurant', 'shipper', 'orderItems']);
+
         $shippers = User::where('role', 'shipper')->where('is_active', true)->get();
 
         return view('admin.orders.show', compact('order', 'shippers'));

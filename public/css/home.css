@@ -302,8 +302,21 @@ body {
 }
 
 .home-products img {
-    max-width: calc(100% / 3);
+    max-width: calc((100% / 3)- 68px);
     margin: 16px 16px 16px 16px;
+}
+
+.product {
+    width: calc((100% /3) - 68px);
+    height: 450px;
+    object-fit: cover;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.product img {
+    width: 100%;
 }
 
 

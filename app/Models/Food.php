@@ -25,10 +25,6 @@ class Food extends Model
         'rejection_reason',
     ];
 
-    // protected $casts = [
-    //     'is_active' => 'boolean',
-    // ];
-
     public function restaurant()
     {
         return $this->belongsTo(Restaurant::class, 'restaurant_id');

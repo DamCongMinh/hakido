@@ -155,6 +155,25 @@ h2 {
     font-style: italic;
 }
 
+.descripttion_title {
+    max-height: 80px; /* chiều cao tối đa khi thu gọn */
+    overflow: hidden;
+    position: relative;
+    transition: max-height 0.3s ease;
+}
+
+.descripttion_title.expanded {
+    max-height: none; /* khi mở rộng */
+}
+
+.toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-left: 10px;
+    font-size: 16px;
+}
+
 .descripttion {
     margin-top: 20px;
     font-size: 15px;
@@ -391,7 +410,9 @@ h2 {
 
 .title-right {
     width: 44%;
-    height: 400px;
+    height: auto;
+    min-height: 200px;
+    max-height: 400px;
     overflow-y: auto;
     background-color: #d2caca;
     display: flex;
@@ -399,6 +420,7 @@ h2 {
     justify-content: start;
     flex-direction: column;
     border: 1px solid #000;
+    scrollbar-width: none;
 }
 
 .title-right {
@@ -407,12 +429,18 @@ h2 {
 
 .title-right::-webkit-scrollbar {
     display: none;
+    width: 16px; 
 }
 
-
-.title-right {
-    scrollbar-width: none;
+.title-right::-webkit-scrollbar-track {
+    background: transparent;
 }
+
+.title-right::-webkit-scrollbar-thumb {
+    background-color: #aaa;
+    border-radius: 2px;
+}
+
 
 
 /* ================== Thẻ mã giảm giá ================== */
@@ -467,19 +495,6 @@ h2 {
     color: gray;
 }
 
-/* WebKit Browsers (Chrome, Edge, Safari) */
-.title-right-::-webkit-scrollbar {
-    width: 16px; 
-}
-
-.title-right::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.title-right::-webkit-scrollbar-thumb {
-    background-color: #aaa;
-    border-radius: 2px;
-}
 
 
 /* Nút "Thêm vào giỏ hàng" */

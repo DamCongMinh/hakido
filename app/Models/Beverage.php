@@ -27,7 +27,7 @@ class Beverage extends Model
         return $this->hasMany(BeverageSize::class, 'beverage_id');
     }
 
-    // Thêm accessor để lấy giá nhỏ nhất từ beverage_sizes
+    // lấy giá nhỏ nhất từ beverage_sizes
     public function getMinPriceAttribute()
     {
         $size = $this->beverageSizes->sortBy('old_price')->first();

@@ -166,6 +166,18 @@ html, body {
     margin: 20px auto;
 }
 
+.btn-primary {
+    background-color: #4CAF50;
+    font-size: 1.3rem;
+    width: 95%;
+    scale: 1;
+    padding: 8px 10px;
+}
+.btn-primary:hover {
+    scale: 1.1;
+    cursor: pointer;
+}
+
 
 /* --- title and products grid --- */
 /* Bố cục cơ bản */

@@ -30,6 +30,7 @@ class Order extends Model
         'receiver_address',
         'payment_method',
         'note',
+        'voucher_id',
         'vnp_TxnRef',
     ];
     
@@ -59,81 +60,8 @@ class Order extends Model
 
     public function items()
     {
-        return $this->hasMany(OrderItem::class); // Đây là quan hệ tới bảng order_items
+        return $this->hasMany(OrderItem::class);
     }
 
-    // public function updateStatus($newStatus, $triggeredBy = null)
-    // {
-    //     $oldStatus = $this->status;
-    //     $this->status = $newStatus;
-    //     $this->save();
-
-    //     // Gửi thông báo cho các vai trò
-    //     $this->sendStatusNotifications($oldStatus, $newStatus, $triggeredBy);
-    // }
-
-    // protected function sendStatusNotifications($oldStatus, $newStatus, $triggeredBy)
-    // {
-    //     // Không gửi nếu trạng thái không thay đổi
-    //     if ($oldStatus === $newStatus) return;
-
-    //     $rolesToNotify = $this->getRolesToNotify($newStatus, $triggeredBy);
-
-    //     foreach ($rolesToNotify as $role => $users) {
-    //         foreach ($users as $user) {
-    //             $user->notify(new OrderStatusNotification($this, $newStatus, $role));
-    //         }
-    //     }
-    // }
-
-    // protected function getRolesToNotify($newStatus, $triggeredBy)
-    // {
-    //     $roles = [];
-
-    //     switch ($newStatus) {
-    //         case 'pending':
-    //             $roles['restaurant'] = [$this->restaurant->user];
-    //             $roles['admin'] = User::where('role', 'admin')->get();
-    //             break;
-                
-    //         case 'processing':
-    //             $roles['restaurant'] = [$this->restaurant->user];
-    //             $roles['shipper'] = User::where('role', 'shipper')->get();
-    //             $roles['customer'] = [$this->customer];
-    //             break;
-                
-    //         case 'delivering':
-    //             $roles['customer'] = [$this->customer];
-    //             $roles['restaurant'] = [$this->restaurant->user];
-    //             $roles['shipper'] = [$this->shipper];
-    //             break;
-                
-    //         case 'completed':
-    //             $roles['customer'] = [$this->customer];
-    //             $roles['restaurant'] = [$this->restaurant->user];
-    //             $roles['shipper'] = [$this->shipper];
-    //             $roles['admin'] = User::where('role', 'admin')->get();
-    //             break;
-                
-    //         case 'canceled':
-    //             $allRoles = ['customer', 'restaurant', 'shipper', 'admin'];
-    //             foreach ($allRoles as $role) {
-    //                 if ($role === $triggeredBy) continue; // Không gửi cho người hủy
-                    
-    //                 if ($role === 'customer' && $this->customer) {
-    //                     $roles[$role] = [$this->customer];
-    //                 } elseif ($role === 'restaurant' && $this->restaurant) {
-    //                     $roles[$role] = [$this->restaurant->user];
-    //                 } elseif ($role === 'shipper' && $this->shipper) {
-    //                     $roles[$role] = [$this->shipper];
-    //                 } elseif ($role === 'admin') {
-    //                     $roles[$role] = User::where('role', 'admin')->get();
-    //                 }
-    //             }
-    //             break;
-    //     }
-
-    //     return $roles;
-    // }
 
 }

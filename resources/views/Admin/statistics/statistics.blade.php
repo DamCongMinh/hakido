@@ -36,15 +36,23 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($restaurants as $index => $restaurant)
-                    @if (isset($monthlyStats[$index]))
+                @foreach ($restaurants as $restaurant)
+                    @if (isset($monthlyStats[$restaurant->id]))
+                        @foreach ($monthlyStats[$restaurant->id] as $stat)
+                            <tr>
+                                <td>{{ $restaurant->name }}</td>
+                                <td>Tháng {{ $stat->month }}</td>
+                                <td>{{ number_format($stat->revenue, 0, ',', '.') }}</td>
+                            </tr>
+                        @endforeach
+                    @else
                         <tr>
                             <td>{{ $restaurant->name }}</td>
-                            <td>{{ $monthlyStats[$index]->month }}</td>
-                            <td>{{ number_format($monthlyStats[$index]->revenue, 0, ',', '.') }}</td>
+                            <td colspan="2">Không có dữ liệu</td>
                         </tr>
                     @endif
                 @endforeach
+
             </tbody>
         </table> 
 
@@ -61,10 +69,10 @@
             const chart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: {!! json_encode($monthlyStats->pluck('month')) !!},
+                    labels: {!! json_encode($monthlyTotalStats->pluck('month')) !!},
                     datasets: [{
                         label: 'Doanh thu theo tháng (VND)',
-                        data: {!! json_encode($monthlyStats->pluck('revenue')) !!},
+                        data: {!! json_encode($monthlyTotalStats->pluck('revenue')) !!},
                         backgroundColor: 'rgba(54, 162, 235, 0.7)',
                         borderColor: 'rgba(54, 162, 235, 1)',
                         borderWidth: 1

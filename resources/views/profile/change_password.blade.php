@@ -11,9 +11,17 @@
 <body>
     @include('layout.header')
 
-    <form action="{{ route('profile.change_password') }}" method="POST">
+    <form id="change_password" action="{{ route('profile.change_password') }}" method="POST">
         @csrf
 
+        <label for="current_password">Mật khẩu hiện tại:</label>
+        <input class="input_change" type="password" name="current_password" id="current_password" required>
+
+        <label for="new_password">Mật khẩu mới:</label>
+        <input class="input_change" type="password" name="new_password" id="new_password" required>
+
+        <label for="new_password_confirmation">Xác nhận mật khẩu mới:</label>
+        <input class="input_change" type="password" name="new_password_confirmation" id="new_password_confirmation" required>
         {{-- Thông báo thành công --}}
         @if(session('success'))
             <div class="alert-success">
@@ -31,15 +39,6 @@
                 </ul>
             </div>
         @endif
-
-        <label for="current_password">Mật khẩu hiện tại:</label>
-        <input class="input_change" type="password" name="current_password" id="current_password" required>
-
-        <label for="new_password">Mật khẩu mới:</label>
-        <input class="input_change" type="password" name="new_password" id="new_password" required>
-
-        <label for="new_password_confirmation">Xác nhận mật khẩu mới:</label>
-        <input class="input_change" type="password" name="new_password_confirmation" id="new_password_confirmation" required>
 
         <button type="submit">Đổi mật khẩu</button>
     </form> 

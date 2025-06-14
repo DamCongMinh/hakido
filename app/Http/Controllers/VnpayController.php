@@ -190,14 +190,23 @@ class VnpayController extends Controller
 
                 //Lấy dữ liệu từ pending_payments
                 $pending = \App\Models\PendingPayment::where('txn_ref', $txnRef)->first();
+                
+                // $user = $pending->user;
+
+                // if (!$user) {
+                //     return view('payments.vnpayfailed', ['error' => 'User not found']);
+                // }
+
 
                 if ($pending) {
+                    $customer = \App\Models\Customer::find($pending->customer_id);
+                    $user = $customer?->user;
                     $checkoutData = $pending->checkout_data;
                     $cartData = $pending->cart_data;
 
                     //Tạo đơn hàng mới
                     $order = \App\Models\Order::create([
-                        'customer_id' => $pending->customer_id,
+                        'customer_id' => $user->id,
                         // 'vnp_TxnRef' => $txnRef,
                         'restaurant_id' => $checkoutData['restaurant_id'] ?? null,
                         'status' => 'pending',
@@ -232,7 +241,7 @@ class VnpayController extends Controller
 
                     
                     Payment::create([
-                        'customer_id' => $pending->customer_id,
+                        'customer_id' => $customer->id,
                         'order_id' => $order->id,
                         'txn_ref' => $txnRef,
                         'amount' => ($request->input('vnp_Amount') ?? 0) / 100,
@@ -241,8 +250,8 @@ class VnpayController extends Controller
                         'raw_data' => json_encode($request->all()),
                     ]);
 
-                    $customer = \App\Models\Customer::find($pending->customer_id);
-                    $user = $customer?->user;
+                    // $customer = \App\Models\Customer::find($pending->customer_id);
+                    // $user = $customer?->user;
 
                     if ($user && $user->cart) {
                         foreach ($cartData as $restaurantId => $items) {

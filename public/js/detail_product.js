@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const mainImage = document.querySelector(".product-show img");
     const thumbnails = document.querySelectorAll(".list-img img");
     const productName = document.querySelector(".detail-product h2");
-    const description = document.querySelector(".description");
+    // const description = document.querySelector(".description");
     const oldPriceEl = document.getElementById('old-price');
     const discountEl = document.getElementById('discount');
     const newPriceEl = document.getElementById('new-price');
@@ -20,13 +20,24 @@ document.addEventListener("DOMContentLoaded", function () {
     const checkoutProductIdInput = document.querySelector('input[name="selected_items[0][product_id]"]');
     const checkoutTypeInput = document.querySelector('input[name="selected_items[0][product_type]"]');
     let currentProduct = null;
- 
 
-    // console.log('Các phần tử giá:', {
-    //     oldPriceEl: document.getElementById('old-price'),
-    //     discountEl: document.getElementById('discount'),
-    //     newPriceEl: document.getElementById('new-price')
-    // });
+    const toggleBtn = document.getElementById('toggleBtn');
+    const description = document.querySelector('.descripttion_title');
+    const icon = toggleBtn.querySelector('i');
+
+        toggleBtn.addEventListener('click', function () {
+            description.classList.toggle('expanded');
+
+            if (description.classList.contains('expanded')) {
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+            } else {
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            }
+        });
+
+ 
 
     function displayProductInfo(thumbnail) {
         // Debug: kiểm tra dữ liệu từ thumbnail

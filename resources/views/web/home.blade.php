@@ -51,7 +51,7 @@
                 </div>
                 <div class="product-content">
                     <div>
-                        <img src="{{ asset('img/slide4.jpg') }}" alt="">
+                        <img src="{{ asset('img/nuoc-ep-tao.png') }}" alt="">
                         <img src="{{ asset('img/slide5.jpg') }}" alt="">
                     </div>
                 </div>

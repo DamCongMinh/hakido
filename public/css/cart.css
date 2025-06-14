@@ -14,7 +14,7 @@ body {
 
 table {
     width: 100%;
-    min-height: 60vh;
+    min-height: 30vh;
     border-collapse: collapse;
     background-color: #fff;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);

@@ -6,6 +6,7 @@ use App\Models\Restaurant;
 use App\Models\Food;
 use App\Models\Beverage;
 use Illuminate\Http\Request;
+use App\Models\Voucher;
 
 class ShowDetailController extends Controller
 {
@@ -15,55 +16,61 @@ class ShowDetailController extends Controller
             ['is_active', '=', 1],
             ['is_approved', '=', 1]
         ];
-    
+
         if (!in_array($type, ['food', 'beverage'])) {
             abort(404);
         }
-    
+
         // Lấy sản phẩm và đánh giá
         if ($type === 'food') {
             $product = Food::with(['restaurant' => function ($query) {
                 $query->withCount(['foods', 'beverages']);
             }])->where($queryConditions)->findOrFail($id);
-    
+
             $reviews = \App\Models\FoodReview::with('customer')
                         ->where('food_id', $id)
                         ->latest()
                         ->get();
-        } else { // beverage
+        } else {
             $product = Beverage::with([
                 'restaurant' => function ($query) {
                     $query->withCount(['foods', 'beverages']);
                 },
                 'beverageSizes' => function($query) {
-                    $query->orderBy('old_price'); // Sắp xếp theo giá
+                    $query->orderBy('old_price');
                 }
             ])->where($queryConditions)->findOrFail($id);
-    
-            // Tính toán giá trị cho beverage
+
             if ($product->beverageSizes->isNotEmpty()) {
                 $product->min_price = $product->beverageSizes->min(function($size) {
-                    return $size->old_price * (1 - $size->discount_percent/100);
+                    return $size->old_price * (1 - $size->discount_percent / 100);
                 });
                 $product->max_price = $product->beverageSizes->max(function($size) {
-                    return $size->old_price * (1 - $size->discount_percent/100);
+                    return $size->old_price * (1 - $size->discount_percent / 100);
                 });
-                
-                // Thêm new_price cho từng size
+
                 $product->beverageSizes->each(function($size) {
-                    $size->new_price = $size->old_price * (1 - $size->discount_percent/100);
+                    $size->new_price = $size->old_price * (1 - $size->discount_percent / 100);
                 });
             } else {
                 $product->min_price = 0;
                 $product->max_price = 0;
             }
-    
+
             $reviews = \App\Models\BeverageReview::with('customer')
                         ->where('beverage_id', $id)
                         ->latest()
                         ->get();
         }
-    
+
+        // 🎟️ Thêm voucher theo restaurant_id
+        $restaurantId = $product->restaurant->id;
+        $vouchers = Voucher::where('restaurant_id', $restaurantId)
+            ->where('is_active', 1)
+            ->whereDate('start_date', '<=', now())
+            ->whereDate('end_date', '>=', now())
+            ->get();
+
         // Bộ lọc đánh giá
         $filters = [
             'all' => $reviews->count(),
@@ -75,29 +82,23 @@ class ShowDetailController extends Controller
             'with_media' => $reviews->filter(fn($r) => $r->media && count($r->media))->count(),
             'with_comment' => $reviews->filter(fn($r) => trim($r->comment))->count(),
         ];
-    
+
         $productAvgRating = $reviews->count() ? round($reviews->avg('rating'), 1) : null;
-    
-        // Thông tin nhà hàng
-        $restaurant = $product->restaurant;
-        $restaurantId = $restaurant->id;
-    
-        $totalProducts = $restaurant->foods_count + $restaurant->beverages_count;
-    
+
+        $totalProducts = $product->restaurant->foods_count + $product->restaurant->beverages_count;
+
         $restaurantStats = [
-            'rating_count' => $restaurant->rating_count ?? 0,
-            'reply_rate' => $restaurant->reply_rate ?? 'Đang cập nhật',
-            'reply_time' => $restaurant->reply_time ?? 'Đang cập nhật',
-            'joined' => $restaurant->created_at->diffForHumans(),
-            'follower_count' => $restaurant->follower_count ?? 0,
+            'rating_count' => $product->restaurant->rating_count ?? 0,
+            'reply_rate' => $product->restaurant->reply_rate ?? 'Đang cập nhật',
+            'reply_time' => $product->restaurant->reply_time ?? 'Đang cập nhật',
+            'joined' => $product->restaurant->created_at->diffForHumans(),
+            'follower_count' => $product->restaurant->follower_count ?? 0,
         ];
-    
-        // Đánh giá của nhà hàng
+
         $orderIds = \App\Models\Order::where('restaurant_id', $restaurantId)->pluck('id');
         $totalRestaurantReviews = \App\Models\FoodReview::whereIn('order_id', $orderIds)->count()
-                                  + \App\Models\BeverageReview::whereIn('order_id', $orderIds)->count();
-    
-        // Ảnh sản phẩm
+                                + \App\Models\BeverageReview::whereIn('order_id', $orderIds)->count();
+
         $foodImages = \App\Models\Food::where('restaurant_id', $restaurantId)
                         ->whereNotNull('image')
                         ->pluck('image');
@@ -105,13 +106,12 @@ class ShowDetailController extends Controller
                             ->whereNotNull('image')
                             ->pluck('image');
         $productImages = $foodImages->merge($beverageImages);
-    
-        // Tất cả sản phẩm
+
         $foods = \App\Models\Food::where('restaurant_id', $restaurantId)->get();
         $beverages = \App\Models\Beverage::with(['beverageSizes' => function($query) {
             $query->orderBy('old_price');
         }])->where('restaurant_id', $restaurantId)->get();
-    
+
         $allProducts = $foods->map(function ($item) {
             return [
                 'id' => $item->id,
@@ -135,7 +135,7 @@ class ShowDetailController extends Controller
                         'price' => $s->old_price * (100 - $s->discount_percent) / 100,
                     ];
                 });
-        
+
                 return [
                     'id' => $item->id,
                     'type' => 'beverage',
@@ -147,18 +147,16 @@ class ShowDetailController extends Controller
                     'max_price' => $sizes->max('price')
                 ];
             })
-        )->all(); // giữ .all() để ra mảng thường nếu cần truyền sang view
-        
-    
-        // Cập nhật hoạt động của nhà hàng (nếu đăng nhập)
+        )->all();
+
+        // Cập nhật hoạt động nếu là nhà hàng
         $user = auth()->user();
         if ($user && $user->role === 'restaurant' && $user->restaurant) {
             if (!$user->restaurant->last_active_at || $user->restaurant->last_active_at->lt(now()->subMinute())) {
                 $user->restaurant->update(['last_active_at' => now()]);
             }
         }
-    
-        // Trả về view
+
         return view('web.detail_product', compact(
             'product',
             'type',
@@ -169,15 +167,17 @@ class ShowDetailController extends Controller
             'totalProducts',
             'totalRestaurantReviews',
             'productImages',
-            'allProducts'
+            'allProducts',
+            'vouchers' 
         ));
     }
 
 
 
+
     public function store(Request $request)
     {
-        dd($request->all());
+        // dd($request->all());
         $validated = $request->validate([
             'type' => 'required|in:food,beverage',
             'product_id' => 'required|integer',
@@ -341,6 +341,8 @@ class ShowDetailController extends Controller
         $totalShippingFee = array_sum($restaurantShippingFees);
         $finalTotal = array_sum($restaurantTotalSums);
 
+        $restaurantId = array_key_first($groupedItems);
+
         session([
             'checkout_data' => [
                 'groupedItems' => $groupedItems,
@@ -386,9 +388,6 @@ class ShowDetailController extends Controller
 
         return $earthRadius * $angle;
     }
-    
-
-
 
 }
 

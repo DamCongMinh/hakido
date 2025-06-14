@@ -1,0 +1,92 @@
+#voucherForm {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 25px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.header_right--account .account-icon {
+    margin-bottom: 12px !important;
+}
+  
+#voucherForm label {
+  display: block;
+  margin-bottom: 15px;
+  font-weight: 600;
+  color: #333;
+}
+  
+#voucherForm input[type="text"],
+#voucherForm input[type="number"],
+#voucherForm input[type="date"],
+#voucherForm select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-sizing: border-box;
+  font-size: 15px;
+}
+
+#voucherForm input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+#voucherForm input[type="number"]::-webkit-outer-spin-button,
+#voucherForm input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+#voucherForm select {
+  height: 40px;
+  background-color: white;
+  cursor: pointer;
+}
+
+#voucherForm button[type="submit"] {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 10px;
+  transition: background-color 0.3s;
+}
+
+#voucherForm button[type="submit"]:hover {
+  background-color: #45a049;
+}
+
+
+@media (max-width: 768px) {
+  #voucherForm {
+    padding: 15px;
+    margin: 10px;
+  }
+}
+
+
+#voucherForm input:focus,
+#voucherForm select:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+}
+
+
+#percentField {
+  display: block;
+}
+
+#typeSelect[value="free_shipping"] ~ #percentField,
+#typeSelect:has(option[value="free_shipping"]:checked) ~ #percentField {
+  display: none;
+}
