@@ -81,7 +81,7 @@
                     <a href="{{ route('password.request') }}">Quên mật khẩu?</a>
 
                     <div class="social-icons">
-                        <a href="/login/facebook"><i class="fab fa-facebook"></i> Đăng nhập với Facebook</a>
+                        {{-- <a href="/login/facebook"><i class="fab fa-facebook"></i> Đăng nhập với Facebook</a> --}}
                         <a href="/login/google"><i class="fab fa-google"></i> Đăng nhập với Google</a>
                     </div>
                 </form>

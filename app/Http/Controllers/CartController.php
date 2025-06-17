@@ -217,8 +217,8 @@ class CartController extends Controller
     public function applyVoucher(Request $request)
     {
         $voucherCode = $request->input('voucher_code');
-        $groupedItems = $request->input('groupedItems', []); // array: restaurant_id => [items]
-        $shippingFees = $request->input('shippingFees', []); // array: restaurant_id => fee
+        $groupedItems = $request->input('groupedItems', []);
+        $shippingFees = $request->input('shippingFees', []);
     
         // Tìm voucher
         $voucher = \App\Models\Voucher::where('code', $voucherCode)
@@ -295,6 +295,7 @@ class CartController extends Controller
     
     public function processCheckout(Request $request)
     {
+        dd($request->all());
         $selectedItems = $request->input('selected_items');
 
         if (!$selectedItems || !is_array($selectedItems)) {
@@ -406,6 +407,7 @@ class CartController extends Controller
         session([
             'checkout_data' => [
                 'groupedItems' => $groupedItems,
+                'restaurant_id' => $restaurantId,
                 'restaurantShippingFees' => $restaurantShippingFees,
                 'restaurantTotalAmounts' => $restaurantTotalAmounts,
                 'restaurantTotalSums' => $restaurantTotalSums,
