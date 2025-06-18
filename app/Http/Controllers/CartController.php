@@ -295,7 +295,7 @@ class CartController extends Controller
     
     public function processCheckout(Request $request)
     {
-        dd($request->all());
+
         $selectedItems = $request->input('selected_items');
 
         if (!$selectedItems || !is_array($selectedItems)) {

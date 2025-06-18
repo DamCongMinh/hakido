@@ -173,80 +173,8 @@ class ShowDetailController extends Controller
         ));
     }
 
-    public function store(Request $request)
+    public function checkout(Request $request)
     {
-        // dd($request->all());
-        $validated = $request->validate([
-            'type' => 'required|in:food,beverage',
-            'product_id' => 'required|integer',
-            'quantity' => 'required|integer|min:1',
-            'size' => 'nullable|string',
-        ]);
-
-        if ($validated['type'] === 'food') {
-            $product = Food::findOrFail($validated['product_id']);
-
-            if ($validated['quantity'] > $product->quantity) {
-                return back()->with('error', 'Số lượng vượt quá tồn kho.');
-            }
-
-            return back()->with('success', 'Đặt hàng thành công!');
-        }
-
-        if ($validated['type'] === 'beverage') {
-            $beverage = Beverage::with('beverageSizes')->findOrFail($validated['product_id']);
-
-            $selectedSize = $beverage->beverageSizes->firstWhere('size', $validated['size']);
-
-            if (!$selectedSize) {
-                return back()->with('error', 'Không tìm thấy size đồ uống.');
-            }
-
-            if ($validated['quantity'] > $selectedSize->quantity) {
-                return back()->with('error', 'Số lượng vượt quá tồn kho của size đã chọn.');
-            }
-            return back()->with('success', 'Đặt hàng thành công!');
-        }
-
-        return back()->with('error', 'Dữ liệu không hợp lệ.');
-    }
-
-    // public function checkout(Request $request)
-    // {
-        
-    //     $validated = $request->validate([
-    //         'type' => 'required|in:food,beverage',
-    //         'product_id' => 'required|integer',
-    //         'quantity' => 'required|integer|min:1',
-    //         'size' => 'nullable|string'
-    //     ]);
-
-    //     if ($validated['type'] === 'food') {
-    //         $product = Food::findOrFail($validated['product_id']);
-    //     } else {
-    //         $product = Beverage::with('beverageSizes')->findOrFail($validated['product_id']);
-    //         $selectedSize = $product->beverageSizes->firstWhere('size', $validated['size']);
-    //         if (!$selectedSize) {
-    //             return back()->with('error', 'Không tìm thấy size đã chọn.');
-    //         }
-    //     }
-
-    //     // Chuyển dữ liệu tới view checkout
-    //     return view('web.checkout', [
-    //         'product' => $product,
-    //         'type' => $validated['type'],
-    //         'quantity' => $validated['quantity'],
-    //         'size' => $validated['size'] ?? null
-    //     ]);
-    // }
-
-    public function processCheckout(Request $request)
-    {
-        // dd('reached');
-        $customer = auth()->user()?->customer;
-        if (!$customer) {
-            return redirect()->route('login')->with('error', 'Bạn cần đăng nhập để tiếp tục');
-        }
 
         $validated = $request->validate([
             'type' => 'required|in:food,beverage',
@@ -255,51 +183,67 @@ class ShowDetailController extends Controller
             'size' => 'nullable|string'
         ]);
 
-        $productId = $validated['product_id'];
-        $type = $validated['type'];
-        $quantity = $validated['quantity'];
-        $size = $validated['size'] ?? null;
-
-        if ($type === 'food') {
-            $product = Food::findOrFail($productId);
-            $unitPrice = $product->old_price * (100 - $product->discount_percent) / 100;
-            $restaurant = $product->restaurant;
+        if ($validated['type'] === 'food') {
+            $product = Food::findOrFail($validated['product_id']);
         } else {
-            $product = Beverage::with('beverageSizes')->findOrFail($productId);
-            $sizeObj = $product->beverageSizes->firstWhere('size', $size);
-            if (!$sizeObj) return back()->with('error', 'Không tìm thấy size');
-            $unitPrice = $sizeObj->old_price * (100 - $sizeObj->discount_percent) / 100;
-            $restaurant = $product->restaurant;
-        }
-
-        $restaurantId = $restaurant->id;
-
-        // Tính phí ship theo khoảng cách
-        if (
-            $restaurant && $restaurant->latitude && $restaurant->longitude &&
-            $customer->latitude && $customer->longitude
-        ) {
-            $distance = $this->haversineDistance(
-                $restaurant->latitude, $restaurant->longitude,
-                $customer->latitude, $customer->longitude
-            );
-
-            if ($distance < 10) {
-                $shippingFee = 15000;
-            } elseif ($distance < 20) {
-                $shippingFee = 25000;
-            } elseif ($distance <= 30) {
-                $shippingFee = 35000;
-            } else {
-                $shippingFee = 50000;
+            $product = Beverage::with('beverageSizes')->findOrFail($validated['product_id']);
+            $selectedSize = $product->beverageSizes->firstWhere('size', $validated['size']);
+            if (!$selectedSize) {
+                return back()->with('error', 'Không tìm thấy size đã chọn.');
             }
-        } else {
-            $distance = null;
-            $shippingFee = 0;
         }
 
-        $groupedItems = [
-            $restaurantId => [[
+        // Chuyển dữ liệu tới view checkout
+        return view('web.checkout', [
+            'product' => $product,
+            'type' => $validated['type'],
+            'quantity' => $validated['quantity'],
+            'size' => $validated['size'] ?? null
+        ]);
+    }
+
+    public function processCheckout(Request $request)
+    {
+        // dd($request->all());
+        $items = $request->input('selected_items', []);
+        $groupedItems = [];
+
+        $customer = auth()->user()?->customer;
+        if (!$customer) {
+            return redirect()->route('login')->with('error', 'Bạn cần đăng nhập để tiếp tục');
+        }
+
+        $restaurantShippingFees = [];
+        $restaurantNames = [];
+        $restaurantDistances = [];
+        $restaurantTotalAmounts = [];
+        $restaurantTotalSums = [];
+        $firstRestaurantId = null;
+
+        foreach ($items as $item) {
+            $productId = $item['product_id'];
+            $type = $item['product_type'];
+            $quantity = $item['quantity'] ?? 1;
+            $size = $item['size'] ?? null;
+
+            if ($type === 'food') {
+                $product = Food::findOrFail($productId);
+                $unitPrice = $product->old_price * (100 - $product->discount_percent) / 100;
+                $restaurant = $product->restaurant;
+            } else {
+                $product = Beverage::with('beverageSizes')->findOrFail($productId);
+                $sizeObj = $product->beverageSizes->firstWhere('size', $size);
+                if (!$sizeObj) return back()->with('error', 'Không tìm thấy size');
+                $unitPrice = $sizeObj->old_price * (100 - $sizeObj->discount_percent) / 100;
+                $restaurant = $product->restaurant;
+            }
+
+            $restaurantId = $restaurant->id ?? null;
+            if (!$restaurantId) continue;
+
+            $restaurantNames[$restaurantId] = $restaurant->name;
+
+            $groupedItems[$restaurantId][] = [
                 'product_id' => $productId,
                 'product_type' => $type,
                 'size' => $size,
@@ -308,39 +252,85 @@ class ShowDetailController extends Controller
                 'price' => $unitPrice,
                 'quantity' => $quantity,
                 'total' => $unitPrice * $quantity,
-            ]]
-        ];
+            ];
 
-        $restaurantShippingFees = [$restaurantId => $shippingFee];
-        $restaurantDistances = [$restaurantId => $distance];
-        $restaurantNames = [$restaurantId => $restaurant->name];
-        $restaurantTotalAmounts = [$restaurantId => $unitPrice * $quantity];
-        $restaurantTotalSums = [$restaurantId => $unitPrice * $quantity + $shippingFee];
-        $totalAmount = $unitPrice * $quantity;
-        $totalShippingFee = $shippingFee;
-        $finalTotal = $totalAmount + $totalShippingFee;
+            if (!isset($restaurantShippingFees[$restaurantId])) {
+                $restaurant = $product->restaurant;
 
-        $checkoutData = [
+                if (
+                    $restaurant && $restaurant->latitude && $restaurant->longitude &&
+                    $customer->latitude && $customer->longitude
+                ) {
+                    $distance = $this->haversineDistance(
+                        $restaurant->latitude,
+                        $restaurant->longitude,
+                        $customer->latitude,
+                        $customer->longitude
+                    );
+
+                    $restaurantDistances[$restaurantId] = $distance;
+
+                    if ($distance < 10) {
+                        $shippingFee = 15000;
+                    } elseif ($distance < 20) {
+                        $shippingFee = 25000;
+                    } elseif ($distance <= 30) {
+                        $shippingFee = 35000;
+                    } else {
+                        $shippingFee = 50000;
+                    }
+
+                    $restaurantShippingFees[$restaurantId] = $shippingFee;
+                } else {
+                    $restaurantDistances[$restaurantId] = null;
+                    $restaurantShippingFees[$restaurantId] = 0;
+                }
+            }
+
+        }
+
+        foreach ($groupedItems as $restaurantId => $items) {
+            $totalItems = collect($items)->sum('total');
+            $shipping = $restaurantShippingFees[$restaurantId] ?? 0;
+
+            $restaurantTotalAmounts[$restaurantId] = $totalItems;
+            $restaurantTotalSums[$restaurantId] = $totalItems + $shipping;
+        }
+
+        $totalAmount = array_sum($restaurantTotalAmounts);
+        $totalShippingFee = array_sum($restaurantShippingFees);
+        $finalTotal = array_sum($restaurantTotalSums);
+
+        $restaurantId = array_key_first($groupedItems);
+
+        session([
+            'checkout_data' => [
+                'groupedItems' => $groupedItems,
+                'restaurant_id' => $restaurantId,
+                'restaurantShippingFees' => $restaurantShippingFees,
+                'restaurantTotalAmounts' => $restaurantTotalAmounts,
+                'restaurantTotalSums' => $restaurantTotalSums,
+                'totalAmount' => $totalAmount,
+                'totalShippingFee' => $totalShippingFee,
+                'finalTotal' => $finalTotal,
+                'receiver_name' => $customer->name,
+                'receiver_phone' => $customer->phone,
+                'receiver_address' => $customer->address,
+            ]
+        ]);
+
+        return view('web.checkout', [
             'groupedItems' => $groupedItems,
-            'restaurantShippingFees' => $restaurantShippingFees,
             'restaurantDistances' => $restaurantDistances,
-            'restaurantNames' => $restaurantNames,
+            'restaurantShippingFees' => $restaurantShippingFees,
             'restaurantTotalAmounts' => $restaurantTotalAmounts,
             'restaurantTotalSums' => $restaurantTotalSums,
-            'finalTotal' => $finalTotal,
-            'discount' => 0,
-            'voucher' => null,
-            'totalShippingFee' => $totalShippingFee,
+            'restaurantNames' => $restaurantNames,
             'totalAmount' => $totalAmount,
-            'user' => auth()->user(),
+            'totalShippingFee' => $totalShippingFee,
+            'finalTotal' => $finalTotal,
             'customer' => $customer,
-            'isGuest' => false,
-        ];
-        
-        session(['checkout_data' => $checkoutData]);
-        session()->save(); // ép Laravel lưu session
-        dd(session()->all());
-        return redirect()->route('checkout.show');
+        ]);
     }
 
 
