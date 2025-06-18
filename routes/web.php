@@ -22,6 +22,7 @@ use App\Http\Controllers\SearchAndFilterController;
 use App\Http\Controllers\SearchRestaurantController;
 use App\Http\Controllers\ShowDetailController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\VnpayController;
@@ -131,6 +132,8 @@ Route::middleware(['auth', 'role:customer'])->group(function () {
     Route::patch('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
     Route::match(['get', 'post'], '/checkout-now', [ShowDetailController::class, 'processCheckout'])->name('checkout.now');
     Route::get('/checkout', [ShowDetailController::class, 'checkout'])->name('checkout');
+
+
 
 
     // show view và lấy order_id
@@ -256,10 +259,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/products/{id}/edit', [RestaurantProductController::class, 'edit'])->name('products.edit');
     Route::put('/products/{id}', [RestaurantProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{id}', [RestaurantProductController::class, 'destroy'])->name('products.destroy');
-    //vouchers
-    // Route::get('/vouchers', function () {
-    //     return view('web.vouchers');
-    // })->name('voucher.view');
     
     Route::get('/create/vouchers', [VoucherController::class, 'createVoucher'])->name('create.voucher');
     Route::post('/add/vouchers', [VoucherController::class, 'addVoucher'])->name('add.voucher');
