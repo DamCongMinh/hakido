@@ -287,5 +287,5 @@ Route::get('/test', function () {
 });
 
 Route::get('/homepage', function () {
-    return 'trang home';
+    return view('web.home');
 });
