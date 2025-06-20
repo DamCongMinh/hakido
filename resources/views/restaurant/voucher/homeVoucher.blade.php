@@ -35,7 +35,7 @@
                                 @if($voucher->type === 'free_shipping')
                                     Miễn phí ship
                                 @else
-                                    {{ number_format($voucher->value) }} đ
+                                    {{ number_format($voucher->value) }} %
                                 @endif
                             </td>
                             <td>{{ number_format($voucher->min_order_value) }} đ</td>

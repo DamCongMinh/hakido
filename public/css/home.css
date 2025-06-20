@@ -423,3 +423,15 @@ body {
     line-height: 1.5;
     margin-top: 16px;
 }
+
+@media (max-width: 480px) {
+    .show-left h1 {
+        font-size: 1.3rem;
+    }
+}
+
+@media (min-width: 481px) and (max-width: 1024px) {
+    .show-left h1 {
+        font-size: 1.6rem;
+    }
+}

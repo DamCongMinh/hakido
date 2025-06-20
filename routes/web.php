@@ -284,3 +284,7 @@ Route::prefix('shipper/orders')->name('shipper.orders.')->middleware(['auth'])->
     Route::get('/shipper/income-stats', [ShipperOrderController::class, 'incomeStats'])->name('shipper.income.stats');
 });
 
+
+Route::get('/test', function () {
+    return "<script>alert('hehe');</script>";
+});
