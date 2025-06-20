@@ -285,3 +285,7 @@ Route::prefix('shipper/orders')->name('shipper.orders.')->middleware(['auth'])->
 Route::get('/test', function () {
     return "<script>alert('hehe');</script>";
 });
+
+Route::get('/homepage', function () {
+    return view('web.home');
+});
