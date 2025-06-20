@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{{-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,10 +12,9 @@
 </head>
 <body>
     <meta name="csrf-token" content="{{ csrf_token() }}">
-<!-------------- Header của trang home ---------------->
+
     @include('layout.header')
 
-<!-------------- Body của trang home ---------------->
     <section id="home_body">
         <div class="body_container">
             <div class="home-slide">
@@ -27,7 +26,6 @@
                                 <h1>{{ $slide->title }}</h1>
                                 <p>{{ $slide->description1 }}</p>
                                 <p>{{ $slide->description2 }}</p>
-                                {{-- <a href="{{  }}" class="btn">Order now</a> --}}
                             </div>
                             <div class="show-right">
                                 <img src="{{ $slide->image }}" alt="">
@@ -134,7 +132,7 @@
                 </div>               
             </div>
         </div>
-        <!-------------- js của trang home ---------------->
+        
         <script src="{{ url('js/home.js') }}"></script>
         
         <script>
@@ -143,7 +141,7 @@
     </section>
 
 
-<!-------------- Footer của trang home ---------------->
+
     @include('layout.footer')
 </body>
-</html>
+</html> --}}
