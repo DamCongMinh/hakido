@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{{-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -92,13 +92,13 @@
                     <div class="account-nav">
                         <ul>
                             
-                            <!-- Nếu chưa đăng nhập -->
+                            
                             @guest
                                 <li><a href="{{ route('login') }}"><i class="fa-solid fa-user-plus"></i> Đăng ký</a></li>
                                 <li><a href="{{ route('login') }}"><i class="fa-solid fa-sign-in-alt"></i> Đăng nhập</a></li>
                             @endguest
 
-                            <!-- Nếu đã đăng nhập -->
+                           
                             @auth
                                 <li>
                                     <img
@@ -109,11 +109,7 @@
                                     
                                 />
                                     <h3>{{ Auth::user()->name }}</h3>
-
-                                    <!-- Link cho tất cả user -->
-                                    {{-- <li><a href="{{ route('profile.home_info') }}"><i class="fa-solid fa-user"></i> Tài khoản của tôi</a></li> --}}
-
-                                    <!-- Nếu là admin -->
+                                  
                                     @if (Auth::user()->role === 'admin')
                                         <li><a href="{{ route('admin.accounts.index') }}"><i class="fa-solid fa-users-gear"></i> Quản lý người dùng</a></li>
                                         <li><a href="{{ route('admin.orders.index') }}"><i class="fa-solid fa-clipboard-list"></i> Quản lý đơn hàng</a></li>
@@ -122,7 +118,7 @@
                                         <li><a href="{{ route('admin.home_statistics') }}"><i class="fa-solid fa-chart-line"></i> Báo cáo thống kê doanh thu & đơn hàng</a></li>
                                     @endif
 
-                                    <!-- Nếu là restaurant -->
+                                   
                                     @if (Auth::user()->role === 'restaurant')
                                         <li><a href="{{ route('profile.home_info') }}"><i class="fa-solid fa-user"></i> Tài khoản của tôi</a></li>
                                         <li><a href="{{ route('restaurant.products.home') }}"><i class="fa-solid fa-utensils"></i> Quản lý sản phẩm</a></li>
@@ -131,7 +127,7 @@
                                         <li><a href="{{ route('restaurant.statistics.home') }}"><i class="fa-solid fa-chart-pie"></i> Báo cáo thống kê doanh thu & đơn hàng</a></li>
                                     @endif
 
-                                    <!-- Nếu là shipper -->
+                                    
                                     @if (Auth::user()->role === 'shipper')
                                         <li><a href="{{ route('profile.home_info') }}"><i class="fa-solid fa-user"></i> Tài khoản của tôi</a></li>
                                         <li><a href="{{ route('shipper.orders.available') }}"><i class="fa-solid fa-cart-arrow-down"></i> Đơn hàng đang chờ</a></li>
@@ -140,7 +136,7 @@
                                         <li><a href="{{ route('shipper.orders.incomeStats') }}"><i class="fa-solid fa-sack-dollar"></i> Thống kê thu nhập</a></li>
                                     @endif
 
-                                    <!-- Nếu là customer -->
+                                    
                                     @if (Auth::user()->role === 'customer')
                                         <li><a href="{{ route('profile.home_info') }}"><i class="fa-solid fa-user"></i> Tài khoản của tôi</a></li>
                                         <li><a href="{{ route('cart.show') }}"><i class="fa-solid fa-shopping-cart"></i> Giỏ hàng của tôi</a></li>
@@ -166,11 +162,11 @@
     <script src="{{ asset('js/notification.js') }}"></script>
     @if (session('token') && session('user'))
     <script>
-    // Lưu dữ liệu vào localStorage sau khi đăng nhập bằng Google
+    
         localStorage.setItem('token', '{{ session('token') }}');
         localStorage.setItem('user', JSON.stringify({!! session('user') !!}));
     </script>
 
     @endif
 </body>
-</html>
+</html> --}}

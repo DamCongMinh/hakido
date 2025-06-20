@@ -74,9 +74,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin/accounts')->name('admin.acco
 });
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
-// Route::get('/home', function () {
-//     dd(Auth::user());
-// })->name('home');
 
 
 Route::get('/home_admin', fn () => view('admin.home_admin'))
