@@ -67,23 +67,6 @@ document.querySelector(".prev-btn").addEventListener("click", () => {
     updateSlide("prev");
 });
 
-// document.addEventListener("DOMContentLoaded", function () {
-//     const orderButton = document.querySelector(".show-left button");
-
-//     orderButton.addEventListener("click", function (event) {
-//         event.preventDefault(); // Ngăn chặn chuyển trang ngay lập tức
-
-//         // Hiển thị hiệu ứng nhấn button
-//         orderButton.classList.add("button-clicked");
-
-//         setTimeout(() => {
-//             orderButton.classList.remove("button-clicked");
-
-//             // Chuyển hướng đến trang order sau khi hiệu ứng chạy xong
-//             window.location.href = "{{ route('list-product') }}"; // Thay bằng link thật
-//         }, 500);
-//     });
-// });
 // hiệu ứng chữ cho slide
 function resetTextAnimation(element) {
     element.style.animation = 'none';
