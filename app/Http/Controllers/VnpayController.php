@@ -16,7 +16,7 @@ class VnpayController extends Controller
 {
     
     public function PaymentVnpay() {
-        dd(session('checkout_data'));
+        // dd(session('checkout_data'));
     
         $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
         $vnp_IpnUrl = config('vnpay.inp_url');

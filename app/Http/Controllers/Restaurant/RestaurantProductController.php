@@ -30,6 +30,7 @@ class RestaurantProductController extends Controller
 
     public function store(Request $request)
     {
+        dd($request->hasFile('image'), $request->file('image'));
         $request->validate([
             'type' => 'required|in:food,beverage',
             'category_id' => 'required|exists:categories,id',
