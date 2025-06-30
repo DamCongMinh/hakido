@@ -16,6 +16,7 @@ class VnpayController extends Controller
 {
     
     public function PaymentVnpay() {
+        dd(session('checkout_data'));
     
         $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
         $vnp_IpnUrl = config('vnpay.inp_url');
@@ -100,7 +101,7 @@ class VnpayController extends Controller
 
     public function vnpay_ipn(Request $request)
     {
-        Log::info(' Đã vào vnpay_ipn');
+        // Log::info(' Đã vào vnpay_ipn');
     
         $vnp_HashSecret = 'SEA84YCMTR5FYNHWADFYENQLBLRO2HNY'; 
         $inputData = [];

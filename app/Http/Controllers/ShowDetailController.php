@@ -320,8 +320,6 @@ class ShowDetailController extends Controller
             ]
         ]);
 
-        dd(session('checkout_data'));
-
 
         return view('web.checkout', [
             'groupedItems' => $groupedItems,
