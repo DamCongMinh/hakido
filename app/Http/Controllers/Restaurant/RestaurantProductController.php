@@ -28,9 +28,70 @@ class RestaurantProductController extends Controller
         return view('restaurant.products.create', compact('type', 'categories'));
     }
 
+    // public function store(Request $request)
+    // {
+    //     $request->validate([
+    //         'type' => 'required|in:food,beverage',
+    //         'category_id' => 'required|exists:categories,id',
+    //         'name' => 'required|string|max:255',
+    //         'description' => 'nullable|string',
+    //         'image' => 'required|image',
+    //     ]);
+
+    //     $restaurantId = Auth::user()->restaurant->id;
+
+    //     $data = [
+    //         'restaurant_id' => $restaurantId,
+    //         'category_id' => $request->category_id,
+    //         'name' => $request->name,
+    //         'description' => $request->description,
+    //         'status' => 'pending',
+    //         'image' => $request->file('image')->store('products', 'public'),
+    //         'is_active' => 1,
+    //     ];
+
+    //     if ($request->type === 'food') {
+    //         $data['old_price'] = $request->old_price ?? 0;
+    //         $data['discount_percent'] = $request->discount_percent ?? 0;
+    //         $data['quantity'] = $request->quantity ?? 0;
+
+    //         $discounted = $data['old_price'] * (1 - $data['discount_percent'] / 100);
+    //         $data['min_price'] = $discounted;
+    //         $data['max_price'] = $discounted;
+
+    //         Food::create($data);
+    //     } else {
+    //         $beverage = Beverage::create($data);
+
+    //         $prices = [];
+
+    //         if ($request->has('sizes')) {
+    //             foreach ($request->sizes as $size => $info) {
+    //                 if (!empty($info['old_price'])) {
+    //                     $discount = $info['discount_percent'] ?? 0;
+    //                     $new_price = $info['old_price'] * (1 - $discount / 100);
+    //                     $prices[] = $new_price;
+
+    //                     $beverage->beverageSizes()->create([
+    //                         'size' => $size,
+    //                         'old_price' => $info['old_price'],
+    //                         'discount_percent' => $discount,
+    //                         'quantity' => $info['quantity'] ?? 0,
+    //                     ]);
+    //                 }
+    //             }
+    //         }
+
+    //         $beverage->min_price = collect($prices)->min() ?? 0;
+    //         $beverage->max_price = collect($prices)->max() ?? 0;
+    //         $beverage->save();
+    //     }
+
+    //     return redirect()->route('restaurant.products.home')->with('success', 'Thêm sản phẩm thành công, chờ admin duyệt!');
+    // }
+
     public function store(Request $request)
     {
-        dd($request->hasFile('image'), $request->file('image'));
         $request->validate([
             'type' => 'required|in:food,beverage',
             'category_id' => 'required|exists:categories,id',
@@ -41,13 +102,24 @@ class RestaurantProductController extends Controller
 
         $restaurantId = Auth::user()->restaurant->id;
 
+        // Lưu file ảnh, gán vào biến $imagePath
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('products', 'public');
+            dd($imagePath);
+        } else {
+            return back()->withErrors(['image' => 'Không nhận được file ảnh.']);
+        }
+
+        // Log ra tên ảnh lưu lại (có thể bật debug)
+        // logger('Image path:', [$imagePath]);
+
         $data = [
             'restaurant_id' => $restaurantId,
             'category_id' => $request->category_id,
             'name' => $request->name,
             'description' => $request->description,
             'status' => 'pending',
-            'image' => $request->file('image')->store('products', 'public'),
+            'image' => $imagePath,
             'is_active' => 1,
         ];
 
@@ -90,6 +162,7 @@ class RestaurantProductController extends Controller
 
         return redirect()->route('restaurant.products.home')->with('success', 'Thêm sản phẩm thành công, chờ admin duyệt!');
     }
+
 
     public function edit($id)
     {
