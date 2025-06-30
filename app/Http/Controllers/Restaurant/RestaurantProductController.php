@@ -105,7 +105,7 @@ class RestaurantProductController extends Controller
         // Lưu file ảnh, gán vào biến $imagePath
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('products', 'public');
-            dd($imagePath);
+            logger('✅ Đã lưu ảnh tại:', [$imagePath]);
         } else {
             return back()->withErrors(['image' => 'Không nhận được file ảnh.']);
         }
