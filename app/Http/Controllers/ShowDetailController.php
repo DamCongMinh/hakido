@@ -58,6 +58,7 @@ class ShowDetailController extends Controller
                 $product->max_price = 0;
             }
 
+
             $reviews = \App\Models\BeverageReview::with('customer')
                         ->where('beverage_id', $id)
                         ->latest()

@@ -9,6 +9,19 @@
     @include('layout.header')
 
     <div class="container mt-5">
+        @if(session('success'))
+            <script>
+                alert("{{ session('success') }}");
+            </script>
+        @endif
+
+        @if(session('error'))
+            <script>
+                alert("{{ session('error') }}");
+            </script>
+        @endif
+
+
         <h1 class="mb-4">Sản phẩm đã đặt</h1>
 
         @if ($orders->isEmpty())

@@ -234,22 +234,20 @@ class OrderController extends Controller
 
     public function cancel(Order $order)
     {
-        $customer = auth()->user()->customer;
+        $user = auth()->user();
 
-        // Kiểm tra quyền hủy đơn (đảm bảo đơn thuộc về khách hàng hiện tại)
-        if ($order->customer_id !== $customer->id) {
+        if ($order->customer_id !== $user->id) {
             return back()->with('error', 'Bạn không có quyền hủy đơn hàng này.');
         }
 
-        // Chỉ cho phép hủy nếu đang ở trạng thái pending
         if ($order->status !== 'pending') {
             return back()->with('error', 'Chỉ có thể hủy đơn hàng đang chờ xác nhận.');
         }
 
-        // Cập nhật trạng thái
         $order->status = 'canceled';
         $order->save();
 
         return back()->with('success', 'Đơn hàng đã được hủy thành công.');
     }
+
 }
