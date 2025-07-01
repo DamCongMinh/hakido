@@ -8,12 +8,12 @@ use App\Models\Beverage;
 use App\Models\PendingPayment;
 use App\Models\Voucher;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class CartController extends Controller
 {
     // public function add(Request $request)
     // {
-    //     dd($request->all());
     //     $validated = $request->validate([
     //         'type' => 'required|in:food,beverage',
     //         'product_id' => 'required|integer',
@@ -73,84 +73,61 @@ class CartController extends Controller
 
     // }
 
-
     public function add(Request $request)
     {
-        // Nếu request gửi JSON (dùng fetch), thì merge nội dung JSON vào request input
-        if ($request->isJson()) {
-            $request->merge(json_decode($request->getContent(), true));
-        }
+        Log::info('B1 - Nhận request', $request->all());
 
-        // Validate input
         $validated = $request->validate([
             'type' => 'required|in:food,beverage',
             'product_id' => 'required|integer',
             'quantity' => 'required|integer|min:1',
             'size' => 'nullable|string',
         ]);
+        Log::info('B2 - Đã validate', $validated);
 
-        // Kiểm tra đăng nhập
         $user = auth()->user();
         if (!$user) {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Bạn cần đăng nhập để thêm vào giỏ hàng.'
-                ], 401);
-            }
+            Log::warning('B3 - Chưa đăng nhập');
             return redirect()->route('login')->with('error', 'Bạn cần đăng nhập để thêm vào giỏ hàng.');
         }
+        Log::info('B3 - User ID: ' . $user->id);
 
-        // Tìm hoặc tạo giỏ hàng
         $cart = $user->cart()->firstOrCreate([
             'user_id' => $user->id,
         ]);
+        Log::info('B4 - Cart ID: ' . $cart->id);
 
-        // Kiểm tra sản phẩm đã có trong giỏ chưa
         $query = $cart->items()
             ->where('product_id', $validated['product_id'])
             ->where('product_type', $validated['type']);
 
         if ($validated['type'] === 'beverage') {
             $query->where('size', $validated['size']);
+            Log::info('B5 - Kiểm tra thêm theo size: ' . $validated['size']);
         }
 
         $existingItem = $query->first();
+        Log::info('B6 - Đã kiểm tra tồn tại sản phẩm trong giỏ', ['exists' => !!$existingItem]);
 
         if ($existingItem) {
             $existingItem->increment('quantity', $validated['quantity']);
+            Log::info('B7 - Tăng số lượng sản phẩm');
         } else {
-            // Tính giá
             if ($validated['type'] === 'food') {
-                $food = Food::find($validated['product_id']);
-                if (!$food) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Sản phẩm đồ ăn không tồn tại.'
-                    ], 404);
-                }
+                $food = Food::findOrFail($validated['product_id']);
                 $price = $food->old_price * (100 - $food->discount_percent) / 100;
+                Log::info('B8 - Giá food', ['price' => $price]);
             } else {
-                $beverage = Beverage::with('beverageSizes')->find($validated['product_id']);
-                if (!$beverage) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Sản phẩm đồ uống không tồn tại.'
-                    ], 404);
-                }
-
+                $beverage = Beverage::with('beverageSizes')->findOrFail($validated['product_id']);
                 $sizeObj = $beverage->beverageSizes->firstWhere('size', $validated['size']);
                 if (!$sizeObj) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Không tìm thấy size phù hợp.'
-                    ], 404);
+                    Log::error('B9 - Không tìm thấy size phù hợp', ['size' => $validated['size']]);
+                    return back()->with('error', 'Không tìm thấy size');
                 }
-
                 $price = $sizeObj->old_price * (100 - $sizeObj->discount_percent) / 100;
+                Log::info('B10 - Giá beverage', ['price' => $price]);
             }
 
-            // Thêm mới sản phẩm vào giỏ hàng
             $cart->items()->create([
                 'product_id' => $validated['product_id'],
                 'product_type' => $validated['type'],
@@ -158,18 +135,21 @@ class CartController extends Controller
                 'unit_price' => $price,
                 'quantity' => $validated['quantity'],
             ]);
+            Log::info('B11 - Đã thêm mới vào giỏ hàng');
         }
 
-        // Trả kết quả
         if ($request->expectsJson()) {
+            Log::info('B12 - Trả về JSON');
             return response()->json([
                 'success' => true,
                 'message' => 'Đã thêm vào giỏ hàng!'
             ]);
         }
 
+        Log::info('B13 - Redirect lại với success');
         return back()->with('success', 'Đã thêm vào giỏ hàng!');
     }
+
 
 
     public function show()
