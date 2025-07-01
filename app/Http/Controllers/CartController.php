@@ -13,6 +13,7 @@ class CartController extends Controller
 {
     public function add(Request $request)
     {
+        dd($request);
         $validated = $request->validate([
             'type' => 'required|in:food,beverage',
             'product_id' => 'required|integer',
